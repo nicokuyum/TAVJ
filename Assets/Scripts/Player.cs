@@ -1,20 +1,21 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Text;
 using UnityEngine;
 
-public class Player : MonoBehaviour {
+public class Player : MonoBehaviour
+{
 
-	public int health;
-	public String destIp;
-	public int sourcePort;
-	public int destPort;
+	public int MaxHealth;
+	public int Health;
+	public bool Invulnerable;
+	public String DestIp;
+	public int SourcePort;
+	public int DestPort;
 
 	// Se llama luego de haber sido constuido el GameObject y todos sus componentes
 	void Awake () {
-		Debug.Log ("Health = " + health);
+		Debug.Log ("Health = " + Health);
 	}
 
 	// Se llama antes del primer update (siempre despues de awake)
@@ -26,8 +27,9 @@ public class Player : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 		if (Input.GetKeyDown (KeyCode.A)) {
-			Debug.Log ("Sending UDP Packet to " + destIp + " port " + destPort);
-			SendUdp(sourcePort, destIp, destPort, Encoding.ASCII.GetBytes("Hello bitch"));
+			Debug.Log ("Sending UDP Packet to " + DestIp + " port " + DestPort);
+			byte[] bytes = {1, 2, 3, 4};
+			SendUdp(SourcePort, DestIp, DestPort, bytes);
 		}
 	}
 	
@@ -35,5 +37,19 @@ public class Player : MonoBehaviour {
 	{
 		using (UdpClient c = new UdpClient(srcPort))
 			c.Send(data, data.Length, dstIp, dstPort);
+	}
+	
+	public byte[] compressPlayer(Player player)
+	{
+		Compressor compressor = new Compressor();
+		Vector3 pos = this.transform.position;
+        
+		compressor.WriteNumber(player.Health, compressor.GetBitsRequired(player.MaxHealth));
+		compressor.PutBit(player.Invulnerable);
+		compressor.WriteFloat(pos.x, 100, 0, 0.1f);
+		compressor.WriteFloat(pos.y, 100, 0, 0.1f);
+		compressor.WriteFloat(pos.z, 100, 0, 0.1f);
+
+		return compressor.GetBuffer();
 	}
 }
