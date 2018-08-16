@@ -1,13 +1,11 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using UnityEngine;
 
-public class Enemy : MonoBehaviour
+public class UDPListener : MonoBehaviour
 {
 	static readonly object lockObject = new object();
 
@@ -43,7 +41,7 @@ public class Enemy : MonoBehaviour
 		{
 			IPEndPoint RemoteIpEndPoint = new IPEndPoint(IPAddress.Any, 0);
             
-            byte[] receiveBytes = udpClient.Receive(ref RemoteIpEndPoint);
+			byte[] receiveBytes = udpClient.Receive(ref RemoteIpEndPoint);
 
 			lock (lockObject)
 			{
