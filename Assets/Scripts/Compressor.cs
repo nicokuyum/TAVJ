@@ -40,6 +40,7 @@ public class Compressor : Encoder
     }
     
     public void PutBit(bool value) {
+        Console.WriteLine("Putting bit: " + (value ? 1 : 0));
         long longValue = value ? 1L : 0L;
         bits |= longValue << currentBitCount;
         currentBitCount++;
@@ -48,9 +49,9 @@ public class Compressor : Encoder
     
     private void WriteIfNecessary() {
         if (currentBitCount >= 32) {
-            if (buffer.Position + 4 > buffer.Capacity) {
-                throw new InvalidOperationException("write buffer overflow");
-            }
+            //if (buffer.Position + 4 > buffer.Capacity) {
+            //    throw new InvalidOperationException("write buffer overflow");
+            //}
             int word = (int) bits;
             byte a = (byte) (word);
             byte b = (byte) (word >> 8);

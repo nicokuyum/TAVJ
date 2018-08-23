@@ -5,5 +5,5 @@ using UnityEngine;
 public interface Serializable<T>
 {
     byte[] serialize();
-    T deserialize(byte[] data);
+    void deserialize(byte[] data);
 }

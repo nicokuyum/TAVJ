@@ -12,10 +12,11 @@ public class UDPListener : MonoBehaviour
 	public int listenPort;
 
 	private Boolean hasData;
-	private String data;
+	private byte[] data;
 
 	// Use this for initialization
 	void Start () {
+		Debug.Log("v0");
 		Thread thread = new Thread(new ThreadStart(ThreadMethod));
 		thread.Start();
 	}
@@ -26,8 +27,10 @@ public class UDPListener : MonoBehaviour
 		{
 			lock (lockObject)
 			{
-				Debug.Log("Received message: " + data);
-				data = "";
+				Debug.Log(Convert.ToString(data[0], 2).PadLeft(8, '0'));
+				Player p = GameObject.Find("Player").GetComponent<Player>();
+				p.deserialize(data);
+				Debug.Log("Received player: " + p);
 				hasData = false;
 			}
 		}
@@ -45,7 +48,7 @@ public class UDPListener : MonoBehaviour
 
 			lock (lockObject)
 			{
-				data += Encoding.ASCII.GetString(receiveBytes);
+				data = (byte[]) receiveBytes.Clone();
 				hasData = true;
 			}
 		}

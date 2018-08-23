@@ -28,8 +28,7 @@ public class Player : MonoBehaviour, Serializable<Player>
 	void Update () {
 		if (Input.GetKeyDown (KeyCode.A)) {
 			Debug.Log ("Sending UDP Packet to " + DestIp + " port " + DestPort);
-			byte[] bytes = {1, 2, 3, 4};
-			SendUdp(SourcePort, DestIp, DestPort, bytes);
+			SendUdp(SourcePort, DestIp, DestPort, serialize());
 		}
 	}
 	
@@ -53,19 +52,22 @@ public class Player : MonoBehaviour, Serializable<Player>
 		return compressor.GetBuffer();
 	}
 
-	public Player deserialize(byte[] data)
+	public void deserialize(byte[] data)
 	{
-		Player player = new Player();
 		Vector3 pos = new Vector3();
 		Decompressor decompressor = new Decompressor(data);
 
-		player.Health = decompressor.GetNumber(decompressor.GetBitsRequired(this.MaxHealth));
-		player.Invulnerable = decompressor.GetBoolean();
+		this.Health = decompressor.GetNumber(decompressor.GetBitsRequired(this.MaxHealth));
+		this.Invulnerable = decompressor.GetBoolean();
 		pos.x = decompressor.GetFloat(100, 0, 0.1f);
 		pos.y = decompressor.GetFloat(100, 0, 0.1f);
 		pos.z = decompressor.GetFloat(100, 0, 0.1f);
-		player.transform.position = pos;
+		this.gameObject.transform.position = pos;
+	}
 
-		return player;
+	public override string ToString()
+	{
+		return "Health: " + Health + "\nInvulnerable: " + Invulnerable + "\nPosition: " +
+		       this.gameObject.transform.position;
 	}
 }
