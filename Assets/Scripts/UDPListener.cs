@@ -40,7 +40,7 @@ public class UDPListener : MonoBehaviour
 		while (true)
 		{
 			IPEndPoint RemoteIpEndPoint = new IPEndPoint(IPAddress.Any, 0);
-            
+			
 			byte[] receiveBytes = udpClient.Receive(ref RemoteIpEndPoint);
 
 			lock (lockObject)

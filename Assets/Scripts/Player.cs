@@ -3,7 +3,7 @@ using System.Net.Sockets;
 using System.Text;
 using UnityEngine;
 
-public class Player : MonoBehaviour
+public class Player : MonoBehaviour, Serializable<Player>
 {
 
 	public int MaxHealth;
@@ -38,18 +38,34 @@ public class Player : MonoBehaviour
 		using (UdpClient c = new UdpClient(srcPort))
 			c.Send(data, data.Length, dstIp, dstPort);
 	}
-	
-	public byte[] compressPlayer(Player player)
+
+	public byte[] serialize()
 	{
 		Compressor compressor = new Compressor();
 		Vector3 pos = this.transform.position;
         
-		compressor.WriteNumber(player.Health, compressor.GetBitsRequired(player.MaxHealth));
-		compressor.PutBit(player.Invulnerable);
+		compressor.WriteNumber(this.Health, compressor.GetBitsRequired(this.MaxHealth));
+		compressor.PutBit(this.Invulnerable);
 		compressor.WriteFloat(pos.x, 100, 0, 0.1f);
 		compressor.WriteFloat(pos.y, 100, 0, 0.1f);
 		compressor.WriteFloat(pos.z, 100, 0, 0.1f);
 
 		return compressor.GetBuffer();
+	}
+
+	public Player deserialize(byte[] data)
+	{
+		Player player = new Player();
+		Vector3 pos = new Vector3();
+		Decompressor decompressor = new Decompressor(data);
+
+		player.Health = decompressor.GetNumber(decompressor.GetBitsRequired(this.MaxHealth));
+		player.Invulnerable = decompressor.GetBoolean();
+		pos.x = decompressor.GetFloat(100, 0, 0.1f);
+		pos.y = decompressor.GetFloat(100, 0, 0.1f);
+		pos.z = decompressor.GetFloat(100, 0, 0.1f);
+		player.transform.position = pos;
+
+		return player;
 	}
 }

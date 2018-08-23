@@ -1,9 +1,7 @@
-﻿
-using System;
+﻿using System;
 using System.IO;
-using UnityEngine;
 
-public class Compressor
+public class Compressor : Encoder
 {
     private long bits;
     private int currentBitCount;
@@ -22,15 +20,6 @@ public class Compressor
         Flush();
         return buffer.GetBuffer();
     }
-    
-    public int GetBitsRequired(long value) {
-        int bitsRequired = 0;
-        while (value > 0) {
-            bitsRequired++;
-            value >>= 1;
-        }
-        return bitsRequired;
-    }
 
     public void WriteNumber(long value, int size)
     {
@@ -48,13 +37,6 @@ public class Compressor
         int requiredBits = BitLength(maxValues);
         int actualBits = Convert.ToInt32((value - min) / precision);
         WriteNumber(actualBits, requiredBits);
-    }
-    
-    private int BitLength(int a)
-    {
-        int counter = 1;
-        while (Math.Pow(2,counter) < a){ counter++; }
-        return counter;
     }
     
     public void PutBit(bool value) {
