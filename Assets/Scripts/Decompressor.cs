@@ -1,4 +1,5 @@
 ﻿using System;
+using UnityEngine;
 
 public class Decompressor : Encoder
 {
@@ -14,7 +15,7 @@ public class Decompressor : Encoder
 
 	public bool GetBoolean()
 	{
-		return (GetByteFromPos() >> (8 - (position++ % 8)) & 1) == 1;
+		return (GetByteFromPos() >> ((position++ % 8)) & 1) == 1;
 	}
 
 	public int GetNumber(long maxValue)
@@ -39,6 +40,6 @@ public class Decompressor : Encoder
 
 	private byte GetByteFromPos()
 	{
-		return data[(position+1) / 8];
+		return data[(position) / 8];
 	}
 }

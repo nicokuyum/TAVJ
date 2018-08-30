@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Net.Sockets;
+using System.Runtime.CompilerServices;
 using System.Text;
 using UnityEngine;
 
@@ -15,7 +16,7 @@ public class Player : MonoBehaviour, Serializable<Player>
 
 	// Se llama luego de haber sido constuido el GameObject y todos sus componentes
 	void Awake () {
-		Debug.Log ("Health = " + Health);
+//		Debug.Log ("Health = " + Health);
 	}
 
 	// Se llama antes del primer update (siempre despues de awake)
@@ -27,7 +28,6 @@ public class Player : MonoBehaviour, Serializable<Player>
 	// Update is called once per frame
 	void Update () {
 		if (Input.GetKeyDown (KeyCode.A)) {
-			Debug.Log ("Sending UDP Packet to " + DestIp + " port " + DestPort);
 			SendUdp(SourcePort, DestIp, DestPort, serialize());
 		}
 	}
@@ -41,14 +41,13 @@ public class Player : MonoBehaviour, Serializable<Player>
 	public byte[] serialize()
 	{
 		Compressor compressor = new Compressor();
+		
 		Vector3 pos = this.transform.position;
-        
 		compressor.WriteNumber(this.Health, compressor.GetBitsRequired(this.MaxHealth));
 		compressor.PutBit(this.Invulnerable);
 		compressor.WriteFloat(pos.x, 100, 0, 0.1f);
 		compressor.WriteFloat(pos.y, 100, 0, 0.1f);
 		compressor.WriteFloat(pos.z, 100, 0, 0.1f);
-
 		return compressor.GetBuffer();
 	}
 
@@ -67,7 +66,7 @@ public class Player : MonoBehaviour, Serializable<Player>
 
 	public override string ToString()
 	{
-		return "Health: " + Health + "\nInvulnerable: " + Invulnerable + "\nPosition: " +
+		return "Health: " + Health + "\nInvulnerable: " + Invulnerable + " 		Position: " +
 		       this.gameObject.transform.position;
 	}
 }

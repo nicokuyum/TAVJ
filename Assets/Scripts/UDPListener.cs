@@ -16,7 +16,7 @@ public class UDPListener : MonoBehaviour
 
 	// Use this for initialization
 	void Start () {
-		Debug.Log("v0");
+		Debug.Log("v1.156");
 		Thread thread = new Thread(new ThreadStart(ThreadMethod));
 		thread.Start();
 	}
@@ -27,7 +27,6 @@ public class UDPListener : MonoBehaviour
 		{
 			lock (lockObject)
 			{
-				Debug.Log(Convert.ToString(data[0], 2).PadLeft(8, '0'));
 				Player p = GameObject.Find("Player").GetComponent<Player>();
 				p.deserialize(data);
 				Debug.Log("Received player: " + p);
