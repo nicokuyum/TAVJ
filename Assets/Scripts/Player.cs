@@ -14,6 +14,9 @@ public class Player : MonoBehaviour, Serializable<Player>
 	public int SourcePort;
 	public int DestPort;
 
+	public double time = 0;
+	public double fps = 1;
+	
 	// Se llama luego de haber sido constuido el GameObject y todos sus componentes
 	void Awake () {
 //		Debug.Log ("Health = " + Health);
@@ -26,10 +29,30 @@ public class Player : MonoBehaviour, Serializable<Player>
 	}
 	
 	// Update is called once per frame
-	void Update () {
-		if (Input.GetKeyDown (KeyCode.A)) {
+	void Update ()
+	{
+		time += Time.deltaTime;
+		
+		if (Input.GetKey(KeyCode.W))
+		{
+			this.gameObject.transform.Translate(Vector3.forward * Time.deltaTime);
+		} else if (Input.GetKey(KeyCode.A))
+		{
+			this.gameObject.transform.Translate(Vector3.left * Time.deltaTime);
+		} else if (Input.GetKey(KeyCode.S))
+		{
+			this.gameObject.transform.Translate(Vector3.back * Time.deltaTime);
+		} else if (Input.GetKey(KeyCode.D))
+		{
+			this.gameObject.transform.Translate(Vector3.right * Time.deltaTime);
+		}
+
+		if (time >= (1/fps))
+		{
+			time -= (1/fps);
 			SendUdp(SourcePort, DestIp, DestPort, serialize());
 		}
+		
 	}
 	
 	static void SendUdp(int srcPort, string dstIp, int dstPort, byte[] data)
@@ -56,7 +79,7 @@ public class Player : MonoBehaviour, Serializable<Player>
 		Vector3 pos = new Vector3();
 		Decompressor decompressor = new Decompressor(data);
 
-		this.Health = decompressor.GetNumber(decompressor.GetBitsRequired(this.MaxHealth));
+		this.Health = decompressor.GetNumber(this.MaxHealth);
 		this.Invulnerable = decompressor.GetBoolean();
 		pos.x = decompressor.GetFloat(100, 0, 0.1f);
 		pos.y = decompressor.GetFloat(100, 0, 0.1f);

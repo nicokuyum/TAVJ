@@ -25,8 +25,8 @@ public class Server : MonoBehaviour
 	
 	// Use this for initialization
 	void Start () {
-		//Thread thread = new Thread(new ThreadStart(ThreadMethod));
-		//thread.Start();
+		Thread thread = new Thread(new ThreadStart(ThreadMethod));
+		thread.Start();
 	}
 	
 	// Update is called once per frame
@@ -61,8 +61,8 @@ public class Server : MonoBehaviour
 
 			lock (lockObject)
 			{
-				//data += Encoding.ASCII.GetString(receiveBytes);
-				//hasData = true;
+//				data += Encoding.ASCII.GetString(receiveBytes);
+//				hasData = true;
 			}
 			
 		}
