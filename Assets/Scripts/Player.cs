@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -7,6 +8,7 @@ using UnityEngine;
 public class Player : MonoBehaviour, Serializable<Player>
 {
 
+	public int id;
 	public int MaxHealth;
 	public int Health;
 	public bool Invulnerable;
@@ -14,8 +16,12 @@ public class Player : MonoBehaviour, Serializable<Player>
 	public int SourcePort;
 	public int DestPort;
 
-	public double time = 0;
-	public double fps = 1;
+	private float time = 0.0f;
+	private float acumTime = 0.0f;
+	private float fps = 60.0f;
+	private long frameNumber = 0l;
+
+	private Queue<PlayerSnapshot> snaps = new Queue<PlayerSnapshot>();
 	
 	// Se llama luego de haber sido constuido el GameObject y todos sus componentes
 	void Awake () {
@@ -47,9 +53,12 @@ public class Player : MonoBehaviour, Serializable<Player>
 			this.gameObject.transform.Translate(Vector3.right * Time.deltaTime);
 		}
 
-		if (time >= (1/fps))
+		
+		if (acumTime >= (1.0f/60.0f))
 		{
-			time -= (1/fps);
+			frameNumber++;
+			Debug.Log(1.0f/fps);
+			acumTime -= (1.0f/60.0f);
 			SendUdp(SourcePort, DestIp, DestPort, serialize());
 		}
 		
@@ -66,11 +75,14 @@ public class Player : MonoBehaviour, Serializable<Player>
 		Compressor compressor = new Compressor();
 		
 		Vector3 pos = this.transform.position;
+		Quaternion rotation = this.transform.rotation;
+		compressor.WriteNumber(frameNumber, compressor.GetBitsRequired(3600 * (long)fps ));
 		compressor.WriteNumber(this.Health, compressor.GetBitsRequired(this.MaxHealth));
 		compressor.PutBit(this.Invulnerable);
 		compressor.WriteFloat(pos.x, 100, 0, 0.1f);
 		compressor.WriteFloat(pos.y, 100, 0, 0.1f);
 		compressor.WriteFloat(pos.z, 100, 0, 0.1f);
+//		compressor.WriteFloat(rotation.w);
 		return compressor.GetBuffer();
 	}
 
@@ -78,7 +90,7 @@ public class Player : MonoBehaviour, Serializable<Player>
 	{
 		Vector3 pos = new Vector3();
 		Decompressor decompressor = new Decompressor(data);
-
+		this.frameNumber = decompressor.GetNumber(3600 * (long) fps);
 		this.Health = decompressor.GetNumber(this.MaxHealth);
 		this.Invulnerable = decompressor.GetBoolean();
 		pos.x = decompressor.GetFloat(100, 0, 0.1f);
@@ -86,6 +98,8 @@ public class Player : MonoBehaviour, Serializable<Player>
 		pos.z = decompressor.GetFloat(100, 0, 0.1f);
 		this.gameObject.transform.position = pos;
 	}
+	
+	 
 
 	public override string ToString()
 	{
