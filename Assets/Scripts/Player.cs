@@ -37,7 +37,8 @@ public class Player : MonoBehaviour, Serializable<Player>
 	// Update is called once per frame
 	void Update ()
 	{
-		/*time += Time.deltaTime;
+		time += Time.deltaTime;
+		acumTime += Time.deltaTime;
 		
 		if (Input.GetKey(KeyCode.W))
 		{
@@ -60,7 +61,7 @@ public class Player : MonoBehaviour, Serializable<Player>
 			Debug.Log(1.0f/fps);
 			acumTime -= (1.0f/60.0f);
 			SendUdp(SourcePort, DestIp, DestPort, serialize());
-		}*/
+		}
 		
 	}
 	

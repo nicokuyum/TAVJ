@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Text;
 using NUnit.Framework.Constraints;
 using UnityEngine;
 
@@ -27,17 +28,17 @@ public class Decompressor : Encoder
 		{
 			throw new Exception("Invalid string length " + size);
 		}
-		char[] c = new char[size];
+		StringBuilder sb = new StringBuilder();
 		for (int i = 0; i < size; i++)
 		{
-			c[i] = GetChar();
+			sb.Append(GetChar());
 		}
-		return new String(c);
+		return sb.ToString();
 	}
 
 	public char GetChar()
 	{
-		return (char)GetNumber(_maxChar);
+		return (char)(GetNumber(_maxChar)+_minChar);
 	}
 
 	public int GetNumber(long maxValue)
@@ -62,6 +63,6 @@ public class Decompressor : Encoder
 
 	private byte GetByteFromPos()
 	{
-		return data[(position) / 8];
+		return data[position / 8];
 	}
 }
