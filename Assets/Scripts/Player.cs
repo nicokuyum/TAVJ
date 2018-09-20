@@ -7,7 +7,7 @@ using UnityEngine;
 
 public class Player : MonoBehaviour, Serializable<Player>
 {
-
+	public String username;
 	public int id;
 	public int MaxHealth;
 	public int Health;
@@ -37,7 +37,7 @@ public class Player : MonoBehaviour, Serializable<Player>
 	// Update is called once per frame
 	void Update ()
 	{
-		time += Time.deltaTime;
+		/*time += Time.deltaTime;
 		
 		if (Input.GetKey(KeyCode.W))
 		{
@@ -60,7 +60,7 @@ public class Player : MonoBehaviour, Serializable<Player>
 			Debug.Log(1.0f/fps);
 			acumTime -= (1.0f/60.0f);
 			SendUdp(SourcePort, DestIp, DestPort, serialize());
-		}
+		}*/
 		
 	}
 	
@@ -76,6 +76,7 @@ public class Player : MonoBehaviour, Serializable<Player>
 		
 		Vector3 pos = this.transform.position;
 		Quaternion rotation = this.transform.rotation;
+		compressor.WriteString(username);
 		compressor.WriteNumber(frameNumber, compressor.GetBitsRequired(3600 * (long)fps ));
 		compressor.WriteNumber(this.Health, compressor.GetBitsRequired(this.MaxHealth));
 		compressor.PutBit(this.Invulnerable);
@@ -90,6 +91,7 @@ public class Player : MonoBehaviour, Serializable<Player>
 	{
 		Vector3 pos = new Vector3();
 		Decompressor decompressor = new Decompressor(data);
+		this.username = decompressor.GetString();
 		this.frameNumber = decompressor.GetNumber(3600 * (long) fps);
 		this.Health = decompressor.GetNumber(this.MaxHealth);
 		this.Invulnerable = decompressor.GetBoolean();

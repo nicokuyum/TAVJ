@@ -1,12 +1,14 @@
 ﻿using System;
 using System.IO;
+using UnityEngine;
+using UnityEngine.TestTools;
 
 public class Compressor : Encoder
-{
+{   
     private long bits;
     private int currentBitCount;
 
-    private MemoryStream buffer;
+    private readonly MemoryStream buffer;
 
     public Compressor()
     {
@@ -39,12 +41,32 @@ public class Compressor : Encoder
         WriteNumber(actualBits, requiredBits);
     }
     
-    public void PutBit(bool value) {
-        Console.WriteLine("Putting bit: " + (value ? 1 : 0));
+    public void PutBit(bool value) 
+    {
         long longValue = value ? 1L : 0L;
         bits |= longValue << currentBitCount;
         currentBitCount++;
         WriteIfNecessary();
+    }
+
+    public void WriteString(String value)
+    {
+        if (value.Length > _maxStringLength)
+        {
+            Debug.Log("Attempting to write string with size " + value.Length + " when max length allowed is " + _maxStringLength);
+            value = value.Substring(0, _maxStringLength);
+        }
+        WriteNumber(value.Length, GetBitsRequired(_maxStringLength));
+        foreach (var c in value.ToCharArray())
+        {
+            WriteChar(c);
+        }
+    }
+
+    /* Only accept chars from 33 to 126 (this includes all alphanumeric chars) */
+    public void WriteChar(char c)
+    {
+        WriteNumber(c - _minChar, GetBitsRequired(_maxChar));
     }
     
     private void WriteIfNecessary() {
