@@ -38,7 +38,7 @@ public class Player : MonoBehaviour, Serializable<Player>
 	void Update ()
 	{
 		time += Time.deltaTime;
-		
+		acumTime += Time.deltaTime;
 		if (Input.GetKey(KeyCode.W))
 		{
 			this.gameObject.transform.Translate(Vector3.forward * Time.deltaTime);
@@ -52,7 +52,6 @@ public class Player : MonoBehaviour, Serializable<Player>
 		{
 			this.gameObject.transform.Translate(Vector3.right * Time.deltaTime);
 		}
-
 		
 		if (acumTime >= (1.0f/60.0f))
 		{
@@ -66,6 +65,7 @@ public class Player : MonoBehaviour, Serializable<Player>
 	
 	static void SendUdp(int srcPort, string dstIp, int dstPort, byte[] data)
 	{
+		Debug.Log("MANDANDO");
 		using (UdpClient c = new UdpClient(srcPort))
 			c.Send(data, data.Length, dstIp, dstPort);
 	}

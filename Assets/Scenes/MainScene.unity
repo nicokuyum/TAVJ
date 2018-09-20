@@ -320,7 +320,7 @@ Prefab:
     - target: {fileID: 114174899897806152, guid: 9233e3675b6cc4e3a909fe37a54ec89a,
         type: 2}
       propertyPath: DestIp
-      value: 127.0.0.1
+      value: 10.17.65.111
       objectReference: {fileID: 0}
     - target: {fileID: 114174899897806152, guid: 9233e3675b6cc4e3a909fe37a54ec89a,
         type: 2}
@@ -423,14 +423,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e9bb4640ba6ba483dbd09be00b7d8a95, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  id: 0
   MaxHealth: 100
   Health: 80
   Invulnerable: 1
-  DestIp: 127.0.0.1
+  DestIp: 10.17.65.111
   SourcePort: 8080
   DestPort: 8081
-  time: 0
-  fps: 1
 --- !u!4 &2017240581
 Transform:
   m_ObjectHideFlags: 0

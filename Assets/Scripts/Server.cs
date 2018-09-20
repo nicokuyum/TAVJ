@@ -20,6 +20,9 @@ public class Server : MonoBehaviour
 	
 	public static int listenPort;
 	public int idCount = 1;
+	
+	private Boolean hasData;
+	private byte[] data;
 
 	public Dictionary<int,Player> players = new Dictionary<int,Player>();
 	
@@ -33,6 +36,21 @@ public class Server : MonoBehaviour
 	void Update ()
 	{
 		time += Time.deltaTime;
+
+
+		if (hasData)
+		{
+			PlayerSnapshot snap = new PlayerSnapshot(data);
+			hasData = false;
+		}
+
+		foreach (var player in players.Values)
+		{
+			
+		}
+		
+		
+		
 		if (time > snapRate && players.Count != 0)
 		{
 			time -= snapRate;
@@ -62,7 +80,8 @@ public class Server : MonoBehaviour
 			lock (lockObject)
 			{
 //				data += Encoding.ASCII.GetString(receiveBytes);
-//				hasData = true;
+				data = (byte[]) receiveBytes.Clone();
+				hasData = true;
 			}
 			
 		}
