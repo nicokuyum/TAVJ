@@ -12,7 +12,8 @@ public class GlobalSettings{
 	public const int MaxHealth = 100;
 	public const int MaxMatchDuration = 3600;
 
+	public const int GamePort = 42069;
+
 	public const float maxRotation = 360.0f;
-//	public const float minRotation = 
  
 }

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerSnapshot
+public class PlayerSnapshot : Serializable<PlayerSnapshot>
 {
 
     private long frameNumber;
@@ -24,5 +24,41 @@ public class PlayerSnapshot
         position.y = decompressor.GetFloat(GlobalSettings.MaxPosition, GlobalSettings.MinPosition, GlobalSettings.PositionPrecision);
         position.z = decompressor.GetFloat(GlobalSettings.MaxPosition, GlobalSettings.MinPosition, GlobalSettings.PositionPrecision);
      
+    }
+
+    public PlayerSnapshot(Vector3 position)
+    {
+        this.position = position;
+        frameNumber = 1;
+        MaxHealth = GlobalSettings.MaxHealth;
+        Health = MaxHealth;
+        Invulnerable = false;
+        rotation = new Vector3(50,50,50);
+    }
+
+    public PlayerSnapshot()
+    {
+        position = new Vector3(50,50,50);
+        frameNumber = 1;
+        MaxHealth = GlobalSettings.MaxHealth;
+        Health = MaxHealth;
+        Invulnerable = false;
+        rotation = new Vector3(50,50,50);
+    }
+
+    public byte[] serialize()
+    {
+        
+        throw new System.NotImplementedException();
+    }
+
+    public void deserialize(byte[] data)
+    {
+        throw new System.NotImplementedException();
+    }
+
+    public void apply(InputKey key)
+    {
+        throw new System.NotImplementedException();
     }
 }
