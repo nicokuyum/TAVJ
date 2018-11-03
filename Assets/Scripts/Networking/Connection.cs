@@ -1,4 +1,6 @@
-﻿using System.Net;
+﻿using System;
+using System.Net;
+using UnityEngine;
 
 namespace Networking
 {
@@ -12,5 +14,12 @@ namespace Networking
             srcIp = ip;
             srcPrt = port;
         }
+
+        public String toString()
+        {
+            return srcIp.ToString() + " : " + srcPrt;
+        }
     }
+    
+
 }

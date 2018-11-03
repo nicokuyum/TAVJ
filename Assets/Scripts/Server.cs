@@ -137,6 +137,7 @@ public class Server : MonoBehaviour
 
 	private void EstablishConnection(Connection connection, int messageId)
 	{
+		Debug.Log("SE CONECTO " + connection.ToString());
 		int id = idCount++;
 		connections.Add(connection, id);
 		lastAcks.Add(id, messageId);
