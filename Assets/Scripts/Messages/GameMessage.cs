@@ -4,7 +4,14 @@ using UnityEngine;
 
 public abstract class GameMessage
 {
-    public int _MessageId;
+    private static int idCounter = 0;
+    
+    public readonly int _MessageId;
     public abstract MessageType type();
     public abstract bool isReliable();
+
+    protected GameMessage()
+    {
+        this._MessageId = idCounter++;
+    }
 }
