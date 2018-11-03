@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
+using System.Text;
 using System.Threading;
 using UnityEngine;
 
@@ -59,15 +60,22 @@ public class Client : MonoBehaviour
 			{
 				if (gm.isReliable())
 				{
-					Debug.Log("Adding to rq");
 					rq.AddQueue(gm, frame);
 				}
 			}
 			outgoingMessages.AddRange(rq.MessageToResend(frame));
-			Packet p = new Packet(outgoingMessages);
-			SendUdp(p.serialize());
-			outgoingMessages.Clear();
 			Debug.Log("Outgoing messages size: " + outgoingMessages.Count);
+			if (outgoingMessages.Count > 0)
+			{
+				Packet p = new Packet(outgoingMessages);
+				Debug.Log("p size = " + p.MessageCount);
+				byte[] bytes = p.serialize();
+				Debug.Log("bytes = " + Encoding.Default.GetString(bytes));
+				Packet test = new Packet(bytes, null);
+				Debug.Log("test size = " + test.MessageCount);
+				SendUdp(p.serialize());
+				outgoingMessages.Clear();
+			}
 		}
 	}
 	
