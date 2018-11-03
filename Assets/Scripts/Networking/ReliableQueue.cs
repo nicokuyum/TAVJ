@@ -17,6 +17,12 @@ public class ReliableQueue
     }
 
 
+    public ReliableQueue()
+    {
+        MessageQueue = new List<GameMessage>();
+        SentFrames = new Dictionary<GameMessage, long>();
+    }
+
     public void ReceivedACK(int ackid)
     {
         while (MessageQueue[0]._MessageId <= ackid)
