@@ -16,5 +16,6 @@ public class GlobalSettings{
 	public const int GamePort = 42069;
 
 	public const float maxRotation = 360.0f;
- 
+
+	public const int ReliableTimeout = 30;
 }

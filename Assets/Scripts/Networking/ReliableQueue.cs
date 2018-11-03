@@ -21,17 +21,26 @@ public class ReliableQueue
         SentFrames.Add(gm, frameNumber);
     }
 
-    public void ResendIfNeeded()
+    public List<GameMessage> ResendIfNeeded(long frameNumber)
     {
+        List<GameMessage> NeedResend = new List<GameMessage>();
         foreach(KeyValuePair<GameMessage, long> entry in SentFrames)
         {
-            
+            if (frameNumber - entry.Value >= GlobalSettings.ReliableTimeout)
+            {
+                NeedResend.Add(entry.Key);
+            }
         }
 
         foreach (GameMessage gm in SentFrames.Keys)
         {
-            SentFrames[gm] += 1;
-       
+            if (frameNumber - SentFrames[gm] >= GlobalSettings.ReliableTimeout)
+            {
+                NeedResend.Add(gm);
+                SentFrames[gm] = frameNumber;
+            }
         }
+
+        return NeedResend;
     }
 }
