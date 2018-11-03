@@ -5,6 +5,12 @@ using UnityEngine;
 
 public class Encoder {
     
+    
+    protected const int _minChar = 33;
+    protected const int _maxChar = 126;
+    protected const int _maxStringLength = 20;
+    
+    
     public int GetBitsRequired(long value) {
         int bitsRequired = 0;
         while (value > 0) {
