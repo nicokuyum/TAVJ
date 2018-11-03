@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using Networking;
+using UnityEngine;
 
 public class Packet
 {
@@ -21,6 +22,8 @@ public class Packet
         {
             Messages.Add(MessageSerializer.deserialize(decompressor));
         }
+
+        Debug.Log("ENTRO PAQUETE CON ----" + MessageCount + "---- Y LIST :  " + Messages.Count);
     }
 
     public Packet(List<GameMessage> messages)

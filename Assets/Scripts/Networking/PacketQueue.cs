@@ -35,7 +35,7 @@ public class PacketQueue {
 		Packet p = null;
 		lock (LockObject)
 		{
-			Debug.Log(queue.Count);
+			//Debug.Log(queue.Count);
 			if (queue.Count != 0)
 			{
 				p = queue.Dequeue();

@@ -53,6 +53,7 @@ public class Server : MonoBehaviour
 		Packet packet = PacketQueue.GetInstance().PollPacket();
 		while (packet != null)
 		{
+			//Debug.Log("VOY A PROCESARLO");
 			ProcessPacket(packet);
 			packet = PacketQueue.GetInstance().PollPacket();
 		}
@@ -116,7 +117,7 @@ public class Server : MonoBehaviour
 				data = (byte[]) receiveBytes.Clone();
 				
 				PacketQueue.GetInstance().PushPacket(new Packet(data, connection));
-				hasData = true;
+				//Debug.Log("ENTRO ALGO");
 			}
 			
 		}
@@ -170,6 +171,7 @@ public class Server : MonoBehaviour
 
 	private void ProcessPacket( Packet packet)
 	{
+		//Debug.Log("EL PAQUETE TIENE : " + packet.Messages.Count);
 		foreach (GameMessage gm in packet.Messages)
 		{
 			switch (gm.type())
