@@ -47,28 +47,14 @@ public class Server : MonoBehaviour
 
 		if (hasData)
 		{
-			MessageType type = getType(data);
-			//Remember to ignore the first byte
-			
-			switch (type)
-			{
-				case MessageType.ClientConnect:
-					Debug.Log("CONNECT MESSAGE RECIEVED");
-					break;
-				case MessageType.PlayerSnapshot:
-					Debug.Log("SNAP");
-					break;
-				default:
-					break;
-			}
-
+			ProccessData(data);
 			hasData = false;
 		}
-
-		foreach (int id in connections.Values)
+		//TODO 
+		/*foreach (int id in connections.Values)
 		{
 			UpdatePlayer(id);
-		}
+		}*/
 
 
 
@@ -123,7 +109,6 @@ public class Server : MonoBehaviour
 			Connection connection = new Connection(RemoteIpEndPoint.Address,RemoteIpEndPoint.Port);
 			lock (lockObject)
 			{
-//				data += Encoding.ASCII.GetString(receiveBytes);
 				data = (byte[]) receiveBytes.Clone();
 				
 				PacketQueue.GetInstance().PushPacket(new Packet(data, connection));
@@ -177,5 +162,24 @@ public class Server : MonoBehaviour
 		//TODO crearmensajedetipoACK
 		byte[] ackmsg = null;
 		SendUdp(SourcePort, connection.srcIp.ToString(), connection.srcPrt, ackmsg);
+	}
+
+	private void ProccessData(byte[] data)
+	{
+		MessageType type = getType(data);
+		//Remember to ignore the first byte
+			
+		switch (type)
+		{
+			case MessageType.ClientConnect:
+				Debug.Log("CONNECT MESSAGE RECIEVED");
+				break;
+			case MessageType.PlayerSnapshot:
+				Debug.Log("SNAP");
+				break;
+			default:
+				break;
+		}
+
 	}
 }
