@@ -8,7 +8,7 @@ using UnityEngine;
 public class Packet
 {
     private const int MaxMessagesNum = 128;
-    private readonly int MessageCount;
+    public readonly int MessageCount;
     public Connection connection;
     public List<GameMessage> Messages;
 
@@ -20,7 +20,7 @@ public class Packet
         MessageCount = decompressor.GetNumber(MaxMessagesNum);
         for (int i = 0; i < MessageCount; i++)
         {
-            Messages.Add(MessageSerializer.deserialize(decompressor));
+           // Messages.Add(MessageSerializer.deserialize(decompressor));
         }
 
         Debug.Log("ENTRO PAQUETE CON ----" + MessageCount + "---- Y LIST :  " + Messages.Count);
@@ -38,7 +38,7 @@ public class Packet
         compressor.WriteNumber(MessageCount, MaxMessagesNum);
         foreach (var gm in Messages)
         {
-            compressor.WriteData(gm.Serialize());
+            //compressor.WriteData(gm.Serialize());
         }
 
         return compressor.GetBuffer();
