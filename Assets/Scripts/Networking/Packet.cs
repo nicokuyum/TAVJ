@@ -13,6 +13,7 @@ public class Packet
 
     public Packet(byte[] data, Connection connection)
     {
+        Messages = new List<GameMessage>();
         this.connection = connection;
         Decompressor decompressor = new Decompressor(data);
         MessageCount = decompressor.GetNumber(MaxMessagesNum);
