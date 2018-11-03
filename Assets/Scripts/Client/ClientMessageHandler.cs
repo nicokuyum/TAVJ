@@ -24,12 +24,14 @@ public class ClientMessageHandler {
 
 	private void handleAck(AckMessage message)
 	{
-		rq.receiveAck(message.ackid);
+		rq.ReceivedACK(message.ackid);
 	}
 
 	private void handlePlayerSnapshot(PlayerSnapshotMessage psm)
 	{
 		Player p = GameObject.Find("Player").GetComponent<Player>();
-		psm.Snapshot.
+		p.Health = psm.Snapshot.Health;
+		p.Invulnerable = psm.Snapshot.Invulnerable;
+		p.gameObject.transform.position = psm.Snapshot.position;
 	}
 }

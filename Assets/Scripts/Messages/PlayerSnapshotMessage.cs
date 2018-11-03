@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -11,7 +12,7 @@ public class PlayerSnapshotMessage : GameMessage
     {
         this.Snapshot = ps;
     }
-    
+
     public override MessageType type()
     {
         return MessageType.PlayerSnapshot;
@@ -21,4 +22,14 @@ public class PlayerSnapshotMessage : GameMessage
     {
         return false;
     }
+
+    public byte[] Serialize()
+    {
+        Compressor compressor = new Compressor();
+        compressor.WriteNumber((int)MessageType.PlayerSnapshot,Enum.GetNames(typeof(MessageType)).Length);
+        compressor.WriteData(Snapshot.serialize());
+        return compressor.GetBuffer();
+    }
+
+
 }

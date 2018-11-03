@@ -1,8 +1,17 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ClientConnectMessage : GameMessage {
+public class ClientConnectMessage : GameMessage
+{
+    private String name;
+
+    public ClientConnectMessage(String name)
+    {
+        this.name = name;
+    }
+    
     public override MessageType type()
     {
         return MessageType.ClientConnect;
@@ -12,4 +21,13 @@ public class ClientConnectMessage : GameMessage {
     {
         return true;
     }
+
+    public byte[] Serialize()
+    {
+        Compressor compressor = new Compressor();
+        compressor.WriteNumber((int)MessageType.ClientConnect,Enum.GetNames(typeof(MessageType)).Length);
+        compressor.WriteString(name);
+        return compressor.GetBuffer();
+    }
+    
 }

@@ -60,7 +60,7 @@ public class Client : MonoBehaviour
 			byte[] receiveBytes = udpClient.Receive(ref RemoteIpEndPoint);
 			lock (lockObject)
 			{	
-				PacketQueue.GetInstance().PushPacket(new Packet(receiveBytes, RemoteIpEndPoint.Address.ToString()));
+				PacketQueue.GetInstance().PushPacket(new Packet(receiveBytes, null));
 			}
 			
 		}

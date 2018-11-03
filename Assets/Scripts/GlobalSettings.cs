@@ -11,6 +11,7 @@ public class GlobalSettings{
 	public const float MinPosition = -100.0f;
 	public const int MaxHealth = 100;
 	public const int MaxMatchDuration = 3600;
+	public const int MaxACK = int.MaxValue;
 
 	public const int GamePort = 42069;
 

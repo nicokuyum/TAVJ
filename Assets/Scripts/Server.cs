@@ -6,10 +6,12 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
+using Networking;
 using UnityEditor;
 using UnityEditor.VersionControl;
 using UnityEngine;
 using Random = System.Random;
+
 
 public class Server : MonoBehaviour
 {
@@ -43,11 +45,10 @@ public class Server : MonoBehaviour
 	{
 		time += Time.deltaTime;
 
-
 		if (hasData)
 		{
 			MessageType type = getType(data);
-			//Remember to ignore the first byte.
+			//Remember to ignore the first byte
 			
 			switch (type)
 			{
@@ -88,29 +89,12 @@ public class Server : MonoBehaviour
 				}
 			}
 		}
-		
 	}
 
 	private void processPacket(byte[] package)
 	{
-		//processGameMessage(PacketQueue.getInstance().PollPacket());
+		//processGameMessage(PacketQueue.GetInstance().PollPacket());
 
-	}
-
-	private int processGameMessage(GameMessage gm)
-	{
-		switch (gm.type())
-		{
-			case (MessageType.ClientConnect):
-				//if (  )
-					break;
-		}
-
-		/*if (mt.isReliable())
-		{
-			
-		}*/
-		return 0;
 	}
 
 	private void processConnect(GameMessage gm, Connection connection)
@@ -135,14 +119,14 @@ public class Server : MonoBehaviour
 			IPEndPoint RemoteIpEndPoint = new IPEndPoint(IPAddress.Any, 0);
 			
 			byte[] receiveBytes = udpClient.Receive(ref RemoteIpEndPoint);
-			//RemoteIpEndPoint.
+			
+			Connection connection = new Connection(RemoteIpEndPoint.Address,RemoteIpEndPoint.Port);
 			lock (lockObject)
 			{
 //				data += Encoding.ASCII.GetString(receiveBytes);
 				data = (byte[]) receiveBytes.Clone();
 				
-				//TODO Encolar el paquete en la paquet queue con la connection correspondiente
-				//PackageQueue.pushPacket(new Packet(data));
+				PacketQueue.GetInstance().PushPacket(new Packet(data, connection));
 				hasData = true;
 			}
 			
@@ -175,7 +159,6 @@ public class Server : MonoBehaviour
 			, 0);
 			
 		players.Add(id, new PlayerSnapshot(position));
-		
 	}
 
 	private void UpdatePlayer(int id)
@@ -186,7 +169,6 @@ public class Server : MonoBehaviour
 		{
 			ps.apply(key);
 		}
-
 		players[id] = ps;
 	}
 
@@ -194,6 +176,6 @@ public class Server : MonoBehaviour
 	{
 		//TODO crearmensajedetipoACK
 		byte[] ackmsg = null;
-		//SendUdp(SourcePort, connection.srcIp, connection.srcPrt, ackmsg);
+		SendUdp(SourcePort, connection.srcIp.ToString(), connection.srcPrt, ackmsg);
 	}
 }

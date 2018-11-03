@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 using UnityEngine;
 
 public class Decompressor : Encoder
@@ -41,5 +42,25 @@ public class Decompressor : Encoder
 	private byte GetByteFromPos()
 	{
 		return data[(position) / 8];
+	}
+	
+	public String GetString()
+	{
+		int size = GetNumber(_maxStringLength);
+		if (size < 0 || size > _maxStringLength)
+		{
+			throw new Exception("Invalid string length " + size);
+		}
+		StringBuilder sb = new StringBuilder();
+		for (int i = 0; i < size; i++)
+		{
+			sb.Append(GetChar());
+		}
+		return sb.ToString();
+	}
+
+	public char GetChar()
+	{
+		return (char)(GetNumber(_maxChar)+_minChar);
 	}
 }

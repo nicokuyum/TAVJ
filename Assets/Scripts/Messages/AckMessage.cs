@@ -1,12 +1,17 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class AckMessage : GameMessage
 {
-
     public int ackid;
-    
+
+    public AckMessage(int ackid)
+    {
+        this.ackid = ackid;
+    }
+
     public override MessageType type()
     {
         return MessageType.Ack;
@@ -16,4 +21,13 @@ public class AckMessage : GameMessage
     {
         return false;
     }
+
+    public byte[] Serialize()
+    {
+        Compressor compressor = new Compressor();
+        compressor.WriteNumber((int)MessageType.Ack, Enum.GetNames(typeof(MessageType)).Length);
+        compressor.WriteNumber(ackid, Int32.MaxValue);
+        return compressor.GetBuffer();
+    }
+    
 }

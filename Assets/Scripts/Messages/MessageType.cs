@@ -3,4 +3,5 @@
     ClientConnect=1,
     PlayerSnapshot=2,
     PlayerInput=3,
+    Connect=4,
 }

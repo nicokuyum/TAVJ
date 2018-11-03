@@ -2,15 +2,15 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerSnapshot : Serializable<PlayerSnapshot>
+public class PlayerSnapshot
 {
 
-    private long frameNumber;
-    private int MaxHealth;
-    private int Health;
-    private bool Invulnerable;
-    private Vector3 position;
-    private Vector3 rotation;
+    public long frameNumber;
+    public int Health;
+    public bool Invulnerable;
+    public Vector3 position;
+    public Quaternion rotation;
+    
 
 
     public PlayerSnapshot(byte[] data)
@@ -27,33 +27,29 @@ public class PlayerSnapshot : Serializable<PlayerSnapshot>
 
     public PlayerSnapshot(Vector3 position)
     {
-        this.position = position;
         frameNumber = 1;
-        MaxHealth = GlobalSettings.MaxHealth;
-        Health = MaxHealth;
+        Health = GlobalSettings.MaxHealth;
         Invulnerable = false;
-        rotation = new Vector3(50,50,50);
+        position = new Vector3(50,50,50);
     }
 
     public PlayerSnapshot()
     {
-        position = new Vector3(50,50,50);
         frameNumber = 1;
-        MaxHealth = GlobalSettings.MaxHealth;
-        Health = MaxHealth;
+        Health = GlobalSettings.MaxHealth;
         Invulnerable = false;
-        rotation = new Vector3(50,50,50);
     }
 
     public byte[] serialize()
     {
-        
-        throw new System.NotImplementedException();
-    }
-
-    public void deserialize(byte[] data)
-    {
-        throw new System.NotImplementedException();
+        Compressor compressor = new Compressor();
+        compressor.WriteNumber(frameNumber, compressor.GetBitsRequired(3600 * (long)GlobalSettings.Fps));
+        compressor.WriteNumber(this.Health, compressor.GetBitsRequired(GlobalSettings.MaxHealth));
+        compressor.PutBit(this.Invulnerable);
+        compressor.WriteFloat(position.x, GlobalSettings.MaxPosition, GlobalSettings.MinPosition, 0.1f);
+        compressor.WriteFloat(position.y, GlobalSettings.MaxPosition, GlobalSettings.MinPosition, 0.1f);
+        compressor.WriteFloat(position.z, GlobalSettings.MaxPosition, GlobalSettings.MinPosition, 0.1f);
+        return compressor.GetBuffer();
     }
 
     public void apply(InputKey key)

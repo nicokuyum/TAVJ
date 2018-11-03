@@ -18,7 +18,7 @@ public class MessageDeserializer {
 				case MessageType.PlayerInput:		// TODO
 					break;
 				case MessageType.PlayerSnapshot:	// TODO
-					return new PlayerSnapshotMessage();
+					break;
 				default: return null;
 		}
 
