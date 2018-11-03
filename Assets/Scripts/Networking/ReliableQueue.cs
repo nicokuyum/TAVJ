@@ -6,12 +6,24 @@ public class ReliableQueue
 {
     private List<GameMessage> MessageQueue;
     private Dictionary<GameMessage, long> SentFrames;
+    private Dictionary<int, GameMessage> gamemessages;
+
+    public ReliableQueue()
+    {
+        MessageQueue = new List<GameMessage>();
+        SentFrames = new Dictionary<GameMessage, long>();
+        gamemessages = new Dictionary<int, GameMessage>();
+        
+    }
+
 
     public void ReceivedACK(int ackid)
     {
         while (MessageQueue[0]._MessageId <= ackid)
         {
             MessageQueue.RemoveAt(0);
+            SentFrames.Remove(gamemessages[ackid]);
+            gamemessages.Remove(ackid);
         }
     }
 
@@ -19,6 +31,7 @@ public class ReliableQueue
     {
         MessageQueue.Add(gm);
         SentFrames.Add(gm, frameNumber);
+        gamemessages.Add(gm._MessageId, gm);
     }
 
 

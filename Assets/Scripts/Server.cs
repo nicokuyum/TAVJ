@@ -28,6 +28,9 @@ public class Server : MonoBehaviour
 
 	private Boolean hasData;
 	private byte[] data;
+	
+	
+	public List<PlayerSnapshot> playersnapshots = new List<PlayerSnapshot>();
 
 	public Dictionary<int, PlayerSnapshot> players = new Dictionary<int, PlayerSnapshot>();
 	public Dictionary<int, int> lastAcks = new Dictionary<int, int>();
@@ -73,7 +76,7 @@ public class Server : MonoBehaviour
 				SendUdp(SourcePort, DestIp, DestPort, bytes);
 				
 				//TODO SERIALIZE WORLD
-				byte[] serializedWorld = null;
+				byte[] serializedWorld = SerializeWorld();
 				foreach (Connection con  in connections.Keys)
 				{
 					SendUdp(SourcePort, con.srcIp.ToString(), con.srcPrt, serializedWorld);
@@ -185,8 +188,14 @@ public class Server : MonoBehaviour
 
 	}
 
-	private void SerializeWorld()
+	private byte[] SerializeWorld()
 	{
-		
+		List<GameMessage> gms = new List<GameMessage>();
+		foreach (PlayerSnapshot playerSnapshot in players.Values)
+		{
+			gms.Add(new PlayerSnapshotMessage(playerSnapshot));
+		}
+		return (new Packet(gms)).serialize();
 	}
+	
 }
