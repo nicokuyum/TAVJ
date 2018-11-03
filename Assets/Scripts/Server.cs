@@ -23,7 +23,7 @@ public class Server : MonoBehaviour
 	public static int SourcePort;
 	public float time = 0f;
 
-	public static int listenPort;
+	public static int listenPort = 8080;
 	public int idCount = 1;
 
 	private Boolean hasData;
