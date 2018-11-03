@@ -16,13 +16,6 @@ public class ReliableQueue
         
     }
 
-
-    public ReliableQueue()
-    {
-        MessageQueue = new List<GameMessage>();
-        SentFrames = new Dictionary<GameMessage, long>();
-    }
-
     public void ReceivedACK(int ackid)
     {
         while (MessageQueue[0]._MessageId <= ackid)
@@ -43,24 +36,17 @@ public class ReliableQueue
 
     public List<GameMessage> MessageToResend(long frameNumber)
     {
-        List<GameMessage> NeedResend = new List<GameMessage>();
-        foreach(KeyValuePair<GameMessage, long> entry in SentFrames)
-        {
-            if (frameNumber - entry.Value >= GlobalSettings.ReliableTimeout)
-            {
-                NeedResend.Add(entry.Key);
-            }
-        }
+        List<GameMessage> needResend = new List<GameMessage>();
 
-        foreach (GameMessage gm in SentFrames.Keys)
+        foreach (GameMessage gm in MessageQueue)
         {
             if (frameNumber - SentFrames[gm] >= GlobalSettings.ReliableTimeout)
             {
-                NeedResend.Add(gm);
+                needResend.Add(gm);
                 SentFrames[gm] = frameNumber;
             }
         }
-        return NeedResend;
+        return needResend;
     }
     
 }

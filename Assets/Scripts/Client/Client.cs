@@ -54,19 +54,21 @@ public class Client : MonoBehaviour
 				}
 				packet = PacketQueue.GetInstance().PollPacket();
 			}
-		}
-
-		foreach (var gm in outgoingMessages)
-		{
-			if (gm.isReliable())
+			
+			foreach (var gm in outgoingMessages)
 			{
-				rq.AddQueue(gm, frame);
+				if (gm.isReliable())
+				{
+					Debug.Log("Adding to rq");
+					rq.AddQueue(gm, frame);
+				}
 			}
+			outgoingMessages.AddRange(rq.MessageToResend(frame));
+			Packet p = new Packet(outgoingMessages);
+			SendUdp(p.serialize());
+			outgoingMessages.Clear();
+			Debug.Log("Outgoing messages size: " + outgoingMessages.Count);
 		}
-		outgoingMessages.AddRange(rq.MessageToResend(frame));
-		Packet p = new Packet(outgoingMessages);
-		SendUdp(p.serialize());
-		outgoingMessages.Clear();
 	}
 	
 	private void ThreadMethod()
@@ -80,6 +82,7 @@ public class Client : MonoBehaviour
 			byte[] receiveBytes = udpClient.Receive(ref RemoteIpEndPoint);
 			lock (lockObject)
 			{	
+				Debug.Log("Pushing packet");
 				PacketQueue.GetInstance().PushPacket(new Packet(receiveBytes, null));
 			}
 			

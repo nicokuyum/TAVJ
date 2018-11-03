@@ -15,4 +15,9 @@ public abstract class GameMessage
     {
         this._MessageId = idCounter++;
     }
+    
+    public override int GetHashCode()
+    {
+        return idCounter;
+    }
 }
