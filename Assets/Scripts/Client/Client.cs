@@ -11,10 +11,10 @@ public class Client : MonoBehaviour
 	
 	private List<GameMessage> outgoingMessages;
 	
-	public static String DestIp;
-	public static int DestPort;
-	public static int SourcePort;
-	public static int listenPort;
+	public String DestIp;
+	public int DestPort;
+	public int SourcePort;
+	public int listenPort;
 	
 	private float time = 0.0f;
 	private float acumTime = 0.0f;
@@ -28,6 +28,7 @@ public class Client : MonoBehaviour
 
 	// Use this for initialization
 	void Start () {
+		outgoingMessages = new List<GameMessage>();
 		rq = new ReliableQueue();
 		outgoingMessages.Add(new ClientConnectMessage("asdf"));
 		handler = new ClientMessageHandler(rq);
@@ -85,7 +86,7 @@ public class Client : MonoBehaviour
 		}
 	}
 	
-	static void SendUdp(byte[] data)
+	private void SendUdp(byte[] data)
 	{
 		using (UdpClient c = new UdpClient(SourcePort))
 			c.Send(data, data.Length, DestIp, DestPort);
