@@ -17,7 +17,7 @@ public class MessageSerializer {
 				case MessageType.ClientConnect:
 					return ClientConnectDeserialiaze(decompressor);
 				case MessageType.PlayerInput:		// TODO
-					return new PlayerInputMessage();
+					return new PlayerInputMessage(PlayerAction.Shoot);
 				case MessageType.PlayerSnapshot:
 					return PlayerSnapshotDeserialize(decompressor);
 					break;

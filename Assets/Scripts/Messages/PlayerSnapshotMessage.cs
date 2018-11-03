@@ -5,12 +5,12 @@ using UnityEngine;
 
 public class PlayerSnapshotMessage : GameMessage
 {
-    private PlayerSnapshot snapshot;
 
-    
-    public PlayerSnapshotMessage(PlayerSnapshot snapshot)
+    public PlayerSnapshot Snapshot;
+
+    public PlayerSnapshotMessage(PlayerSnapshot ps)
     {
-        this.snapshot = snapshot;
+        this.Snapshot = ps;
     }
 
     public override MessageType type()
@@ -27,7 +27,7 @@ public class PlayerSnapshotMessage : GameMessage
     {
         Compressor compressor = new Compressor();
         compressor.WriteNumber((int)MessageType.PlayerSnapshot,Enum.GetNames(typeof(MessageType)).Length);
-        compressor.WriteData(snapshot.serialize());
+        compressor.WriteData(Snapshot.serialize());
         return compressor.GetBuffer();
     }
 

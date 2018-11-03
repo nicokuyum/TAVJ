@@ -52,9 +52,11 @@ public class Server : MonoBehaviour
 			
 			switch (type)
 			{
-				case MessageType.Connect:
-					Debug.Log("CONNECT MESSAGE RECEIVED");
-					processPacket(data);
+				case MessageType.ClientConnect:
+					Debug.Log("CONNECT MESSAGE RECIEVED");
+					break;
+				case MessageType.PlayerSnapshot:
+					Debug.Log("SNAP");
 					break;
 				default:
 					break;
@@ -91,24 +93,9 @@ public class Server : MonoBehaviour
 
 	private void processPacket(byte[] package)
 	{
-		processGameMessage(PacketQueue.GetInstance().PollPacket());
+		//processGameMessage(PacketQueue.GetInstance().PollPacket());
 
 	}
-
-	/*private int processGameMessage(GameMessage gm)
-	{
-		switch (GameMessage.type)
-		{
-			case (MessageType.CONNECT):
-				if (  )
-					break;
-		}
-
-		if (mt.isReliable())
-		{
-			
-		}
-	}*/
 
 	private void processConnect(GameMessage gm, Connection connection)
 	{
@@ -134,7 +121,6 @@ public class Server : MonoBehaviour
 			byte[] receiveBytes = udpClient.Receive(ref RemoteIpEndPoint);
 			
 			Connection connection = new Connection(RemoteIpEndPoint.Address,RemoteIpEndPoint.Port);
-			
 			lock (lockObject)
 			{
 //				data += Encoding.ASCII.GetString(receiveBytes);
