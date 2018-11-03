@@ -23,13 +23,11 @@ public class PlayerSnapshotMessage : GameMessage
         return false;
     }
 
-    public byte[] Serialize()
+    public override byte[] Serialize()
     {
         Compressor compressor = new Compressor();
         compressor.WriteNumber((int)MessageType.PlayerSnapshot,Enum.GetNames(typeof(MessageType)).Length);
         compressor.WriteData(Snapshot.serialize());
         return compressor.GetBuffer();
     }
-
-
 }

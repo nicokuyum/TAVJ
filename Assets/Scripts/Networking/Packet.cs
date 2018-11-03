@@ -21,4 +21,22 @@ public class Packet
             Messages.Add(MessageSerializer.deserialize(decompressor));
         }
     }
+
+    public Packet(List<GameMessage> messages)
+    {
+        this.MessageCount = messages.Count;
+        this.Messages = messages;
+    }
+
+    public byte[] serialize()
+    {
+        Compressor compressor = new Compressor();
+        compressor.WriteNumber(MessageCount, MaxMessagesNum);
+        foreach (var gm in Messages)
+        {
+            compressor.WriteData(gm.Serialize());
+        }
+
+        return compressor.GetBuffer();
+    }
 }

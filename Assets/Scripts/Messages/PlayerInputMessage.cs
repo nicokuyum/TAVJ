@@ -21,4 +21,9 @@ public class PlayerInputMessage : GameMessage
     {
         return true;
     }
+
+    public override byte[] Serialize()
+    {
+        throw new System.NotImplementedException();
+    }
 }
