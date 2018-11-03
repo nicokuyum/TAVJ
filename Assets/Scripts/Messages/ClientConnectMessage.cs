@@ -22,7 +22,7 @@ public class ClientConnectMessage : GameMessage
         return true;
     }
 
-    public byte[] Serialize()
+    public override byte[] Serialize()
     {
         Compressor compressor = new Compressor();
         compressor.WriteNumber((int)MessageType.ClientConnect,Enum.GetNames(typeof(MessageType)).Length);

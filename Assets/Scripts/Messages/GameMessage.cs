@@ -9,6 +9,7 @@ public abstract class GameMessage
     public readonly int _MessageId;
     public abstract MessageType type();
     public abstract bool isReliable();
+    public abstract byte[] Serialize();
 
     protected GameMessage()
     {

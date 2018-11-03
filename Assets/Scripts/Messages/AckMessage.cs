@@ -22,7 +22,7 @@ public class AckMessage : GameMessage
         return false;
     }
 
-    public byte[] Serialize()
+    public override byte[] Serialize()
     {
         Compressor compressor = new Compressor();
         compressor.WriteNumber((int)MessageType.Ack, Enum.GetNames(typeof(MessageType)).Length);

@@ -5,7 +5,12 @@ using UnityEngine;
 
 public class ClientMessageHandler {
 	
-	ReliableQueue rq = new ReliableQueue();
+	private readonly ReliableQueue rq;
+
+	public ClientMessageHandler(ReliableQueue rq)
+	{
+		this.rq = rq;
+	}
 
 	public void Handle(GameMessage gm)
 	{

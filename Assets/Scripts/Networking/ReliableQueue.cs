@@ -21,7 +21,8 @@ public class ReliableQueue
         SentFrames.Add(gm, frameNumber);
     }
 
-    public List<GameMessage> ResendIfNeeded(long frameNumber)
+
+    public List<GameMessage> MessageToResend(long frameNumber)
     {
         List<GameMessage> NeedResend = new List<GameMessage>();
         foreach(KeyValuePair<GameMessage, long> entry in SentFrames)
@@ -40,7 +41,7 @@ public class ReliableQueue
                 SentFrames[gm] = frameNumber;
             }
         }
-
         return NeedResend;
     }
+    
 }
