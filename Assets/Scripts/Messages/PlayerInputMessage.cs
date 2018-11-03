@@ -7,6 +7,11 @@ public class PlayerInputMessage : GameMessage
 
     public PlayerAction Action;
 
+    public PlayerInputMessage(PlayerAction action)
+    {
+        this.Action = action;
+    }
+
     public override MessageType type()
     {
         return MessageType.PlayerInput;

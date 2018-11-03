@@ -9,6 +9,9 @@ public class UDPListener : MonoBehaviour
 {
 	static readonly object lockObject = new object();
 
+	public String DestIp;
+	public int SourcePort;
+	public int DestPort;
 	public int listenPort;
 
 	private Boolean hasData;

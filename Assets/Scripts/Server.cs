@@ -51,10 +51,10 @@ public class Server : MonoBehaviour
 			
 			switch (type)
 			{
-				case MessageType.Connect:
+				case MessageType.ClientConnect:
 					Debug.Log("CONNECT MESSAGE RECIEVED");
 					break;
-				case MessageType.Snapshot:
+				case MessageType.PlayerSnapshot:
 					Debug.Log("SNAP");
 					break;
 				default:
@@ -99,17 +99,18 @@ public class Server : MonoBehaviour
 
 	private int processGameMessage(GameMessage gm)
 	{
-		switch (GameMessage.type)
+		switch (gm.type())
 		{
-			case (MessageType.CONNECT):
-				if (  )
+			case (MessageType.ClientConnect):
+				//if (  )
 					break;
 		}
 
-		if (mt.isReliable())
+		/*if (mt.isReliable())
 		{
 			
-		}
+		}*/
+		return 0;
 	}
 
 	private void processConnect(GameMessage gm, Connection connection)
@@ -134,7 +135,7 @@ public class Server : MonoBehaviour
 			IPEndPoint RemoteIpEndPoint = new IPEndPoint(IPAddress.Any, 0);
 			
 			byte[] receiveBytes = udpClient.Receive(ref RemoteIpEndPoint);
-			RemoteIpEndPoint.
+			//RemoteIpEndPoint.
 			lock (lockObject)
 			{
 //				data += Encoding.ASCII.GetString(receiveBytes);
@@ -193,6 +194,6 @@ public class Server : MonoBehaviour
 	{
 		//TODO crearmensajedetipoACK
 		byte[] ackmsg = null;
-		SendUdp(SourcePort, connection.srcIp, connection.srcPrt, ackmsg);
+		//SendUdp(SourcePort, connection.srcIp, connection.srcPrt, ackmsg);
 	}
 }

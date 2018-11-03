@@ -1,16 +1,12 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-public class PlayerAction : MonoBehaviour {
-
-	// Use this for initialization
-	void Start () {
-		
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
+﻿
+public enum PlayerAction {
+	StartMoveForward=0,
+	StopMoveForward=1,
+	StartMoveLeft=2,
+	StopMoveLeft=3,
+	StartMoveRight=4,
+	StopMoveRight=5,
+	StartMoveBack=6,
+	StopMoveBack=7,
+	Shoot=8,
 }

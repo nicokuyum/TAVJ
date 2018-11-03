@@ -4,6 +4,7 @@ using System.Net.Sockets;
 using System.Runtime.CompilerServices;
 using System.Text;
 using UnityEngine;
+using UnityEngine.Experimental.UIElements;
 
 public class Player : MonoBehaviour, Serializable<Player>
 {
@@ -12,16 +13,8 @@ public class Player : MonoBehaviour, Serializable<Player>
 	public int MaxHealth;
 	public int Health;
 	public bool Invulnerable;
-	public String DestIp;
-	public int SourcePort;
-	public int DestPort;
 
-	private float time = 0.0f;
-	private float acumTime = 0.0f;
-	private float fps = 60.0f;
-	private long frameNumber = 0l;
-
-	private Queue<PlayerSnapshot> snaps = new Queue<PlayerSnapshot>();
+	private Queue<PlayerInputMessage> actions = new Queue<PlayerInputMessage>();
 	
 	// Se llama luego de haber sido constuido el GameObject y todos sus componentes
 	void Awake () {
@@ -37,37 +30,39 @@ public class Player : MonoBehaviour, Serializable<Player>
 	// Update is called once per frame
 	void Update ()
 	{
-		time += Time.deltaTime;
-		acumTime += Time.deltaTime;
-		if (Input.GetKey(KeyCode.W))
+		if (Input.GetKeyDown(KeyCode.W))
 		{
-			this.gameObject.transform.Translate(Vector3.forward * Time.deltaTime);
-		} else if (Input.GetKey(KeyCode.A))
+			actions.Enqueue(new PlayerInputMessage(PlayerAction.StartMoveForward));
+		} else if (Input.GetKeyDown(KeyCode.W))
 		{
-			this.gameObject.transform.Translate(Vector3.left * Time.deltaTime);
-		} else if (Input.GetKey(KeyCode.S))
-		{
-			this.gameObject.transform.Translate(Vector3.back * Time.deltaTime);
-		} else if (Input.GetKey(KeyCode.D))
-		{
-			this.gameObject.transform.Translate(Vector3.right * Time.deltaTime);
+			actions.Enqueue(new PlayerInputMessage(PlayerAction.StopMoveForward));
 		}
-		
-		if (acumTime >= (1.0f/60.0f))
+		if (Input.GetKeyDown(KeyCode.A))
 		{
-			frameNumber++;
-			Debug.Log(1.0f/fps);
-			acumTime -= (1.0f/60.0f);
-			SendUdp(SourcePort, DestIp, DestPort, serialize());
+			actions.Enqueue(new PlayerInputMessage(PlayerAction.StartMoveLeft));
+		} else if (Input.GetKeyDown(KeyCode.A))
+		{
+			actions.Enqueue(new PlayerInputMessage(PlayerAction.StopMoveLeft));
 		}
-		
-	}
-	
-	static void SendUdp(int srcPort, string dstIp, int dstPort, byte[] data)
-	{
-		Debug.Log("MANDANDO");
-		using (UdpClient c = new UdpClient(srcPort))
-			c.Send(data, data.Length, dstIp, dstPort);
+		if (Input.GetKeyDown(KeyCode.S))
+		{
+			actions.Enqueue(new PlayerInputMessage(PlayerAction.StartMoveBack));
+		} else if (Input.GetKeyDown(KeyCode.S))
+		{
+			actions.Enqueue(new PlayerInputMessage(PlayerAction.StopMoveBack));
+		}
+		if (Input.GetKeyDown(KeyCode.D))
+		{
+			actions.Enqueue(new PlayerInputMessage(PlayerAction.StartMoveRight));
+		} else if (Input.GetKeyDown(KeyCode.D))
+		{
+			actions.Enqueue(new PlayerInputMessage(PlayerAction.StopMoveRight));
+		}
+
+		if (Input.GetMouseButtonDown(0))
+		{
+			actions.Enqueue(new PlayerInputMessage(PlayerAction.Shoot));
+		}
 	}
 
 	public byte[] serialize()
@@ -76,7 +71,7 @@ public class Player : MonoBehaviour, Serializable<Player>
 		
 		Vector3 pos = this.transform.position;
 		Quaternion rotation = this.transform.rotation;
-		compressor.WriteNumber(frameNumber, compressor.GetBitsRequired(3600 * (long)fps ));
+		//compressor.WriteNumber(frameNumber, compressor.GetBitsRequired(3600 * (long)fps ));
 		compressor.WriteNumber(this.Health, compressor.GetBitsRequired(this.MaxHealth));
 		compressor.PutBit(this.Invulnerable);
 		compressor.WriteFloat(pos.x, 100, 0, 0.1f);
@@ -90,7 +85,7 @@ public class Player : MonoBehaviour, Serializable<Player>
 	{
 		Vector3 pos = new Vector3();
 		Decompressor decompressor = new Decompressor(data);
-		this.frameNumber = decompressor.GetNumber(3600 * (long) fps);
+		//this.frameNumber = decompressor.GetNumber(3600 * (long) fps);
 		this.Health = decompressor.GetNumber(this.MaxHealth);
 		this.Invulnerable = decompressor.GetBoolean();
 		pos.x = decompressor.GetFloat(100, 0, 0.1f);
@@ -98,8 +93,11 @@ public class Player : MonoBehaviour, Serializable<Player>
 		pos.z = decompressor.GetFloat(100, 0, 0.1f);
 		this.gameObject.transform.position = pos;
 	}
-	
-	 
+
+	public Queue<PlayerInputMessage> getActions()
+	{
+		return actions;
+	}
 
 	public override string ToString()
 	{
