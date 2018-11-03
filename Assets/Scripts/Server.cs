@@ -33,6 +33,8 @@ public class Server : MonoBehaviour
 	public Dictionary<int, int> lastAcks = new Dictionary<int, int>();
 	public Dictionary<Connection, int> connections = new Dictionary<Connection, int>();
 	public Dictionary<int, List<InputKey>> actions = new Dictionary<int, List<InputKey>>();
+	public Dictionary<int, ReliableQueue> rq = new Dictionary<int, ReliableQueue>();
+	
 	// Use this for initialization
 	void Start()
 	{
@@ -45,11 +47,14 @@ public class Server : MonoBehaviour
 	{
 		time += Time.deltaTime;
 
-		if (hasData)
+		Packet packet = PacketQueue.GetInstance().PollPacket();
+		while (packet != null)
 		{
-			ProccessData(data);
-			hasData = false;
+			ProcessPacket(packet);
+			packet = PacketQueue.GetInstance().PollPacket();
 		}
+		
+		
 		//TODO 
 		/*foreach (int id in connections.Values)
 		{
@@ -77,21 +82,17 @@ public class Server : MonoBehaviour
 		}
 	}
 
-	private void processPacket(byte[] package)
-	{
-		//processGameMessage(PacketQueue.GetInstance().PollPacket());
 
-	}
 
 	private void processConnect(GameMessage gm, Connection connection)
 	{
 		if (!connections.ContainsKey(connection))
 		{
-			EstablishConnection(connection);
+			EstablishConnection(connection, gm._MessageId);
 		}
 		else
 		{
-			ACK(connection, 1);
+			SendAck(connection, gm._MessageId);
 		}
 	}
 
@@ -131,14 +132,13 @@ public class Server : MonoBehaviour
 	}
 
 
-	private void EstablishConnection(Connection connection)
+	private void EstablishConnection(Connection connection, int messageId)
 	{
 		int id = idCount++;
 		connections.Add(connection, id);
-		lastAcks.Add(id, 1);
+		lastAcks.Add(id, messageId);
 		Random random = new Random();
 		int range = (int)(GlobalSettings.MaxPosition - GlobalSettings.MinPosition);
-
 		Vector3 position = new Vector3(random.Next(range) + GlobalSettings.MinPosition
 			, random.Next(range) + GlobalSettings.MinPosition
 			, 0);
@@ -157,29 +157,36 @@ public class Server : MonoBehaviour
 		players[id] = ps;
 	}
 
-	private void ACK(Connection connection, int ack)
+	private void SendAck(Connection connection, int ack)
 	{
 		//TODO crearmensajedetipoACK
-		byte[] ackmsg = null;
+		byte[] ackmsg = (new AckMessage(ack)).Serialize();
 		SendUdp(SourcePort, connection.srcIp.ToString(), connection.srcPrt, ackmsg);
 	}
 
-	private void ProccessData(byte[] data)
+	private void ProcessPacket( Packet packet)
 	{
-		MessageType type = getType(data);
-		//Remember to ignore the first byte
-			
-		switch (type)
+		foreach (GameMessage gm in packet.Messages)
 		{
-			case MessageType.ClientConnect:
-				Debug.Log("CONNECT MESSAGE RECIEVED");
-				break;
-			case MessageType.PlayerSnapshot:
-				Debug.Log("SNAP");
-				break;
-			default:
-				break;
+			switch (gm.type())
+			{
+				case MessageType.ClientConnect:
+					processConnect(gm,packet.connection);
+					break;
+				default:
+					break;
+			}
+
+			if (gm.isReliable())
+			{
+				SendAck(packet.connection, gm._MessageId);
+			}
 		}
 
+	}
+
+	private void SerializeWorld()
+	{
+		
 	}
 }
