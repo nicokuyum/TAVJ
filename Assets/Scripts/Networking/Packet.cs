@@ -20,7 +20,7 @@ public class Packet
         MessageCount = decompressor.GetNumber(MaxMessagesNum);
         for (int i = 0; i < MessageCount; i++)
         {
-           // Messages.Add(MessageSerializer.deserialize(decompressor));
+            Messages.Add(MessageSerializer.deserialize(decompressor));
         }
 
         Debug.Log("ENTRO PAQUETE CON ----" + MessageCount + "---- Y LIST :  " + Messages.Count);

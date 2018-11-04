@@ -19,11 +19,13 @@ public class PacketQueue {
 
 	public static PacketQueue GetInstance()
 	{
+		Debug.Log("gtInstance");
 		return _instance ?? (_instance = new PacketQueue());
 	}
 
 	public void PushPacket(Packet p)
 	{
+		Debug.Log("PUSHING PACKET");
 		lock (LockObject)
 		{
 			queue.Enqueue(p);

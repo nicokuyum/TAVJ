@@ -57,7 +57,7 @@ public class Server : MonoBehaviour
 			ProcessPacket(packet);
 			packet = PacketQueue.GetInstance().PollPacket();
 		}
-		
+
 		
 		//TODO 
 		/*foreach (int id in connections.Values)

@@ -25,8 +25,12 @@ public class Compressor : Encoder
 
     public void WriteNumber(long value, long maxNumber)
     {
-        int size = GetBitsRequired(maxNumber);
-        while (size > 0)
+        WriteNumberWithBitsRequired(value, GetBitsRequired(maxNumber));
+    }
+
+    public void WriteNumberWithBitsRequired(long value, int size)
+    {
+        while(size > 0)
         {
             PutBit(((value >> (size - 1)) & 1) != 0);
             size--;
@@ -76,7 +80,7 @@ public class Compressor : Encoder
     {
         if (currentBitCount > 0)
         {
-            WriteNumber(0, 32 - currentBitCount);
+            WriteNumberWithBitsRequired(0, 32 - currentBitCount);
             WriteIfNecessary();
         }
     }
