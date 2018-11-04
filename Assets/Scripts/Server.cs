@@ -20,10 +20,10 @@ public class Server : MonoBehaviour
 	public static float snapRate;
 	public static String DestIp;
 	public static int DestPort;
-	public static int SourcePort;
+	public static int SourcePort = 8081;
 	public float time = 0f;
 
-	public static int listenPort = 8080;
+	private static int listenPort = GlobalSettings.GamePort;
 	public int idCount = 1;
 
 	private Boolean hasData;
@@ -53,7 +53,7 @@ public class Server : MonoBehaviour
 		Packet packet = PacketQueue.GetInstance().PollPacket();
 		while (packet != null)
 		{
-			//Debug.Log("VOY A PROCESARLO");
+			Debug.Log("VOY A PROCESARLO");
 			ProcessPacket(packet);
 			packet = PacketQueue.GetInstance().PollPacket();
 		}
@@ -70,7 +70,11 @@ public class Server : MonoBehaviour
 		if (time > snapRate && players.Count != 0)
 		{
 			time -= snapRate;
-			if (players.Count != 0)
+			foreach (Connection connection in connections.Keys)
+			{
+				
+			}
+			/*if (players.Count != 0)
 			{
 				Debug.Log("Server Sending UDP Packet to " + DestIp + " port " + DestPort);
 				byte[] bytes = players[1].serialize();
@@ -82,7 +86,7 @@ public class Server : MonoBehaviour
 				{
 					SendUdp(SourcePort, con.srcIp.ToString(), con.srcPrt, serializedWorld);
 				}
-			}
+			}*/
 		}
 	}
 
@@ -90,14 +94,12 @@ public class Server : MonoBehaviour
 
 	private void processConnect(GameMessage gm, Connection connection)
 	{
+		Debug.Log("PROCESSING CONNECTION");
 		if (!connections.ContainsKey(connection))
 		{
 			EstablishConnection(connection, gm._MessageId);
 		}
-		else
-		{
-			SendAck(connection, gm._MessageId);
-		}
+
 	}
 
 
@@ -138,7 +140,7 @@ public class Server : MonoBehaviour
 
 	private void EstablishConnection(Connection connection, int messageId)
 	{
-		Debug.Log("SE CONECTO " + connection.ToString());
+		//Debug.Log("SE CONECTO " + connection.ToString());
 		int id = idCount++;
 		connections.Add(connection, id);
 		lastAcks.Add(id, messageId);
@@ -166,14 +168,22 @@ public class Server : MonoBehaviour
 	{
 		//TODO crearmensajedetipoACK
 		byte[] ackmsg = (new AckMessage(ack)).Serialize();
-		SendUdp(SourcePort, connection.srcIp.ToString(), connection.srcPrt, ackmsg);
+
+		List<GameMessage> gms = new List<GameMessage>();
+		gms .Add( new AckMessage(ack));
+		Packet packet = new Packet(gms);
+	
+		Debug.Log("Responding ACK " + ack);
+		//Debug.Log("SENDING ACK TO  " + connection.srcIp.ToString() + "   PORT   " + GlobalSettings.GamePort);
+		//Debug.Log("ACK  " + ack);
+		//SendUdp(SourcePort, connection.srcIp.ToString(), GlobalSettings.GamePort, packet.serialize());
 	}
 
 	private void ProcessPacket( Packet packet)
 	{
-		//Debug.Log("EL PAQUETE TIENE : " + packet.Messages.Count);
 		foreach (GameMessage gm in packet.Messages)
 		{
+			Debug.Log("Message ID " + gm._MessageId);
 			switch (gm.type())
 			{
 				case MessageType.ClientConnect:

@@ -23,7 +23,7 @@ public class Packet
             Messages.Add(MessageSerializer.deserialize(decompressor));
         }
 
-        Debug.Log("ENTRO PAQUETE CON ----" + MessageCount + "---- Y LIST :  " + Messages.Count);
+       // Debug.Log("ENTRO PAQUETE CON ----" + MessageCount + "---- Y LIST :  " + Messages.Count);
     }
 
     public Packet(List<GameMessage> messages)
@@ -38,7 +38,7 @@ public class Packet
         compressor.WriteNumber(MessageCount, MaxMessagesNum);
         foreach (var gm in Messages)
         {
-            //compressor.WriteData(gm.Serialize());
+            compressor.WriteData(gm.Serialize());
         }
 
         return compressor.GetBuffer();

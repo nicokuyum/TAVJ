@@ -6,7 +6,7 @@ public abstract class GameMessage
 {
     private static int idCounter = 0;
     
-    public readonly int _MessageId;
+    public int _MessageId;
     public abstract MessageType type();
     public abstract bool isReliable();
     public abstract byte[] Serialize();

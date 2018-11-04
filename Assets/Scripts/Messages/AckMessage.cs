@@ -7,6 +7,12 @@ public class AckMessage : GameMessage
 {
     public int ackid;
 
+    public AckMessage(int _MessageId, int ackid)
+    {
+        this._MessageId = _MessageId;
+        this.ackid = ackid;
+    }
+
     public AckMessage(int ackid)
     {
         this.ackid = ackid;

@@ -29,12 +29,12 @@ public class MessageSerializer {
 
 	public static GameMessage AckDeserialize(Decompressor decompressor)
 	{
-		return new AckMessage(decompressor.GetNumber(GlobalSettings.MaxACK));
+		return new AckMessage(decompressor.GetNumber(int.MaxValue), decompressor.GetNumber(GlobalSettings.MaxACK));
 	}
 
 	public static GameMessage ClientConnectDeserialiaze(Decompressor decompressor)
 	{
-		return new ClientConnectMessage(decompressor.GetString());
+		return new ClientConnectMessage(decompressor.GetNumber(int.MaxValue),decompressor.GetString());
 	}
 
 	public static GameMessage PlayerSnapshotDeserialize(Decompressor decompressor)
