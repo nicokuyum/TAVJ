@@ -35,7 +35,7 @@ public class Server : MonoBehaviour
 	public Dictionary<int, PlayerSnapshot> players = new Dictionary<int, PlayerSnapshot>();
 	public Dictionary<int, int> lastAcks = new Dictionary<int, int>();
 	public Dictionary<Connection, int> connections = new Dictionary<Connection, int>();
-	public Dictionary<int, List<InputKey>> actions = new Dictionary<int, List<InputKey>>();
+	public Dictionary<int, HashSet<PlayerAction>> actions = new Dictionary<int, HashSet<PlayerAction>>();
 	public Dictionary<int, ReliableQueue> rq = new Dictionary<int, ReliableQueue>();
 	
 	// Use this for initialization
@@ -67,12 +67,16 @@ public class Server : MonoBehaviour
 
 
 
+
+
 		if (time > snapRate && players.Count != 0)
 		{
 			time -= snapRate;
+			byte[] serializedWorld = SerializeWorld();
 			foreach (Connection connection in connections.Keys)
 			{
-				
+				Debug.Log("SENDING WORLD");	
+				SendUdp(SourcePort, connection.srcIp.ToString(), GlobalSettings.GamePort, serializedWorld);
 			}
 			/*if (players.Count != 0)
 			{
@@ -155,7 +159,7 @@ public class Server : MonoBehaviour
 
 	private void UpdatePlayer(int id)
 	{
-		List<InputKey> keys = actions[id];
+		HashSet<PlayerAction> keys = actions[id];
 		PlayerSnapshot ps = players[id];
 		foreach (InputKey key in keys)
 		{
@@ -175,8 +179,8 @@ public class Server : MonoBehaviour
 	
 		Debug.Log("Responding ACK " + ack);
 		//Debug.Log("SENDING ACK TO  " + connection.srcIp.ToString() + "   PORT   " + GlobalSettings.GamePort);
-		//Debug.Log("ACK  " + ack);
-		//SendUdp(SourcePort, connection.srcIp.ToString(), GlobalSettings.GamePort, packet.serialize());
+		Debug.Log("ACK  " + ack);
+		SendUdp(SourcePort, connection.srcIp.ToString(), GlobalSettings.GamePort, packet.serialize());
 	}
 
 	private void ProcessPacket( Packet packet)
@@ -188,6 +192,9 @@ public class Server : MonoBehaviour
 			{
 				case MessageType.ClientConnect:
 					processConnect(gm,packet.connection);
+					break;
+				case MessageType.PlayerInput:
+					processInput(gm, packet.connection);
 					break;
 				default:
 					break;
@@ -210,5 +217,42 @@ public class Server : MonoBehaviour
 		}
 		return (new Packet(gms)).serialize();
 	}
-	
+
+	private void processInput(GameMessage gm, Connection connection)
+	{
+		PlayerInputMessage inputMessage = (PlayerInputMessage) gm;
+		int id = connections[connection];
+		switch (inputMessage.Action)
+		{
+			case PlayerAction.StartMoveForward:
+				actions[id].Add(PlayerAction.StartMoveForward);
+				break;
+			case PlayerAction.StartMoveRight:
+				actions[id].Add(PlayerAction.StartMoveForward);
+				break;
+			case PlayerAction.StartMoveBack:
+				actions[id].Add(PlayerAction.StartMoveForward);
+				break;
+			case PlayerAction.StartMoveLeft:
+				actions[id].Add(PlayerAction.StartMoveForward);
+				break;
+			case PlayerAction.StopMoveForward:
+				actions[id].Add(PlayerAction.StartMoveForward);
+				break;
+			case PlayerAction.StopMoveRight:
+				actions[id].Add(PlayerAction.StartMoveForward);
+				break;
+			case PlayerAction.StopMoveBack:
+				actions[id].Add(PlayerAction.StartMoveForward);
+				break;
+			case PlayerAction.StopMoveLeft:
+				actions[id].Add(PlayerAction.StartMoveForward);
+				break;
+			case PlayerAction.Shoot:
+				actions[id].Add(PlayerAction.StartMoveForward);
+				break;
+			default:
+				break;
+		}
+	}
 }
