@@ -41,8 +41,8 @@ public class PlayerSnapshot
     public byte[] serialize()
     {
         Compressor compressor = new Compressor();
-        compressor.WriteNumber(frameNumber, compressor.GetBitsRequired(3600 * (long)GlobalSettings.Fps));
-        compressor.WriteNumber(this.Health, compressor.GetBitsRequired(GlobalSettings.MaxHealth));
+        compressor.WriteNumber(frameNumber, 3600 * (long)GlobalSettings.Fps);
+        compressor.WriteNumber(this.Health, GlobalSettings.MaxHealth);
         compressor.PutBit(this.Invulnerable);
         compressor.WriteFloat(position.x, GlobalSettings.MaxPosition, GlobalSettings.MinPosition, 0.1f);
         compressor.WriteFloat(position.y, GlobalSettings.MaxPosition, GlobalSettings.MinPosition, 0.1f);

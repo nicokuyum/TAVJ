@@ -29,8 +29,16 @@ public class ReliableQueue
     public void AddQueue(GameMessage gm, long frameNumber)
     {
         MessageQueue.Add(gm);
-        SentFrames.Add(gm, frameNumber);
-        gamemessages.Add(gm._MessageId, gm);
+        if (SentFrames.ContainsKey(gm))
+        {
+            SentFrames[gm] = frameNumber;
+            gamemessages[gm._MessageId] = gm;
+        }
+        else
+        {
+            SentFrames.Add(gm, frameNumber);
+            gamemessages.Add(gm._MessageId, gm);
+        }
     }
 
 

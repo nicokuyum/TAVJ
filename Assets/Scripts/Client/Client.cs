@@ -44,7 +44,18 @@ public class Client : MonoBehaviour
 		
 		if (acumTime >= (1.0f/fps))
 		{
-			frame++;
+
+			int a = 1;
+			Compressor comp = new Compressor();
+			comp.PutBit(false);
+
+			Debug.Log(" ASD " + (new Decompressor(comp.GetBuffer()).GetBoolean()));
+
+
+
+
+
+			/*frame++;
 			acumTime -= (1.0f/fps);
 			Packet packet = PacketQueue.GetInstance().PollPacket();
 			while (packet != null)
@@ -75,7 +86,7 @@ public class Client : MonoBehaviour
 				Debug.Log("test size = " + test.MessageCount);
 				SendUdp(p.serialize());
 				outgoingMessages.Clear();
-			}
+			}*/
 		}
 	}
 	

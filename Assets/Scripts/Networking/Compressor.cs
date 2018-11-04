@@ -23,8 +23,9 @@ public class Compressor : Encoder
         return buffer.GetBuffer();
     }
 
-    public void WriteNumber(long value, int size)
+    public void WriteNumber(long value, long maxNumber)
     {
+        int size = GetBitsRequired(maxNumber);
         while (size > 0)
         {
             PutBit(((value >> (size - 1)) & 1) != 0);
