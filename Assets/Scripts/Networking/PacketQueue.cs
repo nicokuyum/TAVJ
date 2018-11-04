@@ -24,7 +24,7 @@ public class PacketQueue {
 
 	public void PushPacket(Packet p)
 	{
-		//Debug.Log("PUSHING PACKET");
+		Debug.Log("PUSHING PACKET");
 		lock (LockObject)
 		{
 			queue.Enqueue(p);

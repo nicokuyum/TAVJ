@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using System;
 
 public class PlayerInputMessage : GameMessage
 {
@@ -10,6 +8,12 @@ public class PlayerInputMessage : GameMessage
     public PlayerInputMessage(PlayerAction action)
     {
         this.Action = action;
+    }
+
+    public PlayerInputMessage(PlayerAction action, int id)
+    {
+        _MessageId = id;
+        Action = action;
     }
 
     public override MessageType type()
@@ -24,6 +28,10 @@ public class PlayerInputMessage : GameMessage
 
     public override byte[] Serialize()
     {
-        throw new System.NotImplementedException();
+        Compressor compressor = new Compressor();
+        compressor.WriteNumber((int)MessageType.PlayerInput,Enum.GetNames(typeof(MessageType)).Length);
+        compressor.WriteNumber(_MessageId, int.MaxValue);
+        compressor.WriteNumber((int)Action, Enum.GetNames(typeof(PlayerAction)).Length);
+        return compressor.GetBuffer();
     }
 }

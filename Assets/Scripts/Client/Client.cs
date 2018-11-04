@@ -13,9 +13,9 @@ public class Client : MonoBehaviour
 	private List<GameMessage> outgoingMessages;
 	
 	public String DestIp;
-	public int DestPort;
-	public int SourcePort;
-	public int listenPort;
+	public static int DestPort = GlobalSettings.GamePort;
+	public static int SourcePort = 8081;
+	public static int listenPort = GlobalSettings.GamePort;
 	
 	private float time = 0.0f;
 	private float acumTime = 0.0f;
@@ -29,6 +29,7 @@ public class Client : MonoBehaviour
 
 	// Use this for initialization
 	void Start () {
+		player = GameObject.Find("Player").GetComponent<Player>();
 		outgoingMessages = new List<GameMessage>();
 		rq = new ReliableQueue();
 		outgoingMessages.Add(new ClientConnectMessage("asdf"));
@@ -44,18 +45,7 @@ public class Client : MonoBehaviour
 		
 		if (acumTime >= (1.0f/fps))
 		{
-
-			int a = 1;
-			Compressor comp = new Compressor();
-			comp.PutBit(false);
-
-			Debug.Log(" ASD " + (new Decompressor(comp.GetBuffer()).GetBoolean()));
-
-
-
-
-
-			/*frame++;
+			frame++;
 			acumTime -= (1.0f/fps);
 			Packet packet = PacketQueue.GetInstance().PollPacket();
 			while (packet != null)
@@ -66,6 +56,13 @@ public class Client : MonoBehaviour
 				}
 				packet = PacketQueue.GetInstance().PollPacket();
 			}
+
+			foreach (var action in player.getActions())
+			{
+				outgoingMessages.Add(action);
+			}
+			
+			player.getActions().Clear();
 			
 			foreach (var gm in outgoingMessages)
 			{
@@ -74,19 +71,20 @@ public class Client : MonoBehaviour
 					rq.AddQueue(gm, frame);
 				}
 			}
+			
 			outgoingMessages.AddRange(rq.MessageToResend(frame));
 			Debug.Log("Outgoing messages size: " + outgoingMessages.Count);
 			if (outgoingMessages.Count > 0)
 			{
 				Packet p = new Packet(outgoingMessages);
-				Debug.Log("p size = " + p.MessageCount);
+				//Debug.Log("p size = " + p.MessageCount);
 				byte[] bytes = p.serialize();
-				Debug.Log("bytes = " + Encoding.Default.GetString(bytes));
-				Packet test = new Packet(bytes, null);
-				Debug.Log("test size = " + test.MessageCount);
-				SendUdp(p.serialize());
+				//Debug.Log("bytes = " + Encoding.Default.GetString(bytes));
+				//Packet test = new Packet(bytes, null);
+				//Debug.Log("test size = " + test.MessageCount);
+				SendUdp(bytes);
 				outgoingMessages.Clear();
-			}*/
+			}
 		}
 	}
 	
