@@ -6,6 +6,17 @@ namespace Networking
 {
     public class Connection
     {
+        public override bool Equals(object obj)
+        {
+            Connection con = (Connection) obj;
+            return con.GetHashCode() == con.GetHashCode();
+        }
+
+        public override int GetHashCode()
+        {
+            return srcIp.GetHashCode();
+        }
+
         public int srcPrt;
         public IPAddress srcIp;
 
@@ -19,6 +30,9 @@ namespace Networking
         {
             return srcIp.ToString() + " : " + srcPrt;
         }
+
+
+
     }
     
     

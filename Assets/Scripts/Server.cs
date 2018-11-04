@@ -35,7 +35,7 @@ public class Server : MonoBehaviour
 	public Dictionary<int, PlayerSnapshot> players = new Dictionary<int, PlayerSnapshot>();
 	public Dictionary<int, int> lastAcks = new Dictionary<int, int>();
 	public Dictionary<Connection, int> connections = new Dictionary<Connection, int>();
-	public Dictionary<int, List<InputKey>> actions = new Dictionary<int, List<InputKey>>();
+	public Dictionary<int, HashSet<PlayerAction>> actions = new Dictionary<int, HashSet<PlayerAction>>();
 	public Dictionary<int, ReliableQueue> rq = new Dictionary<int, ReliableQueue>();
 	
 	// Use this for initialization
@@ -64,29 +64,27 @@ public class Server : MonoBehaviour
 		{
 			UpdatePlayer(id);
 		}*/
+		Compressor  comp = new Compressor();
+		comp.WriteFloat(50.0f,GlobalSettings.MaxPosition,GlobalSettings.MinPosition,0.1f);
+		Debug.Log(new Decompressor(comp.GetBuffer()).GetFloat(GlobalSettings.MaxPosition, GlobalSettings.MinPosition, 0.1f));
 
 
 
 		if (time > snapRate && players.Count != 0)
 		{
 			time -= snapRate;
+			byte[] serializedWorld = SerializeWorld();
 			foreach (Connection connection in connections.Keys)
 			{
-				
+				//Debug.Log("SENDING WORLD");	
+				SendUdp(SourcePort, connection.srcIp.ToString(), GlobalSettings.GamePort, serializedWorld);
 			}
-			/*if (players.Count != 0)
+
+			for (int i = 1; i < idCount; i++)
 			{
-				Debug.Log("Server Sending UDP Packet to " + DestIp + " port " + DestPort);
-				byte[] bytes = players[1].serialize();
-				SendUdp(SourcePort, DestIp, DestPort, bytes);
-				
-				//TODO SERIALIZE WORLD
-				byte[] serializedWorld = SerializeWorld();
-				foreach (Connection con  in connections.Keys)
-				{
-					SendUdp(SourcePort, con.srcIp.ToString(), con.srcPrt, serializedWorld);
-				}
-			}*/
+				UpdatePlayer(i);
+			}
+
 		}
 	}
 
@@ -117,7 +115,7 @@ public class Server : MonoBehaviour
 			lock (lockObject)
 			{
 				data = (byte[]) receiveBytes.Clone();
-				Debug.Log("ENTRARON " + data.Length + " BYTES");
+				//Debug.Log("ENTRARON " + data.Length + " BYTES");
 				PacketQueue.GetInstance().PushPacket(new Packet(data, connection));
 				//Debug.Log("ENTRO ALGO");
 			}
@@ -140,28 +138,32 @@ public class Server : MonoBehaviour
 
 	private void EstablishConnection(Connection connection, int messageId)
 	{
-		//Debug.Log("SE CONECTO " + connection.ToString());
+		Debug.Log("SE CONECTO " + connection.ToString());
 		int id = idCount++;
 		connections.Add(connection, id);
+		connections[connection] = id;
 		lastAcks.Add(id, messageId);
 		Random random = new Random();
 		int range = (int)(GlobalSettings.MaxPosition - GlobalSettings.MinPosition);
 		Vector3 position = new Vector3(random.Next(range) + GlobalSettings.MinPosition
 			, random.Next(range) + GlobalSettings.MinPosition
 			, 0);
-			
-		players.Add(id, new PlayerSnapshot(position));
+		actions[id]= new HashSet<PlayerAction>();
+		PlayerSnapshot ps = new PlayerSnapshot();
+		players.Add(id, ps);
+		playersnapshots.Add(ps);
+		
 	}
 
 	private void UpdatePlayer(int id)
 	{
-		List<InputKey> keys = actions[id];
+		Debug.Log("Updating Player   "  + id);
+		HashSet<PlayerAction> keys = actions[id];
 		PlayerSnapshot ps = players[id];
-		foreach (InputKey key in keys)
+		foreach (PlayerAction action in keys)
 		{
-			ps.apply(key);
+			Mover.GetInstance().ApplyAction(ps,action);
 		}
-		players[id] = ps;
 	}
 
 	private void SendAck(Connection connection, int ack)
@@ -170,13 +172,11 @@ public class Server : MonoBehaviour
 		byte[] ackmsg = (new AckMessage(ack)).Serialize();
 
 		List<GameMessage> gms = new List<GameMessage>();
-		gms .Add( new AckMessage(ack));
+		
+		gms.Add( new AckMessage(ack));
+		
 		Packet packet = new Packet(gms);
-	
-		Debug.Log("Responding ACK " + ack);
-		//Debug.Log("SENDING ACK TO  " + connection.srcIp.ToString() + "   PORT   " + GlobalSettings.GamePort);
-		//Debug.Log("ACK  " + ack);
-		//SendUdp(SourcePort, connection.srcIp.ToString(), GlobalSettings.GamePort, packet.serialize());
+		SendUdp(SourcePort, connection.srcIp.ToString(), GlobalSettings.GamePort, packet.serialize());
 	}
 
 	private void ProcessPacket( Packet packet)
@@ -189,10 +189,15 @@ public class Server : MonoBehaviour
 				case MessageType.ClientConnect:
 					processConnect(gm,packet.connection);
 					break;
+				case MessageType.PlayerInput:
+					processInput(gm, packet.connection);
+					break;
 				default:
 					break;
 			}
-
+			
+			
+			//TODO Procesar si es reliable SOLAMENTE si el ack es inferior al que mande
 			if (gm.isReliable())
 			{
 				SendAck(packet.connection, gm._MessageId);
@@ -207,8 +212,50 @@ public class Server : MonoBehaviour
 		foreach (PlayerSnapshot playerSnapshot in players.Values)
 		{
 			gms.Add(new PlayerSnapshotMessage(playerSnapshot));
+			Debug.Log("Position " +((PlayerSnapshotMessage)gms[0]).Snapshot.position.x +
+			          " " + (((PlayerSnapshotMessage)gms[0]).Snapshot.position.y) + " " + 
+				(((PlayerSnapshotMessage)gms[0]).Snapshot.position.x));
 		}
 		return (new Packet(gms)).serialize();
 	}
-	
+
+	private void processInput(GameMessage gm, Connection connection)
+	{
+		PlayerInputMessage inputMessage = (PlayerInputMessage) gm;		
+		
+		int id = connections[connection];
+		Debug.Log(inputMessage.Action);
+		switch (inputMessage.Action)
+		{
+			case PlayerAction.StartMoveForward:
+				actions[id].Add(PlayerAction.StartMoveForward);
+				break;
+			case PlayerAction.StartMoveRight:
+				actions[id].Add(PlayerAction.StartMoveRight);
+				break;
+			case PlayerAction.StartMoveBack:
+				actions[id].Add(PlayerAction.StartMoveBack);
+				break;
+			case PlayerAction.StartMoveLeft:
+				actions[id].Add(PlayerAction.StartMoveLeft);
+				break;
+			case PlayerAction.StopMoveForward:
+				actions[id].Remove(PlayerAction.StartMoveForward);
+				break;
+			case PlayerAction.StopMoveRight:
+				actions[id].Remove(PlayerAction.StartMoveRight);
+				break;
+			case PlayerAction.StopMoveBack:
+				actions[id].Remove(PlayerAction.StartMoveBack);
+				break;
+			case PlayerAction.StopMoveLeft:
+				actions[id].Remove(PlayerAction.StartMoveLeft);
+				break;
+			case PlayerAction.Shoot:
+				actions[id].Add(PlayerAction.Shoot);
+				break;
+			default:
+				break;
+		}
+	}
 }
