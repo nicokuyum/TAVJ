@@ -32,7 +32,8 @@ public class AckMessage : GameMessage
     {
         Compressor compressor = new Compressor();
         compressor.WriteNumber((int)MessageType.Ack, Enum.GetNames(typeof(MessageType)).Length);
-        compressor.WriteNumber(ackid, Int32.MaxValue);
+        compressor.WriteNumber(_MessageId, int.MaxValue);
+        compressor.WriteNumber(ackid, GlobalSettings.MaxACK);
         return compressor.GetBuffer();
     }
     
