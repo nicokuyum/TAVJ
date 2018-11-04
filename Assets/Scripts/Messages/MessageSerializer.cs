@@ -47,6 +47,7 @@ public class MessageSerializer {
 		position.x = decompressor.GetFloat(GlobalSettings.MaxPosition, GlobalSettings.MinPosition, 0.1f);
 		position.y = decompressor.GetFloat(GlobalSettings.MaxPosition, GlobalSettings.MinPosition, 0.1f);
 		position.z = decompressor.GetFloat(GlobalSettings.MaxPosition, GlobalSettings.MinPosition, 0.1f);
+		playerSnapshot.position = position;
 		return new PlayerSnapshotMessage(playerSnapshot);
 	}
 

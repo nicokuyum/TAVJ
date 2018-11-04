@@ -13,7 +13,6 @@ public class ReliableQueue
         MessageQueue = new List<GameMessage>();
         SentFrames = new Dictionary<GameMessage, long>();
         gamemessages = new Dictionary<int, GameMessage>();
-        
     }
 
     public void ReceivedACK(int ackid)

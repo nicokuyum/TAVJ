@@ -28,7 +28,7 @@ public class PlayerSnapshot
         frameNumber = 1;
         Health = GlobalSettings.MaxHealth;
         Invulnerable = false;
-        position = new Vector3(50,50,50);
+        this.position = new Vector3(50,50,50);
     }
 
     public PlayerSnapshot()
@@ -36,6 +36,7 @@ public class PlayerSnapshot
         frameNumber = 1;
         Health = GlobalSettings.MaxHealth;
         Invulnerable = false;
+        position = new Vector3(50, 50, 50);
     }
 
     public byte[] serialize()

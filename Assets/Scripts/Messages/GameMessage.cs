@@ -18,6 +18,6 @@ public abstract class GameMessage
     
     public override int GetHashCode()
     {
-        return idCounter;
+        return _MessageId;
     }
 }
