@@ -20,11 +20,8 @@ public class MessageSerializer {
 					return PlayerInputDeserialize(decompressor);
 				case MessageType.PlayerSnapshot:
 					return PlayerSnapshotDeserialize(decompressor);
-					break;
 				default: return null;
 		}
-
-		return null;
 	}
 
 	public static GameMessage AckDeserialize(Decompressor decompressor)
@@ -47,6 +44,7 @@ public class MessageSerializer {
 		position.x = decompressor.GetFloat(GlobalSettings.MaxPosition, GlobalSettings.MinPosition, 0.1f);
 		position.y = decompressor.GetFloat(GlobalSettings.MaxPosition, GlobalSettings.MinPosition, 0.1f);
 		position.z = decompressor.GetFloat(GlobalSettings.MaxPosition, GlobalSettings.MinPosition, 0.1f);
+		playerSnapshot.position = position;
 		return new PlayerSnapshotMessage(playerSnapshot);
 	}
 

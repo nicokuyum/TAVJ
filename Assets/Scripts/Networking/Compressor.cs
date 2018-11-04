@@ -41,9 +41,8 @@ public class Compressor : Encoder
     {
         double values = (max - min) / precision;
         int maxValues = Convert.ToInt32(Math.Ceiling(values));
-        int requiredBits = BitLength(maxValues);
         int actualBits = Convert.ToInt32((value - min) / precision);
-        WriteNumber(actualBits, requiredBits);
+        WriteNumber(actualBits, maxValues);
     }
 
     public void PutBit(bool value)
