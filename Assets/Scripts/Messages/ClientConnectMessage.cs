@@ -30,8 +30,8 @@ public class ClientConnectMessage : GameMessage
     public override byte[] Serialize()
     {
         Compressor compressor = new Compressor();
-        compressor.WriteNumber(_MessageId, int.MaxValue);
         compressor.WriteNumber((int)MessageType.ClientConnect,Enum.GetNames(typeof(MessageType)).Length);
+        compressor.WriteNumber(_MessageId, int.MaxValue);
         compressor.WriteString(name);
         return compressor.GetBuffer();
     }

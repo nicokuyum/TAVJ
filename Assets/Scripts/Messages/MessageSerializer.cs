@@ -15,9 +15,9 @@ public class MessageSerializer {
 				case MessageType.Ack:
 					return AckDeserialize(decompressor);
 				case MessageType.ClientConnect:
-					return ClientConnectDeserialiaze(decompressor);
+					return ClientConnectDeserialize(decompressor);
 				case MessageType.PlayerInput:		// TODO
-					return new PlayerInputMessage(PlayerAction.Shoot);
+					return PlayerInputDeserialize(decompressor);
 				case MessageType.PlayerSnapshot:
 					return PlayerSnapshotDeserialize(decompressor);
 					break;
@@ -32,7 +32,7 @@ public class MessageSerializer {
 		return new AckMessage(decompressor.GetNumber(int.MaxValue), decompressor.GetNumber(GlobalSettings.MaxACK));
 	}
 
-	public static GameMessage ClientConnectDeserialiaze(Decompressor decompressor)
+	public static GameMessage ClientConnectDeserialize(Decompressor decompressor)
 	{
 		return new ClientConnectMessage(decompressor.GetNumber(int.MaxValue),decompressor.GetString());
 	}
@@ -49,8 +49,13 @@ public class MessageSerializer {
 		position.z = decompressor.GetFloat(GlobalSettings.MaxPosition, GlobalSettings.MinPosition, 0.1f);
 		return new PlayerSnapshotMessage(playerSnapshot);
 	}
-	
 
+	public static GameMessage PlayerInputDeserialize(Decompressor decompressor)
+	{
+		int id = decompressor.GetNumber(int.MaxValue);
+		PlayerAction action = (PlayerAction)decompressor.GetNumber(Enum.GetNames(typeof(PlayerAction)).Length);
+		return new PlayerInputMessage(action, id);
+	}
 
 
 }

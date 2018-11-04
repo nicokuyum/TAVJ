@@ -18,7 +18,7 @@ public class ReliableQueue
 
     public void ReceivedACK(int ackid)
     {
-        while (MessageQueue[0]._MessageId <= ackid)
+        while (MessageQueue.Count > 0 && MessageQueue[0]._MessageId <= ackid)
         {
             MessageQueue.RemoveAt(0);
             SentFrames.Remove(gamemessages[ackid]);
@@ -52,6 +52,10 @@ public class ReliableQueue
             {
                 needResend.Add(gm);
                 SentFrames[gm] = frameNumber;
+                foreach (var r in needResend)
+                {
+                    Debug.Log("Msg Id to resend: " + ((ClientConnectMessage)r)._MessageId);
+                }
             }
         }
         return needResend;
