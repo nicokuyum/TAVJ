@@ -17,6 +17,7 @@ public class ReliableQueue
 
     public void ReceivedACK(int ackid)
     {
+        Debug.Log("Received ack id: " + ackid);
         while (MessageQueue.Count > 0 && MessageQueue[0]._MessageId <= ackid)
         {
             MessageQueue.RemoveAt(0);
@@ -44,17 +45,12 @@ public class ReliableQueue
     public List<GameMessage> MessageToResend(long frameNumber)
     {
         List<GameMessage> needResend = new List<GameMessage>();
-
         foreach (GameMessage gm in MessageQueue)
         {
             if (frameNumber - SentFrames[gm] >= GlobalSettings.ReliableTimeout)
             {
                 needResend.Add(gm);
                 SentFrames[gm] = frameNumber;
-                foreach (var r in needResend)
-                {
-                    Debug.Log("Msg Id to resend: " + ((ClientConnectMessage)r)._MessageId);
-                }
             }
         }
         return needResend;

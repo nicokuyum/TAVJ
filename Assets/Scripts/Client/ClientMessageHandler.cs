@@ -29,6 +29,7 @@ public class ClientMessageHandler {
 
 	private void handleAck(AckMessage message)
 	{
+		Debug.Log("Handling ack with ackid " + message.ackid);
 		rq.ReceivedACK(message.ackid);
 	}
 

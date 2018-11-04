@@ -16,15 +16,12 @@ public class MessageSerializer {
 					return AckDeserialize(decompressor);
 				case MessageType.ClientConnect:
 					return ClientConnectDeserialize(decompressor);
-				case MessageType.PlayerInput:		// TODO
+				case MessageType.PlayerInput:
 					return PlayerInputDeserialize(decompressor);
 				case MessageType.PlayerSnapshot:
 					return PlayerSnapshotDeserialize(decompressor);
-					break;
 				default: return null;
 		}
-
-		return null;
 	}
 
 	public static GameMessage AckDeserialize(Decompressor decompressor)
