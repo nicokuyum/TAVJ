@@ -1,6 +1,6 @@
 ﻿using System;
 
-public class PlayerInputMessage : GameMessage
+public class PlayerInputMessage : ReliableMessage
 {
 
     public PlayerAction Action;

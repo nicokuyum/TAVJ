@@ -26,7 +26,7 @@ public class MessageSerializer {
 
 	public static GameMessage AckDeserialize(Decompressor decompressor)
 	{
-		return new AckMessage(decompressor.GetNumber(int.MaxValue), decompressor.GetNumber(GlobalSettings.MaxACK));
+		return new AckMessage(decompressor.GetNumber(GlobalSettings.MaxACK));
 	}
 
 	public static GameMessage ClientConnectDeserialize(Decompressor decompressor)
