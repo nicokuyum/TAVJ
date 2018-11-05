@@ -21,6 +21,7 @@ public class Client : MonoBehaviour
 	private float acumTime = 0.0f;
 	private float fps = GlobalSettings.Fps;
 	private long frame = 0;
+	private int subframe = 0;
 
 	private ClientMessageHandler handler;
 	private ReliableQueue rq;
@@ -42,6 +43,11 @@ public class Client : MonoBehaviour
 	void Update () {
 		time += Time.deltaTime;
 		acumTime += Time.deltaTime;
+		subframe++;
+		if (subframe == GlobalSettings.PrintingSubFrameRate)
+		{
+			subframe = 0;
+		}
 		
 		if (acumTime >= (1.0f/fps))
 		{
@@ -71,6 +77,8 @@ public class Client : MonoBehaviour
 					rq.AddQueue((ReliableMessage)gm, frame);
 				}
 			}
+			
+			SnapshotHandler.GetInstance().updatePlayer(SnapshotHandler.GetInstance().getSnapshot(frame, subframe));
 			
 			outgoingMessages.AddRange(rq.MessageToResend(frame));
 			Debug.Log("Outgoing messages size: " + outgoingMessages.Count);

@@ -5,13 +5,23 @@ using UnityEngine;
 public class SnapshotHandler
 {
 
+    private static SnapshotHandler _instance;
+    
+
+    
+    
     private SortedList<long, PlayerSnapshot> snapshotBuffer;
     private long start;
     private long end;
 
-    public SnapshotHandler()
+    private SnapshotHandler()
     {
         snapshotBuffer = new SortedList<long, PlayerSnapshot>();
+    }
+
+    public static SnapshotHandler GetInstance()
+    {
+        return _instance ?? (_instance = new SnapshotHandler());
     }
 
     public void ReceiveSnapshot(PlayerSnapshot snapshot)
@@ -63,5 +73,14 @@ public class SnapshotHandler
         return ps;
     }
 
-    
+    public void updatePlayer(PlayerSnapshot ps)
+    {
+        Player p = GameObject.Find("Player").GetComponent<Player>();
+        p.Health = ps.Health;
+        p.Invulnerable = ps.Invulnerable;
+        p.gameObject.transform.position = ps.position;
+        p.gameObject.transform.rotation = ps.rotation;
+    }
+
+
 }

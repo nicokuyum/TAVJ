@@ -24,7 +24,7 @@ public class ClientMessageHandler
 				handleAck((AckMessage) gm);
 				break;
 			case MessageType.PlayerSnapshot:
-				handlePlayerSnapshot((PlayerSnapshotMessage) gm);
+				handlePlayerSnapshotInterpolating((PlayerSnapshotMessage) gm);
 				break;
 			default:
 				throw new NotImplementedException();
@@ -47,7 +47,7 @@ public class ClientMessageHandler
 
 	private void handlePlayerSnapshotInterpolating(PlayerSnapshotMessage psm)
 	{
-		
+		SnapshotHandler.GetInstance().ReceiveSnapshot(psm.Snapshot);
 	}
 
 }
