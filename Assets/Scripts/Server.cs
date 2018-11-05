@@ -114,7 +114,7 @@ public class Server : MonoBehaviour
 			lock (lockObject)
 			{
 				data = (byte[]) receiveBytes.Clone();
-				//Debug.Log("ENTRARON " + data.Length + " BYTES");
+				Debug.Log("ENTRARON " + data.Length + " BYTES");
 				PacketQueue.GetInstance().PushPacket(new Packet(data, connection));
 				//Debug.Log("ENTRO ALGO");
 			}

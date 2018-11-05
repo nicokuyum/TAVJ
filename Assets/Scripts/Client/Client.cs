@@ -48,6 +48,7 @@ public class Client : MonoBehaviour
 		{
 			subframe = 0;
 		}
+		Debug.Log("IPD");
 		
 		if (acumTime >= (1.0f/fps))
 		{
@@ -77,8 +78,10 @@ public class Client : MonoBehaviour
 					rq.AddQueue((ReliableMessage)gm, frame);
 				}
 			}
+
 			
 			SnapshotHandler.GetInstance().updatePlayer(SnapshotHandler.GetInstance().getSnapshot(frame, subframe));
+			
 			
 			outgoingMessages.AddRange(rq.MessageToResend(frame));
 			Debug.Log("Outgoing messages size: " + outgoingMessages.Count);
@@ -102,6 +105,7 @@ public class Client : MonoBehaviour
 
 		while (true)
 		{
+		
 			IPEndPoint RemoteIpEndPoint = new IPEndPoint(IPAddress.Any, 0);
 			
 			byte[] receiveBytes = udpClient.Receive(ref RemoteIpEndPoint);

@@ -17,6 +17,7 @@ public class SnapshotHandler
     private SnapshotHandler()
     {
         snapshotBuffer = new SortedList<long, PlayerSnapshot>();
+        
     }
 
     public static SnapshotHandler GetInstance()
@@ -30,6 +31,11 @@ public class SnapshotHandler
         {
             snapshotBuffer.Add(snapshot.frameNumber,snapshot);
         }
+    }
+
+    public bool ready()
+    {
+        return snapshotBuffer.Count > 2;
     }
 
     public PlayerSnapshot getSnapshot(long frame, int subframe)
