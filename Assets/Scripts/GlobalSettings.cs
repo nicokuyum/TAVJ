@@ -21,4 +21,6 @@ public class GlobalSettings{
 
 	public const float BUFFERWINDOW = 3;
 	public const int PrintingSubFrameRate = 3;
+
+	public const int MaxPlayers = 32;
 }

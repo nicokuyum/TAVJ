@@ -54,7 +54,7 @@ public class SnapshotHandler
     public PlayerSnapshot interpolate(PlayerSnapshot past, PlayerSnapshot future, long frame, int subframe)
     {
         long totalFrames = (future.frameNumber - past.frameNumber) * GlobalSettings.PrintingSubFrameRate;
-        PlayerSnapshot ps = new PlayerSnapshot();
+        PlayerSnapshot ps = new PlayerSnapshot(past.id);
         long percentage = ((frame - past.frameNumber) * subframe + subframe)/ (totalFrames*subframe);
         ps.rotation = Quaternion.Lerp(past.rotation, future.rotation, percentage);
         ps.position = Vector3.Lerp(past.position, future.position, percentage);

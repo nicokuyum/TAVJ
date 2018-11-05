@@ -37,7 +37,8 @@ public class MessageSerializer {
 	public static GameMessage PlayerSnapshotDeserialize(Decompressor decompressor)
 	{
 		Vector3 position = new Vector3();
-		PlayerSnapshot playerSnapshot = new PlayerSnapshot();
+		int id = decompressor.GetNumber(GlobalSettings.MaxPlayers);
+		PlayerSnapshot playerSnapshot = new PlayerSnapshot(id);
 		playerSnapshot.frameNumber = decompressor.GetNumber(3600 * (long) GlobalSettings.Fps);
 		playerSnapshot.Health = decompressor.GetNumber(GlobalSettings.MaxHealth);
 		playerSnapshot.Invulnerable = decompressor.GetBoolean();

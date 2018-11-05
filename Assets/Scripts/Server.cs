@@ -148,7 +148,7 @@ public class Server : MonoBehaviour
 			, random.Next(range) + GlobalSettings.MinPosition
 			, 0);
 		actions[id]= new HashSet<PlayerAction>();
-		PlayerSnapshot ps = new PlayerSnapshot();
+		PlayerSnapshot ps = new PlayerSnapshot(id, position);
 		players.Add(id, ps);
 		playersnapshots.Add(ps);
 		
