@@ -4,15 +4,15 @@ using UnityEngine;
 
 public class ReliableQueue
 {
-    private List<GameMessage> MessageQueue;
-    private Dictionary<GameMessage, long> SentFrames;
-    private Dictionary<int, GameMessage> gamemessages;
+    private List<ReliableMessage> MessageQueue;
+    private Dictionary<ReliableMessage, long> SentFrames;
+    private Dictionary<int, ReliableMessage> gamemessages;
 
     public ReliableQueue()
     {
-        MessageQueue = new List<GameMessage>();
-        SentFrames = new Dictionary<GameMessage, long>();
-        gamemessages = new Dictionary<int, GameMessage>();
+        MessageQueue = new List<ReliableMessage>();
+        SentFrames = new Dictionary<ReliableMessage, long>();
+        gamemessages = new Dictionary<int, ReliableMessage>();
     }
 
     public void ReceivedACK(int ackid)
@@ -26,7 +26,7 @@ public class ReliableQueue
         }
     }
 
-    public void AddQueue(GameMessage gm, long frameNumber)
+    public void AddQueue(ReliableMessage gm, long frameNumber)
     {
         MessageQueue.Add(gm);
         if (SentFrames.ContainsKey(gm))
@@ -45,12 +45,12 @@ public class ReliableQueue
     public List<GameMessage> MessageToResend(long frameNumber)
     {
         List<GameMessage> needResend = new List<GameMessage>();
-        foreach (GameMessage gm in MessageQueue)
+        foreach (ReliableMessage rm in MessageQueue)
         {
-            if (frameNumber - SentFrames[gm] >= GlobalSettings.ReliableTimeout)
+            if (frameNumber - SentFrames[rm] >= GlobalSettings.ReliableTimeout)
             {
-                needResend.Add(gm);
-                SentFrames[gm] = frameNumber;
+                needResend.Add(rm);
+                SentFrames[rm] = frameNumber;
             }
         }
         return needResend;

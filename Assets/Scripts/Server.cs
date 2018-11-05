@@ -89,12 +89,12 @@ public class Server : MonoBehaviour
 
 
 
-	private void processConnect(GameMessage gm, Connection connection)
+	private void processConnect(ClientConnectMessage ccm, Connection connection)
 	{
 		//Debug.Log("PROCESSING CONNECTION");
 		if (!connections.ContainsKey(connection))
 		{
-			EstablishConnection(connection, gm._MessageId);
+			EstablishConnection(connection, ccm._MessageId);
 		}
 
 	}
@@ -186,14 +186,14 @@ public class Server : MonoBehaviour
 	{
 		foreach (GameMessage gm in packet.Messages)
 		{
-			//("Message ID " + gm._MessageId);
+
 			switch (gm.type())
 			{
 				case MessageType.ClientConnect:
-					processConnect(gm,packet.connection);
+					processConnect((ClientConnectMessage)gm,packet.connection);
 					break;
 				case MessageType.PlayerInput:
-					processInput(gm, packet.connection);
+					processInput((PlayerInputMessage)gm, packet.connection);
 					break;
 				default:
 					break;
@@ -203,7 +203,8 @@ public class Server : MonoBehaviour
 			//TODO Procesar si es reliable SOLAMENTE si el ack es inferior al que mande
 			if (gm.isReliable())
 			{
-				SendAck(packet.connection, gm._MessageId);
+				ReliableMessage rm = (ReliableMessage) gm;
+				SendAck(packet.connection, rm._MessageId);
 			}
 		}
 
