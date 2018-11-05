@@ -68,7 +68,7 @@ public class Client : MonoBehaviour
 			{
 				if (gm.isReliable())
 				{
-					rq.AddQueue(gm, frame);
+					rq.AddQueue((ReliableMessage)gm, frame);
 				}
 			}
 			
