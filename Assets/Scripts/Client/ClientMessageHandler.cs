@@ -3,9 +3,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ClientMessageHandler {
-	
+public class ClientMessageHandler
+{
+
 	private readonly ReliableQueue rq;
+
+	private readonly List<PlayerSnapshotMessage> snapshots;
+
 
 	public ClientMessageHandler(ReliableQueue rq)
 	{
@@ -17,10 +21,10 @@ public class ClientMessageHandler {
 		switch (gm.type())
 		{
 			case MessageType.Ack:
-				handleAck((AckMessage)gm);
+				handleAck((AckMessage) gm);
 				break;
 			case MessageType.PlayerSnapshot:
-				handlePlayerSnapshot((PlayerSnapshotMessage)gm);
+				handlePlayerSnapshot((PlayerSnapshotMessage) gm);
 				break;
 			default:
 				throw new NotImplementedException();
@@ -40,4 +44,10 @@ public class ClientMessageHandler {
 		p.Invulnerable = psm.Snapshot.Invulnerable;
 		p.gameObject.transform.position = psm.Snapshot.position;
 	}
+
+	private void handlePlayerSnapshotInterpolating(PlayerSnapshotMessage psm)
+	{
+		
+	}
+
 }
