@@ -19,4 +19,6 @@ public class GlobalSettings{
 
 	public const int ReliableTimeout = 30;
 
+	public const float BUFFERWINDOW = 3;
+	public const int PrintingSubFrameRate = 3;
 }

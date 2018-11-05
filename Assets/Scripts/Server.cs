@@ -35,8 +35,10 @@ public class Server : MonoBehaviour
 	public Dictionary<int, PlayerSnapshot> players = new Dictionary<int, PlayerSnapshot>();
 	public Dictionary<int, int> lastAcks = new Dictionary<int, int>();
 	public Dictionary<Connection, int> connections = new Dictionary<Connection, int>();
-	public Dictionary<int, HashSet<PlayerAction>> actions = new Dictionary<int, HashSet<PlayerAction>>();
 	public Dictionary<int, ReliableQueue> rq = new Dictionary<int, ReliableQueue>();
+	public Dictionary<int, HashSet<PlayerAction>> actions = new Dictionary<int, HashSet<PlayerAction>>();
+	
+	
 	
 	// Use this for initialization
 	void Start()
@@ -64,10 +66,7 @@ public class Server : MonoBehaviour
 		{
 			UpdatePlayer(id);
 		}*/
-		Compressor  comp = new Compressor();
-		comp.WriteFloat(50.0f,GlobalSettings.MaxPosition,GlobalSettings.MinPosition,0.1f);
-		Debug.Log(new Decompressor(comp.GetBuffer()).GetFloat(GlobalSettings.MaxPosition, GlobalSettings.MinPosition, 0.1f));
-
+		
 
 
 		if (time > snapRate && players.Count != 0)
@@ -92,7 +91,7 @@ public class Server : MonoBehaviour
 
 	private void processConnect(GameMessage gm, Connection connection)
 	{
-		Debug.Log("PROCESSING CONNECTION");
+		//Debug.Log("PROCESSING CONNECTION");
 		if (!connections.ContainsKey(connection))
 		{
 			EstablishConnection(connection, gm._MessageId);
@@ -138,7 +137,7 @@ public class Server : MonoBehaviour
 
 	private void EstablishConnection(Connection connection, int messageId)
 	{
-		Debug.Log("SE CONECTO " + connection.ToString());
+		//Debug.Log("SE CONECTO " + connection.ToString());
 		int id = idCount++;
 		connections.Add(connection, id);
 		connections[connection] = id;
@@ -157,13 +156,17 @@ public class Server : MonoBehaviour
 
 	private void UpdatePlayer(int id)
 	{
-		Debug.Log("Updating Player   "  + id);
-		HashSet<PlayerAction> keys = actions[id];
+		//Debug.Log("Updating Player   "  + id);
+		HashSet<PlayerAction> playerActions = actions[id];
+		
 		PlayerSnapshot ps = players[id];
-		foreach (PlayerAction action in keys)
+		ps.frameNumber++;
+		
+		foreach (PlayerAction action in playerActions)
 		{
 			Mover.GetInstance().ApplyAction(ps,action);
 		}
+		
 	}
 
 	private void SendAck(Connection connection, int ack)
@@ -183,7 +186,7 @@ public class Server : MonoBehaviour
 	{
 		foreach (GameMessage gm in packet.Messages)
 		{
-			Debug.Log("Message ID " + gm._MessageId);
+			//("Message ID " + gm._MessageId);
 			switch (gm.type())
 			{
 				case MessageType.ClientConnect:
@@ -212,9 +215,10 @@ public class Server : MonoBehaviour
 		foreach (PlayerSnapshot playerSnapshot in players.Values)
 		{
 			gms.Add(new PlayerSnapshotMessage(playerSnapshot));
-			Debug.Log("Position " +((PlayerSnapshotMessage)gms[0]).Snapshot.position.x +
+			/*Debug.Log("Position " +((PlayerSnapshotMessage)gms[0]).Snapshot.position.x +
 			          " " + (((PlayerSnapshotMessage)gms[0]).Snapshot.position.y) + " " + 
-				(((PlayerSnapshotMessage)gms[0]).Snapshot.position.x));
+				(((PlayerSnapshotMessage)gms[0]).Snapshot.position.x));*/
+		
 		}
 		return (new Packet(gms)).serialize();
 	}
@@ -224,7 +228,7 @@ public class Server : MonoBehaviour
 		PlayerInputMessage inputMessage = (PlayerInputMessage) gm;		
 		
 		int id = connections[connection];
-		Debug.Log(inputMessage.Action);
+		//Debug.Log(inputMessage.Action);
 		switch (inputMessage.Action)
 		{
 			case PlayerAction.StartMoveForward:
