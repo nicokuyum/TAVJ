@@ -10,7 +10,6 @@ public class MessageSerializer {
 	public static GameMessage deserialize(Decompressor decompressor)
 	{
 		MessageType type = (MessageType) decompressor.GetNumber(Enum.GetNames(typeof(MessageType)).Length);
-		//Debug.Log("MENSAJE DE TIPO : " + type.ToString());
 		switch (type)
 		{
 				case MessageType.Ack:
@@ -34,7 +33,6 @@ public class MessageSerializer {
 
 	public static GameMessage ClientConnectDeserialize(Decompressor decompressor)
 	{
-		//Debug.Log("Hasta el deserlialize");
 		return new ClientConnectMessage(decompressor.GetNumber(int.MaxValue),decompressor.GetString());
 	}
 
@@ -46,9 +44,9 @@ public class MessageSerializer {
 		playerSnapshot.frameNumber = decompressor.GetNumber(3600 * (long) GlobalSettings.Fps);
 		playerSnapshot.Health = decompressor.GetNumber(GlobalSettings.MaxHealth);
 		playerSnapshot.Invulnerable = decompressor.GetBoolean();
-		position.x = decompressor.GetFloat(GlobalSettings.MaxPosition, GlobalSettings.MinPosition, 0.1f);
-		position.y = decompressor.GetFloat(GlobalSettings.MaxPosition, GlobalSettings.MinPosition, 0.1f);
-		position.z = decompressor.GetFloat(GlobalSettings.MaxPosition, GlobalSettings.MinPosition, 0.1f);
+		position.x = decompressor.GetFloat(GlobalSettings.MaxPosition, GlobalSettings.MinPosition, GlobalSettings.PositionPrecision);
+		position.y = decompressor.GetFloat(GlobalSettings.MaxPosition, GlobalSettings.MinPosition, GlobalSettings.PositionPrecision);
+		position.z = decompressor.GetFloat(GlobalSettings.MaxPosition, GlobalSettings.MinPosition, GlobalSettings.PositionPrecision);
 		playerSnapshot.position = position;
 		return new PlayerSnapshotMessage(playerSnapshot);
 	}

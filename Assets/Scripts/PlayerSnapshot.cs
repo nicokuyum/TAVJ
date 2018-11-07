@@ -54,16 +54,15 @@ public class PlayerSnapshot
     }
 
     public byte[] serialize()
-    {    
-        Debug.Log(position.x + "  " + position.y + "  " + position.z);
+    {
         Compressor compressor = new Compressor();
         compressor.WriteNumber(id, GlobalSettings.MaxPlayers);
         compressor.WriteNumber(frameNumber, 3600 * (long)GlobalSettings.Fps);
         compressor.WriteNumber(this.Health, GlobalSettings.MaxHealth);
         compressor.PutBit(this.Invulnerable);
-        compressor.WriteFloat(position.x, GlobalSettings.MaxPosition, GlobalSettings.MinPosition, 0.1f);
-        compressor.WriteFloat(position.y, GlobalSettings.MaxPosition, GlobalSettings.MinPosition, 0.1f);
-        compressor.WriteFloat(position.z, GlobalSettings.MaxPosition, GlobalSettings.MinPosition, 0.1f);
+        compressor.WriteFloat(position.x, GlobalSettings.MaxPosition, GlobalSettings.MinPosition, GlobalSettings.PositionPrecision);
+        compressor.WriteFloat(position.y, GlobalSettings.MaxPosition, GlobalSettings.MinPosition, GlobalSettings.PositionPrecision);
+        compressor.WriteFloat(position.z, GlobalSettings.MaxPosition, GlobalSettings.MinPosition, GlobalSettings.PositionPrecision);
         return compressor.GetBuffer();
     }
 

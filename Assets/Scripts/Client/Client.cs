@@ -34,6 +34,7 @@ public class Client : MonoBehaviour
 	// Use this for initialization
 	void Start () {
 		player = GameObject.Find("Player").GetComponent<Player>();
+		player.name = playerName;
 		outgoingMessages = new List<GameMessage>();
 		rq = new ReliableQueue();
 		outgoingMessages.Add(new ClientConnectMessage(playerName));
@@ -78,7 +79,7 @@ public class Client : MonoBehaviour
 			}
 
 			
-			SnapshotHandler.GetInstance().updatePlayer(SnapshotHandler.GetInstance().getSnapshot(frame, 0));
+			//SnapshotHandler.GetInstance().updatePlayer(SnapshotHandler.GetInstance().getSnapshot(frame, 0));
 			
 			
 			outgoingMessages.AddRange(rq.MessageToResend(frame));

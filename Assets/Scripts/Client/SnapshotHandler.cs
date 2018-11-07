@@ -71,7 +71,7 @@ public class SnapshotHandler
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
+            Debug.Log(e);
             return null;
         }
     }
@@ -92,6 +92,7 @@ public class SnapshotHandler
     {
         if (ps != null)
         {
+            Debug.Log("Updating player snapshot");
             Player p = GameObject.Find("Player").GetComponent<Player>();
             p.Health = ps.Health;
             p.Invulnerable = ps.Invulnerable;

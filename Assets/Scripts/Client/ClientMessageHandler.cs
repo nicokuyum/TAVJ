@@ -38,17 +38,22 @@ public class ClientMessageHandler
 
 	private void handleAck(AckMessage message)
 	{
-		Debug.Log("Handling ack with ackid " + message.ackid);
+		//Debug.Log("Handling ack with ackid " + message.ackid);
 		rq.ReceivedACK(message.ackid);
 	}
 
 	private void handlePlayerSnapshotInterpolating(PlayerSnapshotMessage psm)
 	{
-		SnapshotHandler.GetInstance().ReceiveSnapshot(psm.Snapshot);
+		//SnapshotHandler.GetInstance().ReceiveSnapshot(psm.Snapshot);
+		player.Health = psm.Snapshot.Health;
+		player.Invulnerable = psm.Snapshot.Invulnerable;
+		player.gameObject.transform.position = psm.Snapshot.position;
+		player.gameObject.transform.rotation = psm.Snapshot.rotation;
 	}
 
 	private void handleConnectionConfirmation(ClientConnectedMessage ccm)
 	{
+		
 		if (player.name.Equals(ccm.name))
 		{
 			this.player.id = ccm.id;
@@ -65,7 +70,7 @@ public class ClientMessageHandler
 			// Else ignore
 		}
 		
-		//outgoingGameMessages.Add(new AckMessage(ccm.));
+		outgoingGameMessages.Add(new AckMessage(ccm._MessageId));
 	}
 
 }
