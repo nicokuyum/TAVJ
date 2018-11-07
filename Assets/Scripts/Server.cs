@@ -58,8 +58,8 @@ public class Server : MonoBehaviour
 		while (packet != null)
 		{
 			Debug.Log("POR PROCESAR PAQUETE");
-			//ProcessPacket(packet);
-			//packet = PacketQueue.GetInstance().PollPacket();
+			ProcessPacket(packet);
+			packet = PacketQueue.GetInstance().PollPacket();
 		}
 
 		//TODO 
@@ -117,9 +117,7 @@ public class Server : MonoBehaviour
 			lock (lockObject)
 			{
 				data = (byte[]) receiveBytes.Clone();
-				Debug.Log("ENTRARON " + data.Length + " BYTES");
 				PacketQueue.GetInstance().PushPacket(new Packet(data, connection));
-				Debug.Log("ENTRO ALGO");
 			}
 			
 		}

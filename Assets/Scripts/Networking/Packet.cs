@@ -18,15 +18,11 @@ public class Packet
         this.connection = connection;
         Decompressor decompressor = new Decompressor(data);
         MessageCount = decompressor.GetNumber(MaxMessagesNum);
-        Debug.Log("HASTA EL FOR");
-        Debug.Log("MESSAGE COUNT : " + MessageCount);
         for (int i = 0; i < MessageCount; i++)
         {    
-            Debug.Log("MENSAJE NR : " + i);
             Messages.Add(MessageSerializer.deserialize(decompressor));
         }
 
-       Debug.Log("ENTRO PAQUETE CON ----" + MessageCount + "---- Y LIST :  " + Messages.Count);
     }
 
     public Packet(List<GameMessage> messages)
