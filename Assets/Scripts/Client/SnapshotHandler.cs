@@ -7,65 +7,75 @@ public class SnapshotHandler
 {
 
     private static SnapshotHandler _instance;
-    private SortedList<long, Dictionary<int, PlayerSnapshot>> worldSnapshots;
     
-    private SortedList<long, PlayerSnapshot> snapshotBuffer;
-    private long start;
-    private long end;
+    
+    private SortedList<float, Dictionary<int, PlayerSnapshot>> worldSnapshots;
+    
+    private SortedList<float, PlayerSnapshot> snapshotBuffer;
+    //private SortedList<float, bool> timeStamps;
+    
+    private float start;
+    private float end;
 
-    private SnapshotHandler()
+    private SnapshotHandler(float start, float end)
     {
-        snapshotBuffer = new SortedList<long, PlayerSnapshot>();
+        snapshotBuffer = new SortedList<float, PlayerSnapshot>();
         
     }
 
     public static SnapshotHandler GetInstance()
     {
-        return _instance ?? (_instance = new SnapshotHandler());
+        return _instance ?? (_instance = new SnapshotHandler(-1,-1));
     }
 
     public void ReceiveSnapshot(PlayerSnapshot snapshot)
     {
         if (end < snapshot.frameNumber)
         {
-            snapshotBuffer.Add(snapshot.frameNumber,snapshot);
+            snapshotBuffer.Add(snapshot._TimeStamp, snapshot);
+            //timeStamps.Add(snapshot._TimeStamp, false);
         }
     }
 
     public bool ready()
     {
-        return snapshotBuffer.Count > 2;
+        return snapshotBuffer.Count > GlobalSettings.BufferWindow;
     }
 
-    public PlayerSnapshot getSnapshot(long frame, int subframe)
+    public PlayerSnapshot getSnapshot(float time)
     {
         try
         {
-            if (end < frame)
+            if (end < time)
             {
-                snapshotBuffer.Remove(start);
                 start = end;
-                bool changed = false;
-                for (int i = 1; i < GlobalSettings.BUFFERWINDOW && !changed; i++)
+                bool endFound = false;
+                foreach(float f in snapshotBuffer.Keys)
                 {
-                    if (snapshotBuffer.ContainsKey(start + i))
+                    if (!endFound)
                     {
-                        long aux =start + i;
-                        if (frame <= aux)
+                        if (f > time)
                         {
-                            end = start + i;
-                            changed = true;
+                            endFound = true;
+                            end = f;
                         }
-                        else if (start < aux)
+                        else
                         {
-                            snapshotBuffer.Remove(start);
-                            start = aux;
+                            start = f;
                         }
                     }
                 }
-            }
 
-            return interpolate(snapshotBuffer[start], snapshotBuffer[end], frame, subframe);
+                if (!endFound)
+                {
+                    //TODO Could throw an exception or handle it more elegantly
+                    return null;
+                }
+                
+            }
+            deleteOldSnapshots();
+
+            return interpolate(snapshotBuffer[start], snapshotBuffer[end], time);
         }
         catch (Exception e)
         {
@@ -74,16 +84,17 @@ public class SnapshotHandler
         }
     }
 
-    public PlayerSnapshot interpolate(PlayerSnapshot past, PlayerSnapshot future, long frame, int subframe)
+
+    public PlayerSnapshot interpolate(PlayerSnapshot past, PlayerSnapshot future, float time)
     {
-        long totalFrames = (future.frameNumber - past.frameNumber) * GlobalSettings.PrintingSubFrameRate;
-        PlayerSnapshot ps = new PlayerSnapshot(past.id);
-        long percentage = ((frame - past.frameNumber) * subframe + subframe)/ (totalFrames*subframe);
-        ps.rotation = Quaternion.Lerp(past.rotation, future.rotation, percentage);
-        ps.position = Vector3.Lerp(past.position, future.position, percentage);
-        ps.Health = past.Health;
-        ps.Invulnerable = past.Invulnerable;
-        return ps;
+        float timeRatio = (time - past._TimeStamp) / (future._TimeStamp - past._TimeStamp);
+        PlayerSnapshot interpolatedPlayerSnapshot = new PlayerSnapshot(past.id);
+        interpolatedPlayerSnapshot._TimeStamp = time;
+        interpolatedPlayerSnapshot.Health = past.Health;
+        interpolatedPlayerSnapshot.Invulnerable = past.Invulnerable;
+        interpolatedPlayerSnapshot.position = Vector3.Lerp(past.position, future.position, timeRatio);
+        interpolatedPlayerSnapshot.rotation = Quaternion.Lerp(past.rotation, future.rotation, timeRatio);
+        return interpolatedPlayerSnapshot;
     }
 
     public void updatePlayer(PlayerSnapshot ps)
@@ -107,7 +118,7 @@ public class SnapshotHandler
         {
             if (future.ContainsKey(keyValuePair.Key))
             {
-                PlayerSnapshot interpolatedPlayerSnapshot = interpolateWithTime(keyValuePair.Value,
+                PlayerSnapshot interpolatedPlayerSnapshot = interpolate(keyValuePair.Value,
                     future[keyValuePair.Key], time);
                     
                 interpolatedWorld.Add(keyValuePair.Key,interpolatedPlayerSnapshot);
@@ -118,17 +129,22 @@ public class SnapshotHandler
         return interpolatedWorld;
     }
 
-    public PlayerSnapshot interpolateWithTime(PlayerSnapshot past, PlayerSnapshot future, float time)
+    public void deleteOldSnapshots()
     {
-        float timeRatio = (time - past._TimeStamp) / (future._TimeStamp - past._TimeStamp);
-        PlayerSnapshot interpolatedPlayerSnapshot = new PlayerSnapshot(past.id);
-        interpolatedPlayerSnapshot._TimeStamp = time;
-        interpolatedPlayerSnapshot.Health = past.Health;
-        interpolatedPlayerSnapshot.Invulnerable = past.Invulnerable;
-        interpolatedPlayerSnapshot.position = Vector3.Lerp(past.position, future.position, timeRatio);
-        interpolatedPlayerSnapshot.rotation = Quaternion.Lerp(past.rotation, future.rotation, timeRatio);
-        return interpolatedPlayerSnapshot;
+        List<float> messagesToDelete = new List<float>();
+        foreach (float snapshotBufferKey in snapshotBuffer.Keys)
+        {
+            if (snapshotBufferKey < start)
+            {
+                messagesToDelete.Add(snapshotBufferKey);
+            }
+        }
+        foreach (float f in messagesToDelete)
+        {
+            snapshotBuffer.Remove(f);
+        }
     }
+
 
 
 }

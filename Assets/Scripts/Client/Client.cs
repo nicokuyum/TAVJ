@@ -79,9 +79,12 @@ public class Client : MonoBehaviour
 				}
 			}
 
-			
-			SnapshotHandler.GetInstance().updatePlayer(SnapshotHandler.GetInstance().getSnapshot(frame, 0));
-			
+			//TODO Fijarse de no empezar a pedir esto hasta que se haya bufferizado un poco
+			PlayerSnapshot currentSnapshot = SnapshotHandler.GetInstance().getSnapshot(time);
+			if (currentSnapshot != null)
+			{
+				SnapshotHandler.GetInstance().updatePlayer(currentSnapshot);
+			}
 			
 			outgoingMessages.AddRange(rq.MessageToResend(time));
 			Debug.Log("Outgoing messages size: " + outgoingMessages.Count);

@@ -19,7 +19,7 @@ public class GlobalSettings{
 
 	public const float ReliableTimeout = 0.3f;
 
-	public const float BUFFERWINDOW = 5;
+	public const float BufferWindow = 3;
 	public const int PrintingSubFrameRate = 3;
 
 	public const int MaxPlayers = 32;
