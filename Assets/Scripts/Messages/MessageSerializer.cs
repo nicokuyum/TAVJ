@@ -62,7 +62,7 @@ public class MessageSerializer {
 
 
 	public static GameMessage ConnectedClientDeserialize(Decompressor decompressor)
-	{
+	{	
 		int id = decompressor.GetNumber(GlobalSettings.MaxPlayers);
 		float timeStamp = CompressingUtils.GetTime(decompressor);
 		String name = decompressor.GetString();
