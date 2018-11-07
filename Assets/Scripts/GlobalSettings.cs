@@ -6,9 +6,9 @@ using UnityEngine;
 public class GlobalSettings{
 
 	public const int Fps = 60;
-	public const float MaxPosition = 100.0f;
+	public const float MaxPosition = 20.0f;
 	public const float PositionPrecision = 0.1f;
-	public const float MinPosition = -100.0f;
+	public const float MinPosition = -20.0f;
 	public const int MaxHealth = 100;
 	public const int MaxMatchDuration = 3600;
 	public const int MaxACK = int.MaxValue;
@@ -23,4 +23,6 @@ public class GlobalSettings{
 	public const int PrintingSubFrameRate = 3;
 
 	public const int MaxPlayers = 32;
+
+	public const int ServerSendRate = 10;
 }

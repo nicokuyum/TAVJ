@@ -17,12 +17,14 @@ public class Server : MonoBehaviour
 {
 	static readonly object lockObject = new object();
 
-	public static float snapRate;
+	public static float snapRate = GlobalSettings.ServerSendRate;
 	public static String DestIp;
 	public static int DestPort;
 	public static int SourcePort = 8081;
-	public float time = 0f;
-
+	
+	private float time = 0f;
+	private float acumTime = 0f;
+	
 	private static int listenPort = GlobalSettings.GamePort;
 	public int idCount = 1;
 	public long frameNumber = 0;
@@ -52,6 +54,7 @@ public class Server : MonoBehaviour
 	void Update()
 	{
 		time += Time.deltaTime;
+		acumTime += Time.deltaTime;
 
 		Packet packet = PacketQueue.GetInstance().PollPacket();
 		//Debug.Log("PACKET IS NULL? " + packet ==null);
@@ -71,10 +74,13 @@ public class Server : MonoBehaviour
 		SendReliableMessages(frameNumber);
 
 
-		if (time > snapRate && players.Count != 0)
+		if (acumTime >= (1.0f/ snapRate) && players.Count != 0)
 		{
 			frameNumber++;
-			time -= snapRate;
+			while (time > acumTime)
+			{
+				time -= acumTime;
+			}
 			byte[] serializedWorld = SerializeWorld();
 			foreach (Connection connection in connections.Keys)
 			{
@@ -86,7 +92,6 @@ public class Server : MonoBehaviour
 			{
 				UpdatePlayer(i);
 			}
-
 		}
 	}
 
@@ -146,8 +151,8 @@ public class Server : MonoBehaviour
 		
 		int range = (int)(GlobalSettings.MaxPosition - GlobalSettings.MinPosition);
 		Vector3 position = new Vector3(random.Next(range) + GlobalSettings.MinPosition
-			, random.Next(range) + GlobalSettings.MinPosition
-			, 0);
+			, 1
+			, random.Next(range) + GlobalSettings.MinPosition);
 		actions[id]= new HashSet<PlayerAction>();
 		PlayerSnapshot ps = new PlayerSnapshot(id, position);
 		rq.Add(id,new ServerReliableQueue(connection));
@@ -195,10 +200,9 @@ public class Server : MonoBehaviour
 
 	private void ProcessPacket( Packet packet)
 	{
-		Debug.Log("PROCESANDO PAQUETEEEEE");
 		foreach (GameMessage gm in packet.Messages)
 		{
-			Debug.Log("TYPE : " + gm.type().ToString() );
+			Debug.Log("GM type : " + gm.type().ToString() );
 			switch (gm.type())
 			{
 				case MessageType.ClientConnect:

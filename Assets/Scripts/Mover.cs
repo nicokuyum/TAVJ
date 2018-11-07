@@ -1,6 +1,7 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
+using Object = UnityEngine.Object;
 
 public class Mover {
 
@@ -20,26 +21,28 @@ public class Mover {
 
     public void ApplyAction(PlayerSnapshot ps, PlayerAction action)
     {
+        
         switch (action)
         {
             case PlayerAction.StartMoveForward:
                 ps.position.x = ps.position.x + 0.5f;
                 break;
             case PlayerAction.StartMoveRight:
-                ps.position.y = ps.position.y + 0.5f;
+                ps.position.z = ps.position.z + 0.5f;
                 break;
             case PlayerAction.StartMoveBack:
                 ps.position.x = ps.position.x - 0.5f;
                 break;
             case PlayerAction.StartMoveLeft:
-                ps.position.y = ps.position.y - 0.5f;
+                ps.position.z = ps.position.z - 0.5f;
                 break;
             case PlayerAction.Shoot:
                 break;
             default:
+                throw new NotImplementedException();
                 break;
         }
-        Debug.Log("La posicion ahora es " + ps.position.x);
+        //Debug.Log("La posicion ahora es " + ps.position.x);
     }
     
 }
