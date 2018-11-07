@@ -55,7 +55,6 @@ public class Server : MonoBehaviour
 		Packet packet = PacketQueue.GetInstance().PollPacket();
 		while (packet != null)
 		{
-			Debug.Log("VOY A PROCESARLO");
 			ProcessPacket(packet);
 			packet = PacketQueue.GetInstance().PollPacket();
 		}
@@ -161,7 +160,7 @@ public class Server : MonoBehaviour
 		
 		PlayerSnapshot ps = players[id];
 		ps.frameNumber++;
-		
+
 		foreach (PlayerAction action in playerActions)
 		{
 			Mover.GetInstance().ApplyAction(ps,action);

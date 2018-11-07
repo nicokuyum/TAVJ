@@ -45,6 +45,7 @@ public class PlayerSnapshot
 
     public byte[] serialize()
     {
+        Debug.Log("frameNumber : " + frameNumber);
         Compressor compressor = new Compressor();
         compressor.WriteNumber(id, GlobalSettings.MaxPlayers);
         compressor.WriteNumber(frameNumber, 3600 * (long)GlobalSettings.Fps);

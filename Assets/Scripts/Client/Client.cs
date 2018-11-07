@@ -43,11 +43,11 @@ public class Client : MonoBehaviour
 	void Update () {
 		time += Time.deltaTime;
 		acumTime += Time.deltaTime;
-		subframe++;
+		/*subframe++;
 		if (subframe == GlobalSettings.PrintingSubFrameRate)
 		{
 			subframe = 0;
-		}
+		}*/
 		Debug.Log("IPD");
 		
 		if (acumTime >= (1.0f/fps))
