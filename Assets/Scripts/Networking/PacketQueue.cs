@@ -24,14 +24,17 @@ public class PacketQueue {
 
 	public void PushPacket(Packet p)
 	{
-		lock (LockObject)
+		Debug.Log("ASDASd");
+		Debug.Log("PUSHEADOOOOOOO");
+		/*lock (LockObject)
 		{
 			queue.Enqueue(p);
-		}
+		}*/
 	}
 
 	public Packet PollPacket()
 	{
+		//Debug.Log(queue.Count);
 		Packet p = null;
 		lock (LockObject)
 		{

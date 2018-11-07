@@ -25,6 +25,7 @@ public class Server : MonoBehaviour
 
 	private static int listenPort = GlobalSettings.GamePort;
 	public int idCount = 1;
+	public long frameNumber = 0;
 
 	private Boolean hasData;
 	private byte[] data;
@@ -35,7 +36,7 @@ public class Server : MonoBehaviour
 	public Dictionary<int, PlayerSnapshot> players = new Dictionary<int, PlayerSnapshot>();
 	public Dictionary<int, int> lastAcks = new Dictionary<int, int>();
 	public Dictionary<Connection, int> connections = new Dictionary<Connection, int>();
-	public Dictionary<int, ReliableQueue> rq = new Dictionary<int, ReliableQueue>();
+	public Dictionary<int, ServerReliableQueue> rq = new Dictionary<int, ServerReliableQueue>();
 	public Dictionary<int, HashSet<PlayerAction>> actions = new Dictionary<int, HashSet<PlayerAction>>();
 	
 	
@@ -53,23 +54,26 @@ public class Server : MonoBehaviour
 		time += Time.deltaTime;
 
 		Packet packet = PacketQueue.GetInstance().PollPacket();
+		//Debug.Log("PACKET IS NULL? " + packet ==null);
 		while (packet != null)
 		{
-			ProcessPacket(packet);
-			packet = PacketQueue.GetInstance().PollPacket();
+			Debug.Log("POR PROCESAR PAQUETE");
+			//ProcessPacket(packet);
+			//packet = PacketQueue.GetInstance().PollPacket();
 		}
 
-		
 		//TODO 
 		/*foreach (int id in connections.Values)
 		{
 			UpdatePlayer(id);
 		}*/
-		
+
+		SendReliableMessages(frameNumber);
 
 
 		if (time > snapRate && players.Count != 0)
 		{
+			frameNumber++;
 			time -= snapRate;
 			byte[] serializedWorld = SerializeWorld();
 			foreach (Connection connection in connections.Keys)
@@ -90,10 +94,10 @@ public class Server : MonoBehaviour
 
 	private void processConnect(ClientConnectMessage ccm, Connection connection)
 	{
-		//Debug.Log("PROCESSING CONNECTION");
+		Debug.Log("PROCESSING CONNECTION");
 		if (!connections.ContainsKey(connection))
 		{
-			EstablishConnection(connection, ccm._MessageId);
+			EstablishConnection(connection, ccm._MessageId, ccm.name);
 		}
 
 	}
@@ -115,7 +119,7 @@ public class Server : MonoBehaviour
 				data = (byte[]) receiveBytes.Clone();
 				Debug.Log("ENTRARON " + data.Length + " BYTES");
 				PacketQueue.GetInstance().PushPacket(new Packet(data, connection));
-				//Debug.Log("ENTRO ALGO");
+				Debug.Log("ENTRO ALGO");
 			}
 			
 		}
@@ -134,24 +138,34 @@ public class Server : MonoBehaviour
 	}
 
 
-	private void EstablishConnection(Connection connection, int messageId)
+	private void EstablishConnection(Connection connection, int messageId, String playerName)
 	{
-		//Debug.Log("SE CONECTO " + connection.ToString());
 		int id = idCount++;
 		connections.Add(connection, id);
-		connections[connection] = id;
+		//connections[connection] = id;
 		lastAcks.Add(id, messageId);
 		Random random = new Random();
+		
 		int range = (int)(GlobalSettings.MaxPosition - GlobalSettings.MinPosition);
 		Vector3 position = new Vector3(random.Next(range) + GlobalSettings.MinPosition
 			, random.Next(range) + GlobalSettings.MinPosition
 			, 0);
 		actions[id]= new HashSet<PlayerAction>();
 		PlayerSnapshot ps = new PlayerSnapshot(id, position);
+		rq.Add(id,new ServerReliableQueue(connection));
 		players.Add(id, ps);
 		playersnapshots.Add(ps);
-		
+		BroadCastConnectionMessage(id, playerName);
 	}
+
+	private void BroadCastConnectionMessage(int id, String playerName)
+	{
+		foreach (int playerId in players.Keys)
+		{
+			rq[playerId].AddQueue(new ClientConnectedMessage(id, playerName), frameNumber);
+		}
+	}
+	
 
 	private void UpdatePlayer(int id)
 	{
@@ -183,9 +197,10 @@ public class Server : MonoBehaviour
 
 	private void ProcessPacket( Packet packet)
 	{
+		Debug.Log("PROCESANDO PAQUETEEEEE");
 		foreach (GameMessage gm in packet.Messages)
 		{
-
+			Debug.Log("TYPE : " + gm.type().ToString() );
 			switch (gm.type())
 			{
 				case MessageType.ClientConnect:
@@ -194,7 +209,11 @@ public class Server : MonoBehaviour
 				case MessageType.PlayerInput:
 					processInput((PlayerInputMessage)gm, packet.connection);
 					break;
+				case MessageType.Ack:
+					processAck((AckMessage) gm, packet.connection);
+					break;
 				default:
+					throw new NotImplementedException();
 					break;
 			}
 			
@@ -212,20 +231,18 @@ public class Server : MonoBehaviour
 	private byte[] SerializeWorld()
 	{
 		List<GameMessage> gms = new List<GameMessage>();
-		foreach (PlayerSnapshot playerSnapshot in players.Values)
+		foreach (PlayerSnapshot playerSnapshot in playersnapshots)// players.Values
 		{
 			gms.Add(new PlayerSnapshotMessage(playerSnapshot));
-			/*Debug.Log("Position " +((PlayerSnapshotMessage)gms[0]).Snapshot.position.x +
-			          " " + (((PlayerSnapshotMessage)gms[0]).Snapshot.position.y) + " " + 
-				(((PlayerSnapshotMessage)gms[0]).Snapshot.position.x));*/
-		
 		}
 		return (new Packet(gms)).serialize();
 	}
 
-	private void processInput(GameMessage gm, Connection connection)
+	
+	
+	private void processInput(PlayerInputMessage inputMessage, Connection connection)
 	{
-		PlayerInputMessage inputMessage = (PlayerInputMessage) gm;		
+	
 		
 		int id = connections[connection];
 		//Debug.Log(inputMessage.Action);
@@ -260,6 +277,27 @@ public class Server : MonoBehaviour
 				break;
 			default:
 				break;
+		}
+	}
+
+	public void processAck(AckMessage gm, Connection connection)
+	{
+		int id = connections[connection];
+		if (lastAcks[id] < gm.ackid)
+		{
+			lastAcks[id] = gm.ackid;
+			rq[id].ReceivedACK(gm.ackid);
+		}
+	}
+
+	public void SendReliableMessages(long frameNumber)
+	{
+		foreach (KeyValuePair<int, ServerReliableQueue> entry in rq)
+		{
+			List<GameMessage> messagesToSend = entry.Value.MessageToResend(frameNumber);
+			Packet packet = new Packet(messagesToSend);
+			
+			SendUdp(SourcePort, entry.Value.connection.srcIp.ToString(), GlobalSettings.GamePort, packet.serialize());
 		}
 	}
 }
