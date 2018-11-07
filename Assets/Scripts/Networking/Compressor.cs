@@ -94,7 +94,7 @@ public class Compressor : Encoder
             value = value.Substring(0, _maxStringLength);
         }
 
-        WriteNumber(value.Length, GetBitsRequired(_maxStringLength));
+        WriteNumber(value.Length, _maxStringLength);
         foreach (var c in value.ToCharArray())
         {
             WriteChar(c);
@@ -105,7 +105,7 @@ public class Compressor : Encoder
     /* Only accept chars from 33 to 126 (this includes all alphanumeric chars) */
     public void WriteChar(char c)
     {
-        WriteNumber(c - _minChar, GetBitsRequired(_maxChar));
+        WriteNumber(c - _minChar, _maxChar);
     }
 
     
