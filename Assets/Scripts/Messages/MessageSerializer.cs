@@ -10,6 +10,7 @@ public class MessageSerializer {
 	public static GameMessage deserialize(Decompressor decompressor)
 	{
 		MessageType type = (MessageType) decompressor.GetNumber(Enum.GetNames(typeof(MessageType)).Length);
+		Debug.Log("MENSAJE DE TIPO : " + type.ToString());
 		switch (type)
 		{
 				case MessageType.Ack:
@@ -33,6 +34,7 @@ public class MessageSerializer {
 
 	public static GameMessage ClientConnectDeserialize(Decompressor decompressor)
 	{
+		Debug.Log("Hasta el deserlialize");
 		return new ClientConnectMessage(decompressor.GetNumber(int.MaxValue),decompressor.GetString());
 	}
 

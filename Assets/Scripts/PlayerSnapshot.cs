@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using Random = System.Random;
 
 public class PlayerSnapshot
 {
@@ -43,6 +44,15 @@ public class PlayerSnapshot
         position = new Vector3(50, 50, 50);
     }
 
+    public PlayerSnapshot(int id, int frameNumber)
+    {
+        this.id = id;
+        this.frameNumber = frameNumber;
+        Health = GlobalSettings.MaxHealth;
+        Invulnerable = false;
+        position = new Vector3(50,50,50);
+    }
+
     public byte[] serialize()
     {
         Debug.Log("frameNumber : " + frameNumber);
@@ -60,5 +70,15 @@ public class PlayerSnapshot
     public void apply(InputKey key)
     {
         throw new System.NotImplementedException();
+    }
+
+    public PlayerSnapshot RandomPositionSnapshot(int id)
+    {
+        Random random = new Random();
+        int range = (int)(GlobalSettings.MaxPosition - GlobalSettings.MinPosition);
+        Vector3 position = new Vector3(random.Next(range) + GlobalSettings.MinPosition
+            , random.Next(range) + GlobalSettings.MinPosition
+            , 0);
+        return new PlayerSnapshot(id, position);
     }
 }

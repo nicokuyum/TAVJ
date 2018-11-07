@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class ClientConnectMessage : ReliableMessage
 {
-    private String name;
+    public String name;
 
     public ClientConnectMessage(int _MessageId, String name)
     {
@@ -17,6 +17,7 @@ public class ClientConnectMessage : ReliableMessage
     {
         this.name = name;
     }
+    
     public override MessageType type()
     {
         return MessageType.ClientConnect;
