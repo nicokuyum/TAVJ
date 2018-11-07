@@ -167,7 +167,7 @@ public class Server : MonoBehaviour
 	{
 		foreach (int playerId in players.Keys)
 		{
-			rq[playerId].AddQueue(new ClientConnectedMessage(id, playerName, time), frameNumber);
+			rq[playerId].AddQueue(new ClientConnectedMessage(id, playerName, time), time);
 		}
 	}
 	
@@ -298,7 +298,7 @@ public class Server : MonoBehaviour
 	{
 		foreach (KeyValuePair<int, ServerReliableQueue> entry in rq)
 		{
-			List<GameMessage> messagesToSend = entry.Value.MessageToResend(frameNumber);
+			List<GameMessage> messagesToSend = entry.Value.MessageToResend(time);
 			if (messagesToSend.Count > 0)
 			{
 				Packet packet = new Packet(messagesToSend);
@@ -306,4 +306,5 @@ public class Server : MonoBehaviour
 			}
 		}
 	}
+	
 }

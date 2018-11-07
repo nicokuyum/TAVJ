@@ -17,7 +17,7 @@ public class GlobalSettings{
 
 	public const float maxRotation = 360.0f;
 
-	public const int ReliableTimeout = 3;
+	public const float ReliableTimeout = 0.3f;
 
 	public const float BUFFERWINDOW = 5;
 	public const int PrintingSubFrameRate = 3;

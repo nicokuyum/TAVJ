@@ -74,7 +74,8 @@ public class Client : MonoBehaviour
 			{
 				if (gm.isReliable())
 				{
-					rq.AddQueue((ReliableMessage)gm, frame);
+					//TODO check if there already is time sync between client and server (es necesario que lo haya?)
+					rq.AddQueue((ReliableMessage)gm, time);
 				}
 			}
 
@@ -82,7 +83,7 @@ public class Client : MonoBehaviour
 			SnapshotHandler.GetInstance().updatePlayer(SnapshotHandler.GetInstance().getSnapshot(frame, 0));
 			
 			
-			outgoingMessages.AddRange(rq.MessageToResend(frame));
+			outgoingMessages.AddRange(rq.MessageToResend(time));
 			Debug.Log("Outgoing messages size: " + outgoingMessages.Count);
 			if (outgoingMessages.Count > 0)
 			{

@@ -4,21 +4,24 @@ using UnityEngine;
 
 public class ReliableQueue
 {
+    //Messages with pending ACK
     private List<ReliableMessage> MessageQueue;
-    private Dictionary<ReliableMessage, long> SentFrames;
+    
+    //Time at which message was last resent
+    private Dictionary<ReliableMessage, float> SentFrames;
+    
+    //ACKID to message mapping
     private Dictionary<int, ReliableMessage> gamemessages;
-    private float time;
 
     public ReliableQueue()
     {
         MessageQueue = new List<ReliableMessage>();
-        SentFrames = new Dictionary<ReliableMessage, long>();
+        SentFrames = new Dictionary<ReliableMessage, float>();
         gamemessages = new Dictionary<int, ReliableMessage>();
     }
 
     public void ReceivedACK(int ackid)
     {
-        Debug.Log("Received ack id: " + ackid);
         while (MessageQueue.Count > 0 && MessageQueue[0]._MessageId <= ackid)
         {
             MessageQueue.RemoveAt(0);
@@ -27,35 +30,35 @@ public class ReliableQueue
         }
     }
 
-    public void AddQueue(ReliableMessage gm, long frameNumber)
+    
+    public void AddQueue(ReliableMessage gm, float time)
     {
         MessageQueue.Add(gm);
-        if (SentFrames.ContainsKey(gm))
+        /*if (SentFrames.ContainsKey(gm))
         {
-            SentFrames[gm] = frameNumber;
+            SentFrames[gm] = 0;
             gamemessages[gm._MessageId] = gm;
         }
         else
-        {
-            SentFrames.Add(gm, frameNumber);
-            gamemessages.Add(gm._MessageId, gm);
-        }
+        {*/
+        SentFrames.Add(gm, 0);
+        gamemessages.Add(gm._MessageId, gm);
+        //}
     }
 
 
-    public List<GameMessage> MessageToResend(long frameNumber)
+    public List<GameMessage> MessageToResend(float time)
     {
         List<GameMessage> needResend = new List<GameMessage>();
         foreach (ReliableMessage rm in MessageQueue)
         {
-            if (frameNumber - SentFrames[rm] >= GlobalSettings.ReliableTimeout)
+            if (time - SentFrames[rm] >= GlobalSettings.ReliableTimeout)
             {
                 Debug.Log("NEED ACK OF MESSAGE " + rm._MessageId);
                 needResend.Add(rm);
-                SentFrames[rm] = frameNumber;
+                SentFrames[rm] = time;
             }
         }
-        
         return needResend;
     }
     

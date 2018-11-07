@@ -56,7 +56,6 @@ public class ClientMessageHandler
 
 	private void handleConnectionConfirmation(ClientConnectedMessage ccm)
 	{
-		
 		if (player.name.Equals(ccm.name))
 		{
 			this.player.id = ccm.id;
