@@ -31,10 +31,12 @@ public class Server : MonoBehaviour
 
 	private Boolean hasData;
 	private byte[] data;
+
+
+	public GameObject Prefab;
 	
 	
 	public List<PlayerSnapshot> playersnapshots = new List<PlayerSnapshot>();
-
 	public Dictionary<int, PlayerSnapshot> players = new Dictionary<int, PlayerSnapshot>();
 	public Dictionary<int, int> lastAcks = new Dictionary<int, int>();
 	public Dictionary<Connection, int> connections = new Dictionary<Connection, int>();
@@ -60,7 +62,7 @@ public class Server : MonoBehaviour
 		//Debug.Log("PACKET IS NULL? " + packet ==null);
 		while (packet != null)
 		{
-			Debug.Log("POR PROCESAR PAQUETE");
+			//Debug.Log("POR PROCESAR PAQUETE");
 			ProcessPacket(packet);
 			packet = PacketQueue.GetInstance().PollPacket();
 		}
@@ -76,10 +78,11 @@ public class Server : MonoBehaviour
 
 		if (acumTime >= (1.0f/ snapRate) && players.Count != 0)
 		{
+			//Debug.Log(time);
 			frameNumber++;
-			while (time > acumTime)
+			while (acumTime > (1.0f/snapRate))
 			{
-				time -= acumTime;
+				acumTime -= (1.0f/snapRate);
 			}
 			byte[] serializedWorld = SerializeWorld();
 			foreach (Connection connection in connections.Keys)
@@ -99,7 +102,7 @@ public class Server : MonoBehaviour
 
 	private void processConnect(ClientConnectMessage ccm, Connection connection)
 	{
-		Debug.Log("PROCESSING CONNECTION");
+		//Debug.Log("PROCESSING CONNECTION");
 		if (!connections.ContainsKey(connection))
 		{
 			EstablishConnection(connection, ccm._MessageId, ccm.name);
@@ -124,7 +127,6 @@ public class Server : MonoBehaviour
 				data = (byte[]) receiveBytes.Clone();
 				PacketQueue.GetInstance().PushPacket(new Packet(data, connection));
 			}
-			
 		}
 	}
 	
@@ -165,7 +167,7 @@ public class Server : MonoBehaviour
 	{
 		foreach (int playerId in players.Keys)
 		{
-			rq[playerId].AddQueue(new ClientConnectedMessage(id, playerName), frameNumber);
+			rq[playerId].AddQueue(new ClientConnectedMessage(id, playerName, time), frameNumber);
 		}
 	}
 	
@@ -202,7 +204,7 @@ public class Server : MonoBehaviour
 	{
 		foreach (GameMessage gm in packet.Messages)
 		{
-			Debug.Log("GM type : " + gm.type().ToString() );
+			//Debug.Log("GM type : " + gm.type().ToString() );
 			switch (gm.type())
 			{
 				case MessageType.ClientConnect:
@@ -297,9 +299,11 @@ public class Server : MonoBehaviour
 		foreach (KeyValuePair<int, ServerReliableQueue> entry in rq)
 		{
 			List<GameMessage> messagesToSend = entry.Value.MessageToResend(frameNumber);
-			Packet packet = new Packet(messagesToSend);
-			
-			SendUdp(SourcePort, entry.Value.connection.srcIp.ToString(), GlobalSettings.GamePort, packet.serialize());
+			if (messagesToSend.Count > 0)
+			{
+				Packet packet = new Packet(messagesToSend);
+				SendUdp(SourcePort, entry.Value.connection.srcIp.ToString(), GlobalSettings.GamePort, packet.serialize());
+			}
 		}
 	}
 }

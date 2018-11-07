@@ -33,36 +33,39 @@ public class MessageSerializer {
 
 	public static GameMessage ClientConnectDeserialize(Decompressor decompressor)
 	{
-		return new ClientConnectMessage(decompressor.GetNumber(int.MaxValue),decompressor.GetString());
+		int id = decompressor.GetNumber(int.MaxValue);
+		float time = CompressingUtils.GetTime(decompressor);
+		String name = decompressor.GetString();
+		return new ClientConnectMessage(decompressor.GetNumber(int.MaxValue),decompressor.GetString(), time);
 	}
 
+	
 	public static GameMessage PlayerSnapshotDeserialize(Decompressor decompressor)
 	{
-		Vector3 position = new Vector3();
 		int id = decompressor.GetNumber(GlobalSettings.MaxPlayers);
 		PlayerSnapshot playerSnapshot = new PlayerSnapshot(id);
+		playerSnapshot._TimeStamp = CompressingUtils.GetTime(decompressor);
 		playerSnapshot.frameNumber = decompressor.GetNumber(3600 * (long) GlobalSettings.Fps);
 		playerSnapshot.Health = decompressor.GetNumber(GlobalSettings.MaxHealth);
 		playerSnapshot.Invulnerable = decompressor.GetBoolean();
-		position.x = decompressor.GetFloat(GlobalSettings.MaxPosition, GlobalSettings.MinPosition, GlobalSettings.PositionPrecision);
-		position.y = decompressor.GetFloat(GlobalSettings.MaxPosition, GlobalSettings.MinPosition, GlobalSettings.PositionPrecision);
-		position.z = decompressor.GetFloat(GlobalSettings.MaxPosition, GlobalSettings.MinPosition, GlobalSettings.PositionPrecision);
-		playerSnapshot.position = position;
+		playerSnapshot.position = CompressingUtils.GetPosition(decompressor);
 		return new PlayerSnapshotMessage(playerSnapshot);
 	}
 
 	public static GameMessage PlayerInputDeserialize(Decompressor decompressor)
 	{
 		int id = decompressor.GetNumber(int.MaxValue);
-		PlayerAction action = (PlayerAction)decompressor.GetNumber(Enum.GetNames(typeof(PlayerAction)).Length);
-		return new PlayerInputMessage(action, id);
+		float time = CompressingUtils.GetTime(decompressor);
+		PlayerAction action = (PlayerAction)decompressor.GetNumber(Enum.GetNames(typeof(PlayerAction)).Length);	
+		return new PlayerInputMessage(action, id, time);
 	}
 
 
 	public static GameMessage ConnectedClientDeserialize(Decompressor decompressor)
 	{
 		int id = decompressor.GetNumber(GlobalSettings.MaxPlayers);
+		float timeStamp = CompressingUtils.GetTime(decompressor);
 		String name = decompressor.GetString();
-		return new ClientConnectedMessage(id, name);
+		return new ClientConnectedMessage(id, name, timeStamp);
 	}
 }

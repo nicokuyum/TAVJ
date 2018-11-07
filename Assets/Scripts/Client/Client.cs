@@ -37,7 +37,7 @@ public class Client : MonoBehaviour
 		player.name = playerName;
 		outgoingMessages = new List<GameMessage>();
 		rq = new ReliableQueue();
-		outgoingMessages.Add(new ClientConnectMessage(playerName));
+		outgoingMessages.Add(new ClientConnectMessage(playerName, time));
 		otherPlayers = new Dictionary<int, Player>();
 		handler = new ClientMessageHandler(rq, player, otherPlayers, outgoingMessages);
 		Thread thread = new Thread(new ThreadStart(ThreadMethod));

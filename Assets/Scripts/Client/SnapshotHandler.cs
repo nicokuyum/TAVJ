@@ -7,9 +7,7 @@ public class SnapshotHandler
 {
 
     private static SnapshotHandler _instance;
-    
-
-    
+    private SortedList<long, Dictionary<int, PlayerSnapshot>> worldSnapshots;
     
     private SortedList<long, PlayerSnapshot> snapshotBuffer;
     private long start;
@@ -99,6 +97,37 @@ public class SnapshotHandler
             p.gameObject.transform.position = ps.position;
             p.gameObject.transform.rotation = ps.rotation;
         }
+    }
+
+    public Dictionary<int, PlayerSnapshot> interpolateWorld(Dictionary<int, PlayerSnapshot> past,
+        Dictionary<int, PlayerSnapshot> future, float time)
+    {
+        Dictionary<int, PlayerSnapshot> interpolatedWorld = new Dictionary<int, PlayerSnapshot>();
+        foreach (KeyValuePair<int,PlayerSnapshot> keyValuePair in past)
+        {
+            if (future.ContainsKey(keyValuePair.Key))
+            {
+                PlayerSnapshot interpolatedPlayerSnapshot = interpolateWithTime(keyValuePair.Value,
+                    future[keyValuePair.Key], time);
+                    
+                interpolatedWorld.Add(keyValuePair.Key,interpolatedPlayerSnapshot);
+            }
+            
+        }
+
+        return interpolatedWorld;
+    }
+
+    public PlayerSnapshot interpolateWithTime(PlayerSnapshot past, PlayerSnapshot future, float time)
+    {
+        float timeRatio = (time - past._TimeStamp) / (future._TimeStamp - past._TimeStamp);
+        PlayerSnapshot interpolatedPlayerSnapshot = new PlayerSnapshot(past.id);
+        interpolatedPlayerSnapshot._TimeStamp = time;
+        interpolatedPlayerSnapshot.Health = past.Health;
+        interpolatedPlayerSnapshot.Invulnerable = past.Invulnerable;
+        interpolatedPlayerSnapshot.position = Vector3.Lerp(past.position, future.position, timeRatio);
+        interpolatedPlayerSnapshot.rotation = Quaternion.Lerp(past.rotation, future.rotation, timeRatio);
+        return interpolatedPlayerSnapshot;
     }
 
 

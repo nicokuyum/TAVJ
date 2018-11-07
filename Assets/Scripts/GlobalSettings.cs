@@ -17,7 +17,7 @@ public class GlobalSettings{
 
 	public const float maxRotation = 360.0f;
 
-	public const int ReliableTimeout = 30;
+	public const int ReliableTimeout = 3;
 
 	public const float BUFFERWINDOW = 5;
 	public const int PrintingSubFrameRate = 3;
@@ -25,4 +25,10 @@ public class GlobalSettings{
 	public const int MaxPlayers = 32;
 
 	public const int ServerSendRate = 10;
+
+	public const float TimePrecision = 0.001f;
+	public const float MinTime = 0.0f;
+	public const float MaxTime = 3600.0f;
+
+	public const float speed = 1.0f;
 }

@@ -7,6 +7,7 @@ public class ReliableQueue
     private List<ReliableMessage> MessageQueue;
     private Dictionary<ReliableMessage, long> SentFrames;
     private Dictionary<int, ReliableMessage> gamemessages;
+    private float time;
 
     public ReliableQueue()
     {
@@ -49,10 +50,12 @@ public class ReliableQueue
         {
             if (frameNumber - SentFrames[rm] >= GlobalSettings.ReliableTimeout)
             {
+                Debug.Log("NEED ACK OF MESSAGE " + rm._MessageId);
                 needResend.Add(rm);
                 SentFrames[rm] = frameNumber;
             }
         }
+        
         return needResend;
     }
     

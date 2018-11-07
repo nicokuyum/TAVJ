@@ -3,10 +3,12 @@
 	private static int idCounter = 0;
     
 	public int _MessageId;
+	public float _TimeStamp;
 	
-	protected ReliableMessage()
+	protected ReliableMessage(float timeStamp)
 	{
 		this._MessageId = idCounter++;
+		this._TimeStamp = timeStamp;
 	}
 
 	public override bool isReliable()
