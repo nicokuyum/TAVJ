@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -40,31 +41,39 @@ public class SnapshotHandler
 
     public PlayerSnapshot getSnapshot(long frame, int subframe)
     {
-        if (end < frame)
+        try
         {
-            snapshotBuffer.Remove(start);
-            start = end;
-            bool changed = false;
-            for (int i = 1; i < GlobalSettings.BUFFERWINDOW && !changed; i++)
+            if (end < frame)
             {
-                if (snapshotBuffer.ContainsKey(start + i))
+                snapshotBuffer.Remove(start);
+                start = end;
+                bool changed = false;
+                for (int i = 1; i < GlobalSettings.BUFFERWINDOW && !changed; i++)
                 {
-                    long aux =start + i;
-                    if (frame <= aux)
+                    if (snapshotBuffer.ContainsKey(start + i))
                     {
-                        end = start + i;
-                        changed = true;
-                    }
-                    else if (start < aux)
-                    {
-                        snapshotBuffer.Remove(start);
-                        start = aux;
+                        long aux =start + i;
+                        if (frame <= aux)
+                        {
+                            end = start + i;
+                            changed = true;
+                        }
+                        else if (start < aux)
+                        {
+                            snapshotBuffer.Remove(start);
+                            start = aux;
+                        }
                     }
                 }
             }
-        }
 
-        return interpolate(snapshotBuffer[start], snapshotBuffer[end], frame, subframe);
+            return interpolate(snapshotBuffer[start], snapshotBuffer[end], frame, subframe);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return null;
+        }
     }
 
     public PlayerSnapshot interpolate(PlayerSnapshot past, PlayerSnapshot future, long frame, int subframe)
@@ -81,11 +90,14 @@ public class SnapshotHandler
 
     public void updatePlayer(PlayerSnapshot ps)
     {
-        Player p = GameObject.Find("Player").GetComponent<Player>();
-        p.Health = ps.Health;
-        p.Invulnerable = ps.Invulnerable;
-        p.gameObject.transform.position = ps.position;
-        p.gameObject.transform.rotation = ps.rotation;
+        if (ps != null)
+        {
+            Player p = GameObject.Find("Player").GetComponent<Player>();
+            p.Health = ps.Health;
+            p.Invulnerable = ps.Invulnerable;
+            p.gameObject.transform.position = ps.position;
+            p.gameObject.transform.rotation = ps.rotation;
+        }
     }
 
 

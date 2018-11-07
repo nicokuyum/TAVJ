@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -7,13 +6,16 @@ public class ClientMessageHandler
 {
 
 	private readonly ReliableQueue rq;
+	private List<GameMessage> outgoingGameMessages;
+	private Player player;
+	private Dictionary<int, Player> otherPlayers;
 
-	private readonly List<PlayerSnapshotMessage> snapshots;
-
-
-	public ClientMessageHandler(ReliableQueue rq)
+	public ClientMessageHandler(ReliableQueue rq, Player player, Dictionary<int, Player> otherPlayers, List<GameMessage> outgoingGameMessages)
 	{
+		this.player = player;
+		this.otherPlayers = otherPlayers;
 		this.rq = rq;
+		this.outgoingGameMessages = outgoingGameMessages;
 	}
 
 	public void Handle(GameMessage gm)
@@ -26,6 +28,9 @@ public class ClientMessageHandler
 			case MessageType.PlayerSnapshot:
 				handlePlayerSnapshotInterpolating((PlayerSnapshotMessage) gm);
 				break;
+			case MessageType.ConnectConfirmation:
+				handleConnectionConfirmation((ClientConnectedMessage) gm);
+				break;
 			default:
 				throw new NotImplementedException();
 		}
@@ -37,17 +42,30 @@ public class ClientMessageHandler
 		rq.ReceivedACK(message.ackid);
 	}
 
-	private void handlePlayerSnapshot(PlayerSnapshotMessage psm)
-	{
-		Player p = GameObject.Find("Player").GetComponent<Player>();
-		p.Health = psm.Snapshot.Health;
-		p.Invulnerable = psm.Snapshot.Invulnerable;
-		p.gameObject.transform.position = psm.Snapshot.position;
-	}
-
 	private void handlePlayerSnapshotInterpolating(PlayerSnapshotMessage psm)
 	{
 		SnapshotHandler.GetInstance().ReceiveSnapshot(psm.Snapshot);
+	}
+
+	private void handleConnectionConfirmation(ClientConnectedMessage ccm)
+	{
+		if (player.name.Equals(ccm.name))
+		{
+			this.player.id = ccm.id;
+		}
+		else
+		{
+			if (!otherPlayers.ContainsKey(ccm.id))
+			{
+				Player newPlayer = new Player();
+				newPlayer.id = ccm.id;
+				newPlayer.name = ccm.name;
+				otherPlayers.Add(ccm.id, newPlayer);
+			}
+			// Else ignore
+		}
+		
+		//outgoingGameMessages.Add(new AckMessage(ccm.));
 	}
 
 }

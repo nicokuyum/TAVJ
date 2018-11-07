@@ -6,7 +6,6 @@ using UnityEngine;
 public class ClientConnectedMessage : GameMessage
 {
 
-
     public int id;
     public String name;
 
@@ -33,6 +32,5 @@ public class ClientConnectedMessage : GameMessage
         compressor.WriteNumber(id, GlobalSettings.MaxPlayers);
         compressor.WriteString(name);
         return compressor.GetBuffer();
-
     }
 }

@@ -11,8 +11,11 @@ public class Client : MonoBehaviour
 	static readonly object lockObject = new object();
 	
 	private List<GameMessage> outgoingMessages;
+
+	private Dictionary<int, Player> otherPlayers;
 	
 	public String DestIp;
+	public String playerName;
 	public static int DestPort = GlobalSettings.GamePort;
 	public static int SourcePort = 8081;
 	public static int listenPort = GlobalSettings.GamePort;
@@ -33,8 +36,9 @@ public class Client : MonoBehaviour
 		player = GameObject.Find("Player").GetComponent<Player>();
 		outgoingMessages = new List<GameMessage>();
 		rq = new ReliableQueue();
-		outgoingMessages.Add(new ClientConnectMessage("asdf"));
-		handler = new ClientMessageHandler(rq);
+		outgoingMessages.Add(new ClientConnectMessage(playerName));
+		otherPlayers = new Dictionary<int, Player>();
+		handler = new ClientMessageHandler(rq, player, otherPlayers, outgoingMessages);
 		Thread thread = new Thread(new ThreadStart(ThreadMethod));
 		thread.Start();
 	}
@@ -43,12 +47,6 @@ public class Client : MonoBehaviour
 	void Update () {
 		time += Time.deltaTime;
 		acumTime += Time.deltaTime;
-		/*subframe++;
-		if (subframe == GlobalSettings.PrintingSubFrameRate)
-		{
-			subframe = 0;
-		}*/
-		Debug.Log("IPD");
 		
 		if (acumTime >= (1.0f/fps))
 		{
@@ -80,7 +78,7 @@ public class Client : MonoBehaviour
 			}
 
 			
-			SnapshotHandler.GetInstance().updatePlayer(SnapshotHandler.GetInstance().getSnapshot(frame, subframe));
+			SnapshotHandler.GetInstance().updatePlayer(SnapshotHandler.GetInstance().getSnapshot(frame, 0));
 			
 			
 			outgoingMessages.AddRange(rq.MessageToResend(frame));
