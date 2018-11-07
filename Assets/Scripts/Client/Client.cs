@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
-using System.Text;
 using System.Threading;
 using UnityEngine;
 
@@ -13,7 +12,8 @@ public class Client : MonoBehaviour
 	private List<GameMessage> outgoingMessages;
 
 	private Dictionary<int, Player> otherPlayers;
-	
+
+	public GameObject prefab;
 	public String DestIp;
 	public String playerName;
 	public static int DestPort = GlobalSettings.GamePort;
@@ -39,7 +39,7 @@ public class Client : MonoBehaviour
 		rq = new ReliableQueue();
 		outgoingMessages.Add(new ClientConnectMessage(playerName));
 		otherPlayers = new Dictionary<int, Player>();
-		handler = new ClientMessageHandler(rq, player, otherPlayers, outgoingMessages);
+		handler = new ClientMessageHandler(rq, player, otherPlayers, outgoingMessages, prefab);
 		Thread thread = new Thread(new ThreadStart(ThreadMethod));
 		thread.Start();
 	}
@@ -79,7 +79,7 @@ public class Client : MonoBehaviour
 			}
 
 			
-			//SnapshotHandler.GetInstance().updatePlayer(SnapshotHandler.GetInstance().getSnapshot(frame, 0));
+			SnapshotHandler.GetInstance().updatePlayer(SnapshotHandler.GetInstance().getSnapshot(frame, 0));
 			
 			
 			outgoingMessages.AddRange(rq.MessageToResend(frame));

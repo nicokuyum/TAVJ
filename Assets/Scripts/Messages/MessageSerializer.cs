@@ -60,7 +60,7 @@ public class MessageSerializer {
 
 
 	public static GameMessage ConnectedClientDeserialize(Decompressor decompressor)
-	{
+	{	
 		int id = decompressor.GetNumber(GlobalSettings.MaxPlayers);
 		String name = decompressor.GetString();
 		return new ClientConnectedMessage(id, name);
