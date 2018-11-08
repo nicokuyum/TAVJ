@@ -1,11 +1,13 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using Random = System.Random;
 
 /**
  * Single class with queue of all incoming packets
  */
-public class PacketQueue {
-
+public class PacketQueue
+{
+	public float packetLoss = 0.0f;
 	private static readonly Object LockObject = new Object();
 	private static PacketQueue _instance;
 	
@@ -24,9 +26,13 @@ public class PacketQueue {
 
 	public void PushPacket(Packet p)
 	{
-		lock (LockObject)
+		Random r = new Random();
+		if (r.NextDouble() >= packetLoss)
 		{
-			queue.Enqueue(p);
+			lock (LockObject)
+			{
+				queue.Enqueue(p);
+			}
 		}
 	}
 

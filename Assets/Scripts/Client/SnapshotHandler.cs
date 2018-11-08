@@ -88,7 +88,7 @@ public class SnapshotHandler
 
     public PlayerSnapshot interpolate(PlayerSnapshot past, PlayerSnapshot future, float time)
     {
-        Debug.Log("past: " + past._TimeStamp + " - future: " + future._TimeStamp + " - time: " + time);
+        //Debug.Log("past: " + past._TimeStamp + " - future: " + future._TimeStamp + " - time: " + time);
         float timeRatio = (time - past._TimeStamp) / (future._TimeStamp - past._TimeStamp);
         PlayerSnapshot interpolatedPlayerSnapshot = new PlayerSnapshot(past.id);
         interpolatedPlayerSnapshot._TimeStamp = time;
@@ -107,7 +107,7 @@ public class SnapshotHandler
             p.Health = ps.Health;
             p.Invulnerable = ps.Invulnerable;
             p.gameObject.transform.position = ps.position;
-            p.gameObject.transform.rotation = ps.rotation;
+            //p.gameObject.transform.rotation = ps.rotation;
         }
     }
 
