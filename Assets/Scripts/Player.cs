@@ -19,6 +19,8 @@ public class Player : MonoBehaviour
 	
 	public float time;
 
+	private HashSet<PlayerAction> liveActions = new HashSet<PlayerAction>();
+
 	private Queue<PlayerInputMessage> actions = new Queue<PlayerInputMessage>();
 	
 	// Se llama luego de haber sido constuido el GameObject y todos sus componentes
@@ -36,32 +38,42 @@ public class Player : MonoBehaviour
 	void Update ()
 	{
 		time += Time.deltaTime;
+		
+		
 		if (Input.GetKeyDown(KeyCode.W))
 		{
+			liveActions.Add(PlayerAction.StartMoveForward);
 			actions.Enqueue(new PlayerInputMessage(PlayerAction.StartMoveForward, time));
 		} else if (Input.GetKeyUp(KeyCode.W))
 		{
+			liveActions.Remove(PlayerAction.StartMoveForward);
 			actions.Enqueue(new PlayerInputMessage(PlayerAction.StopMoveForward, time));
 		}
 		if (Input.GetKeyDown(KeyCode.A))
 		{
+			liveActions.Add(PlayerAction.StartMoveBack);
 			actions.Enqueue(new PlayerInputMessage(PlayerAction.StartMoveLeft, time));
 		} else if (Input.GetKeyUp(KeyCode.A))
 		{
+			liveActions.Remove(PlayerAction.StartMoveBack);
 			actions.Enqueue(new PlayerInputMessage(PlayerAction.StopMoveLeft, time));
 		}
 		if (Input.GetKeyDown(KeyCode.S))
 		{
+			liveActions.Add(PlayerAction.StartMoveRight);
 			actions.Enqueue(new PlayerInputMessage(PlayerAction.StartMoveBack, time));
 		} else if (Input.GetKeyUp(KeyCode.S))
 		{
+			liveActions.Remove(PlayerAction.StartMoveRight);
 			actions.Enqueue(new PlayerInputMessage(PlayerAction.StopMoveBack, time));
 		}
 		if (Input.GetKeyDown(KeyCode.D))
 		{
+			liveActions.Add(PlayerAction.StartMoveLeft);
 			actions.Enqueue(new PlayerInputMessage(PlayerAction.StartMoveRight, time));
 		} else if (Input.GetKeyUp(KeyCode.D))
 		{
+			liveActions.Remove(PlayerAction.StartMoveLeft);
 			actions.Enqueue(new PlayerInputMessage(PlayerAction.StopMoveRight, time));
 		}
 
@@ -75,6 +87,28 @@ public class Player : MonoBehaviour
 		transform.Rotate(new Vector3(yaw, pitch, 0.0f));*/
 	}
 
+	public void prediction()
+	{
+		foreach (PlayerAction action in liveActions)
+		{
+			switch (action)
+			{
+				case PlayerAction.StartMoveForward:
+					gameObject.transform.Translate(Vector3.forward * GlobalSettings.speed * time);
+					break;
+				case PlayerAction.StartMoveRight:
+					gameObject.transform.Translate(Vector3.right * GlobalSettings.speed * time);
+					break;
+				case PlayerAction.StartMoveBack:
+					gameObject.transform.Translate(Vector3.back * GlobalSettings.speed * time);
+					break;
+				case PlayerAction.StartMoveLeft:
+					gameObject.transform.Translate(Vector3.left * GlobalSettings.speed * time);
+					break;
+			}
+		}
+	}
+	
 	public Queue<PlayerInputMessage> getActions()
 	{
 		return actions;

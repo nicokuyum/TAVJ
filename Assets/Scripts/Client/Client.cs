@@ -16,6 +16,7 @@ public class Client : MonoBehaviour
 	public GameObject prefab { get; set; }
 	public String DestIp;
 	public String playerName;
+	public bool prediction;
 	public static int DestPort = GlobalSettings.GamePort;
 	public static int SourcePort = 8081;
 	public static int listenPort = GlobalSettings.GamePort;
@@ -42,6 +43,7 @@ public class Client : MonoBehaviour
 		handler = new ClientMessageHandler(this);
 		SnapshotHandler.GetInstance().otherPlayers = this.otherPlayers;
 		SnapshotHandler.GetInstance().self = this.player;
+		SnapshotHandler.GetInstance().prediction = this.prediction;
 		Thread thread = new Thread(new ThreadStart(ThreadMethod));
 		thread.Start();
 	}
@@ -67,6 +69,7 @@ public class Client : MonoBehaviour
 
 			foreach (var action in player.getActions())
 			{
+				SnapshotHandler.GetInstance().AddActionForPrediction(action);
 				outgoingMessages.Add(action);
 			}
 			

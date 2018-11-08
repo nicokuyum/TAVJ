@@ -164,7 +164,7 @@ public class Server : MonoBehaviour
 
 		
 		GameObject go = Instantiate(prefab);
-		Player newPlayer = go.GetComponent<Player>();
+		ServerPlayer newPlayer = go.GetComponent<ServerPlayer>();
 		PlayerSnapshot ps = new PlayerSnapshot(id, newPlayer, time);
 		
 		Debug.Log("CREATED AT" + ps.position.x + " " + ps.position.y  + " " + ps.position.z);
