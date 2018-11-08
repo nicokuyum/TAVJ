@@ -22,6 +22,8 @@ public class MessageSerializer {
 					return PlayerSnapshotDeserialize(decompressor);
 				case MessageType.ConnectConfirmation:
 					return ConnectedClientDeserialize(decompressor);
+				case MessageType.WorldSnapshot:
+					return WorldSnapshotDeserialize(decompressor);
 				default: return null;
 		}
 	}
@@ -68,4 +70,29 @@ public class MessageSerializer {
 		String name = decompressor.GetString();
 		return new ClientConnectedMessage(id, name, timeStamp);
 	}
+
+	public static GameMessage WorldSnapshotDeserialize(Decompressor decompressor)
+	{
+		float time = CompressingUtils.GetTime(decompressor);
+		int numberOfPlayers = decompressor.GetNumber(GlobalSettings.MaxPlayers);
+		List<PlayerSnapshot> playerSnapshots = new List<PlayerSnapshot>();
+		for (int i = 0; i < numberOfPlayers; i++)
+		{
+			//Should use snapshotdeserialize
+			playerSnapshots.Add(SnapshotDeserialize(decompressor));
+		}
+		return new WorldSnapshotMessage(playerSnapshots,time);
+	}
+
+	public static PlayerSnapshot SnapshotDeserialize(Decompressor decompressor)
+	{
+		int id = decompressor.GetNumber(GlobalSettings.MaxPlayers);
+		PlayerSnapshot playerSnapshot = new PlayerSnapshot(id);
+		playerSnapshot._TimeStamp = CompressingUtils.GetTime(decompressor);
+		playerSnapshot.Health = decompressor.GetNumber(GlobalSettings.MaxHealth);
+		playerSnapshot.Invulnerable = decompressor.GetBoolean();
+		playerSnapshot.position = CompressingUtils.GetPosition(decompressor);
+		return playerSnapshot;
+	}
+
 }

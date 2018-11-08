@@ -7,7 +7,9 @@ public class SnapshotHandler
 {
 
     private static SnapshotHandler _instance;
-    
+
+    public Player self;
+    public Dictionary<int, Player> otherPlayers;
     
     private SortedList<float, Dictionary<int, PlayerSnapshot>> worldSnapshots;
     
@@ -28,20 +30,24 @@ public class SnapshotHandler
         return _instance ?? (_instance = new SnapshotHandler(-1,-1));
     }
 
-    public void ReceiveSnapshot(PlayerSnapshot snapshot)
+    public void ReceiveSnapshot(Dictionary<int, PlayerSnapshot> worldSnap, float time)
     {
-        if (end < snapshot._TimeStamp)
+        if (end < time)
+        {
+            worldSnapshots.Add(time, worldSnap);
+        }
+        /*if (end < snapshot._TimeStamp)
         {
             snapshotBuffer.Add(snapshot._TimeStamp, snapshot);
-        }
+        }*/
     }
 
     public bool ready()
     {
-        return snapshotBuffer.Count > GlobalSettings.BufferWindow;
+        return worldSnapshots.Count > GlobalSettings.BufferWindow;
     }
 
-    public PlayerSnapshot getSnapshot(float time)
+    public Dictionary<int,PlayerSnapshot> getSnapshot(float time)
     {
         try
         {
@@ -50,7 +56,7 @@ public class SnapshotHandler
             {
                 start = end;
                 bool endFound = false;
-                foreach(float f in snapshotBuffer.Keys)
+                foreach(float f in worldSnapshots.Keys)
                 {
                     //Debug.Log("Checking key " + f);
                     if (!endFound)
@@ -76,7 +82,7 @@ public class SnapshotHandler
             }
             deleteOldSnapshots();
 
-            return interpolate(snapshotBuffer[start], snapshotBuffer[end], time);
+            return interpolateWorld(worldSnapshots[start], worldSnapshots[end], time);
         }
         catch (Exception e)
         {
@@ -99,16 +105,40 @@ public class SnapshotHandler
         return interpolatedPlayerSnapshot;
     }
 
-    public void updatePlayer(PlayerSnapshot ps)
+    public void updatePlayer(Dictionary<int, PlayerSnapshot> world)
     {
-        if (ps != null)
+        /* if (ps != null)
         {
             Player p = GameObject.FindWithTag("Player").GetComponent<Player>();
             p.Health = ps.Health;
             p.Invulnerable = ps.Invulnerable;
             p.gameObject.transform.position = ps.position;
             p.gameObject.transform.rotation = ps.rotation;
+        }*/
+        foreach (KeyValuePair<int,PlayerSnapshot> pair in world)
+        {
+            if (otherPlayers.ContainsKey(pair.Key))
+            {
+                Player p = otherPlayers[pair.Key];
+                p.Health = pair.Value.Health;
+                p.Invulnerable = pair.Value.Invulnerable;
+                p.gameObject.transform.position = pair.Value.position;
+                p.gameObject.transform.rotation = pair.Value.rotation;
+            }
+            else
+            {
+                handleSelfSnapshot(pair.Key, pair.Value);
+            }
         }
+    }
+
+    public void handleSelfSnapshot(int id, PlayerSnapshot playerSnapshot)
+    {
+        Player p = self;
+        p.Health = playerSnapshot.Health;
+        p.Invulnerable = playerSnapshot.Invulnerable;
+        p.gameObject.transform.position = playerSnapshot.position;
+        p.gameObject.transform.rotation = playerSnapshot.rotation;
     }
 
     public Dictionary<int, PlayerSnapshot> interpolateWorld(Dictionary<int, PlayerSnapshot> past,
@@ -134,11 +164,11 @@ public class SnapshotHandler
     {
         List<float> messagesToDelete = new List<float>();
         
-        foreach (float snapshotBufferKey in snapshotBuffer.Keys)
+        foreach (float worldSnapshotKey in worldSnapshots.Keys)
         {
-            if (snapshotBufferKey < start)
+            if (worldSnapshotKey < start)
             {
-                messagesToDelete.Add(snapshotBufferKey);
+                messagesToDelete.Add(worldSnapshotKey);
             }
         }
         

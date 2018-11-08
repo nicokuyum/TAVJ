@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class ClientMessageHandler
@@ -23,6 +24,9 @@ public class ClientMessageHandler
 			case MessageType.ConnectConfirmation:
 				handleConnectionConfirmation((ClientConnectedMessage) gm);
 				break;
+			case MessageType.WorldSnapshot:
+				handleWorldSnapshot((WorldSnapshotMessage) gm);
+				break;
 			default:
 				throw new NotImplementedException();
 		}
@@ -36,7 +40,8 @@ public class ClientMessageHandler
 
 	private void handlePlayerSnapshotInterpolating(PlayerSnapshotMessage psm)
 	{
-		SnapshotHandler.GetInstance().ReceiveSnapshot(psm.Snapshot);
+		throw new NotImplementedException();
+		//SnapshotHandler.GetInstance().ReceiveSnapshot(psm.Snapshot);
 	}
 
 	private void handleConnectionConfirmation(ClientConnectedMessage ccm)
@@ -62,4 +67,17 @@ public class ClientMessageHandler
 		client.getOutgoingMessages().Add(new AckMessage(ccm._MessageId));
 	}
 
+	private void handleWorldSnapshot(WorldSnapshotMessage wm)
+	{
+		float time = wm._playerSnapshots[0]._TimeStamp;
+		Dictionary<int, PlayerSnapshot> worldSnap = new Dictionary<int, PlayerSnapshot>();
+		
+		
+		foreach (PlayerSnapshot wmPlayerSnapshot in wm._playerSnapshots)
+		{
+			worldSnap.Add(wmPlayerSnapshot.id, wmPlayerSnapshot);
+		}
+		
+		SnapshotHandler.GetInstance().ReceiveSnapshot(worldSnap, time);
+	}
 }
