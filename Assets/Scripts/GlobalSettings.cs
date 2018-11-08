@@ -13,6 +13,9 @@ public class GlobalSettings{
 	public const int MaxMatchDuration = 3600;
 	public const int MaxACK = int.MaxValue;
 
+	public const float MouseSpeedHorizontal = 2.0f;
+	public const float MouseSpeedVertical = 2.0f;
+	
 	public const int GamePort = 42069;
 
 	public const float maxRotation = 360.0f;

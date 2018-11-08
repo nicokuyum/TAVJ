@@ -10,8 +10,6 @@ public class Mover {
     private static readonly Object LockObject = new Object();
     private static Mover _instance;
     
-    
-    
     private Mover()
     {
     }
@@ -45,6 +43,5 @@ public class Mover {
                 break;
         }
         ps.position = ps.player.transform.position;
-        //Debug.Log("La posicion ahora es " + ps.position.x);
     }
 }

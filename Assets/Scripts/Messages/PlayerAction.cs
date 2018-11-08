@@ -9,6 +9,4 @@ public enum PlayerAction {
 	StartMoveBack=6,
 	StopMoveBack=7,
 	Shoot=8,
-	
-	
 }

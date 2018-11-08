@@ -28,6 +28,7 @@ public class Server : MonoBehaviour
 	
 	private static int listenPort = GlobalSettings.GamePort;
 	public int idCount = 1;
+	public float PacketLoss = 0.0f;
 
 	private Boolean hasData;
 	private byte[] data;
@@ -62,6 +63,7 @@ public class Server : MonoBehaviour
 	// Use this for initialization
 	void Start()
 	{
+		PacketQueue.GetInstance().packetLoss = PacketLoss;
 		Thread thread = new Thread(new ThreadStart(ThreadMethod));
 		thread.Start();
 	}

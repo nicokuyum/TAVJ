@@ -20,6 +20,7 @@ public class SnapshotHandler
 
     private SnapshotHandler(float start, float end)
     {
+        worldSnapshots = new SortedList<float, Dictionary<int, PlayerSnapshot>>();
         snapshotBuffer = new SortedList<float, PlayerSnapshot>();
         this.start = start;
         this.end = end;
@@ -94,7 +95,7 @@ public class SnapshotHandler
 
     public PlayerSnapshot interpolate(PlayerSnapshot past, PlayerSnapshot future, float time)
     {
-        Debug.Log("past: " + past._TimeStamp + " - future: " + future._TimeStamp + " - time: " + time);
+        //Debug.Log("past: " + past._TimeStamp + " - future: " + future._TimeStamp + " - time: " + time);
         float timeRatio = (time - past._TimeStamp) / (future._TimeStamp - past._TimeStamp);
         PlayerSnapshot interpolatedPlayerSnapshot = new PlayerSnapshot(past.id);
         interpolatedPlayerSnapshot._TimeStamp = time;
@@ -107,14 +108,6 @@ public class SnapshotHandler
 
     public void updatePlayer(Dictionary<int, PlayerSnapshot> world)
     {
-        /* if (ps != null)
-        {
-            Player p = GameObject.FindWithTag("Player").GetComponent<Player>();
-            p.Health = ps.Health;
-            p.Invulnerable = ps.Invulnerable;
-            p.gameObject.transform.position = ps.position;
-            p.gameObject.transform.rotation = ps.rotation;
-        }*/
         foreach (KeyValuePair<int,PlayerSnapshot> pair in world)
         {
             if (otherPlayers.ContainsKey(pair.Key))
@@ -138,7 +131,7 @@ public class SnapshotHandler
         p.Health = playerSnapshot.Health;
         p.Invulnerable = playerSnapshot.Invulnerable;
         p.gameObject.transform.position = playerSnapshot.position;
-        p.gameObject.transform.rotation = playerSnapshot.rotation;
+        //p.gameObject.transform.rotation = playerSnapshot.rotation;
     }
 
     public Dictionary<int, PlayerSnapshot> interpolateWorld(Dictionary<int, PlayerSnapshot> past,

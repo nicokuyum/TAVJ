@@ -9,12 +9,14 @@ using UnityEngine.Experimental.UIElements;
 public class Player : MonoBehaviour
 {
 
+	private float yaw = 0.0f;
+	private float pitch = 0.0f;
+	
 	public int id;
 	public int MaxHealth;
 	public int Health;
 	public bool Invulnerable;
 	
-	//TODO INICIALIZAR Y SINCRONIZAR ESTE TIME CON EL SERVER AL RECIBIR EL PRIMER SNAP
 	public float time;
 
 	private Queue<PlayerInputMessage> actions = new Queue<PlayerInputMessage>();
@@ -67,6 +69,10 @@ public class Player : MonoBehaviour
 		{
 			actions.Enqueue(new PlayerInputMessage(PlayerAction.Shoot, time));
 		}
+		
+		/*yaw += GlobalSettings.MouseSpeedHorizontal * Time.deltaTime * Input.GetAxis ("Mouse X");
+		pitch -= GlobalSettings.MouseSpeedVertical * Time.deltaTime * Input.GetAxis ("Mouse Y");
+		transform.Rotate(new Vector3(yaw, pitch, 0.0f));*/
 	}
 
 	public Queue<PlayerInputMessage> getActions()
