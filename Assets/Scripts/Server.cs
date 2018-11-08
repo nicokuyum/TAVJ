@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading;
 using Networking;
 using UnityEditor;
+using UnityEditor.Sprites;
 using UnityEditor.VersionControl;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
@@ -279,8 +280,12 @@ public class Server : MonoBehaviour
 			gms.Add(new PlayerSnapshotMessage(playerSnapshot));
 			Debug.Log(playerSnapshot.position.x +  " " + playerSnapshot.position.z + " " + playerSnapshot.position.y);
 		}
+		
 		Debug.Log("Mundo de : " + gms.Count );
 		return (new Packet(gms)).serialize();
+	/*	List<GameMessage> l = new List<GameMessage>();
+		l.Add(new WorldSnapshotMessage(playersnapshots, time));
+		return (new Packet(l)).serialize();*/
 	}
 
 	

@@ -70,9 +70,9 @@ public class Player : MonoBehaviour
 			actions.Enqueue(new PlayerInputMessage(PlayerAction.Shoot, time));
 		}
 		
-		yaw += GlobalSettings.MouseSpeedHorizontal * Time.deltaTime * Input.GetAxis ("Mouse X");
+		/*yaw += GlobalSettings.MouseSpeedHorizontal * Time.deltaTime * Input.GetAxis ("Mouse X");
 		pitch -= GlobalSettings.MouseSpeedVertical * Time.deltaTime * Input.GetAxis ("Mouse Y");
-		transform.Rotate(new Vector3(yaw, pitch, 0.0f));
+		transform.Rotate(new Vector3(yaw, pitch, 0.0f));*/
 	}
 
 	public Queue<PlayerInputMessage> getActions()

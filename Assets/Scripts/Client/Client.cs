@@ -40,6 +40,8 @@ public class Client : MonoBehaviour
 		outgoingMessages.Add(new ClientConnectMessage(playerName, time));
 		otherPlayers = new Dictionary<int, Player>();
 		handler = new ClientMessageHandler(this);
+		SnapshotHandler.GetInstance().otherPlayers = this.otherPlayers;
+		SnapshotHandler.GetInstance().self = this.player;
 		Thread thread = new Thread(new ThreadStart(ThreadMethod));
 		thread.Start();
 	}
@@ -80,7 +82,7 @@ public class Client : MonoBehaviour
 			}
 
 			//TODO Fijarse de no empezar a pedir esto hasta que se haya bufferizado un poco
-			PlayerSnapshot currentSnapshot = SnapshotHandler.GetInstance().getSnapshot(time);
+			Dictionary<int,PlayerSnapshot> currentSnapshot = SnapshotHandler.GetInstance().getSnapshot(time);
 			if (currentSnapshot != null)
 			{
 				SnapshotHandler.GetInstance().updatePlayer(currentSnapshot);
