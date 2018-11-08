@@ -1102,9 +1102,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8b6cb1e646ad64d54a73c2714f705214, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  DestIp: localhost
+  DestIp: 127.0.0.1
   playerName: kuyum
-  prediction: 1
+  prediction: 0
 --- !u!4 &1907637407
 Transform:
   m_ObjectHideFlags: 0
