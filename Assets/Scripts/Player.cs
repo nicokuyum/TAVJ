@@ -19,7 +19,7 @@ public class Player : MonoBehaviour
 	
 	public float time;
 
-	private HashSet<PlayerAction> liveActions = new HashSet<PlayerAction>();
+	public HashSet<PlayerAction> liveActions = new HashSet<PlayerAction>();
 
 	private Queue<PlayerInputMessage> actions = new Queue<PlayerInputMessage>();
 	
