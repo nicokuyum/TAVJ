@@ -11,7 +11,7 @@ public class PlayerSnapshot
     public bool Invulnerable;
     public Vector3 position;
     public Quaternion rotation;
-    public Player player;
+    public ServerPlayer player;
 
     public PlayerSnapshot(int id, Vector3 position)
     {
@@ -29,7 +29,7 @@ public class PlayerSnapshot
         position = new Vector3(50, 50, 50);
     }
 
-    public PlayerSnapshot(int id, Player player, float time)
+    public PlayerSnapshot(int id, ServerPlayer player, float time)
     {
         this.id = id;
         this._TimeStamp = time;
@@ -38,7 +38,7 @@ public class PlayerSnapshot
         Invulnerable = false;
         int range = (int)(GlobalSettings.MaxPosition - GlobalSettings.MinPosition);
         position = new Vector3(random.Next(range) + GlobalSettings.MinPosition
-            ,1, random.Next(range) + GlobalSettings.MinPosition);
+            ,2, random.Next(range) + GlobalSettings.MinPosition);
         this.player = player;
         player.transform.position = position;
     }
