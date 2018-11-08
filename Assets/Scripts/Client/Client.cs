@@ -8,12 +8,12 @@ using UnityEngine;
 public class Client : MonoBehaviour
 {
 	static readonly object lockObject = new object();
-	
+
 	private List<GameMessage> outgoingMessages;
 
 	private Dictionary<int, Player> otherPlayers;
 
-	public GameObject prefab;
+	public GameObject prefab { get; set; }
 	public String DestIp;
 	public String playerName;
 	public static int DestPort = GlobalSettings.GamePort;
@@ -27,9 +27,9 @@ public class Client : MonoBehaviour
 	private int subframe = 0;
 
 	private ClientMessageHandler handler;
-	private ReliableQueue rq;
+	private ReliableQueue rq { get; set; }
 
-	private Player player;
+	private Player player { get; set; }
 
 	// Use this for initialization
 	void Start () {
@@ -39,7 +39,7 @@ public class Client : MonoBehaviour
 		rq = new ReliableQueue();
 		outgoingMessages.Add(new ClientConnectMessage(playerName, time));
 		otherPlayers = new Dictionary<int, Player>();
-		handler = new ClientMessageHandler(rq, player, otherPlayers, outgoingMessages, prefab);
+		handler = new ClientMessageHandler(this);
 		Thread thread = new Thread(new ThreadStart(ThreadMethod));
 		thread.Start();
 	}
@@ -125,5 +125,35 @@ public class Client : MonoBehaviour
 	{
 		using (UdpClient c = new UdpClient(SourcePort))
 			c.Send(data, data.Length, DestIp, DestPort);
+	}
+
+	public List<GameMessage> getOutgoingMessages()
+	{
+		return this.outgoingMessages;
+	}
+
+	public GameObject getPlayerPrefab()
+	{
+		return this.prefab;
+	}
+
+	public Dictionary<int, Player> getOtherPlayers()
+	{
+		return otherPlayers;
+	}
+
+	public void setTime(float time)
+	{
+		this.time = time;
+	}
+
+	public Player getPlayer()
+	{
+		return this.player;
+	}
+
+	public ReliableQueue GetReliableQueue()
+	{
+		return this.rq;
 	}
 }

@@ -36,7 +36,7 @@ public class MessageSerializer {
 		int id = decompressor.GetNumber(int.MaxValue);
 		float time = CompressingUtils.GetTime(decompressor);
 		String name = decompressor.GetString();
-		return new ClientConnectMessage(name, time);
+		return new ClientConnectMessage(decompressor.GetNumber(int.MaxValue),name, time);
 	}
 
 	
@@ -45,10 +45,10 @@ public class MessageSerializer {
 		int id = decompressor.GetNumber(GlobalSettings.MaxPlayers);
 		PlayerSnapshot playerSnapshot = new PlayerSnapshot(id);
 		playerSnapshot._TimeStamp = CompressingUtils.GetTime(decompressor);
-		playerSnapshot.frameNumber = decompressor.GetNumber(3600 * (long) GlobalSettings.Fps);
 		playerSnapshot.Health = decompressor.GetNumber(GlobalSettings.MaxHealth);
 		playerSnapshot.Invulnerable = decompressor.GetBoolean();
 		playerSnapshot.position = CompressingUtils.GetPosition(decompressor);
+		//Debug.Log("Received PS on position " + playerSnapshot.position);
 		return new PlayerSnapshotMessage(playerSnapshot);
 	}
 

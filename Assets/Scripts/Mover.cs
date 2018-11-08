@@ -27,16 +27,16 @@ public class Mover {
         switch (action)
         {
             case PlayerAction.StartMoveForward:
-                ps.position.x = ps.position.x + GlobalSettings.speed * deltaTime;
+                ps.player.transform.Translate(Vector3.forward * GlobalSettings.speed * deltaTime);
                 break;
             case PlayerAction.StartMoveRight:
-                ps.position.z = ps.position.z + GlobalSettings.speed * deltaTime;
+                ps.player.transform.Translate(Vector3.right * GlobalSettings.speed * deltaTime);
                 break;
             case PlayerAction.StartMoveBack:
-                ps.position.x = ps.position.x - GlobalSettings.speed * deltaTime;
+                ps.player.transform.Translate(Vector3.back * GlobalSettings.speed * deltaTime);
                 break;
             case PlayerAction.StartMoveLeft:
-                ps.position.z = ps.position.z - GlobalSettings.speed * deltaTime;
+                ps.player.transform.Translate(Vector3.left * GlobalSettings.speed * deltaTime);
                 break;
             case PlayerAction.Shoot:
                 break;
@@ -44,7 +44,7 @@ public class Mover {
                 throw new NotImplementedException();
                 break;
         }
+        ps.position = ps.player.transform.position;
         //Debug.Log("La posicion ahora es " + ps.position.x);
     }
-    
 }

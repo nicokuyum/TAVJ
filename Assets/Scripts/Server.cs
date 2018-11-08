@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
@@ -10,6 +11,7 @@ using Networking;
 using UnityEditor;
 using UnityEditor.VersionControl;
 using UnityEngine;
+using Debug = UnityEngine.Debug;
 using Random = System.Random;
 
 
@@ -25,13 +27,12 @@ public class Server : MonoBehaviour
 	
 	private static int listenPort = GlobalSettings.GamePort;
 	public int idCount = 1;
-	public long frameNumber = 0;
 
 	private Boolean hasData;
 	private byte[] data;
 
 
-	public GameObject Prefab;
+	public GameObject prefab;
 	
 	
 	//All Snapshots
@@ -85,7 +86,7 @@ public class Server : MonoBehaviour
 			UpdatePlayer(id);
 		}*/
 
-		SendReliableMessages(frameNumber);
+		SendReliableMessages();
 
 		for (int i = 1; i < idCount; i++)
 		{
@@ -95,7 +96,6 @@ public class Server : MonoBehaviour
 		if (acumTime >= (1.0f/ snapRate) && players.Count != 0)
 		{
 			//Debug.Log(time);
-			frameNumber++;
 			while (acumTime > (1.0f/snapRate))
 			{
 				acumTime -= (1.0f/snapRate);
@@ -106,8 +106,6 @@ public class Server : MonoBehaviour
 				//Debug.Log("SENDING WORLD");	
 				SendUdp(SourcePort, connection.srcIp.ToString(), GlobalSettings.GamePort, serializedWorld);
 			}
-
-
 		}
 	}
 
@@ -160,15 +158,15 @@ public class Server : MonoBehaviour
 		int id = idCount++;
 		connections.Add(connection, id);
 		lastAcks.Add(id, messageId);
-		Random random = new Random();
+
 		
-		int range = (int)(GlobalSettings.MaxPosition - GlobalSettings.MinPosition);
-		Vector3 position = new Vector3(random.Next(range) + GlobalSettings.MinPosition
-			, 1
-			, random.Next(range) + GlobalSettings.MinPosition);
-		actions[id]= new HashSet<PlayerAction>();
-		PlayerSnapshot ps = new PlayerSnapshot(id, position);
+		GameObject go = Instantiate(prefab);
+		Player newPlayer = go.GetComponent<Player>();
+		PlayerSnapshot ps = new PlayerSnapshot(id, newPlayer, time);
+		
+		Debug.Log("CREATED AT" + ps.position.x + " " + ps.position.y  + " " + ps.position.z);
 		rq.Add(id,new ServerReliableQueue(connection));
+		actions[id] = new HashSet<PlayerAction>();
 		bufferedMessages.Add(id, new SortedList<ReliableMessage, bool>());
 		players.Add(id, ps);
 		playersnapshots.Add(ps);
@@ -191,8 +189,9 @@ public class Server : MonoBehaviour
 		HashSet<PlayerAction> playerActions = actions[id];
 		
 		PlayerSnapshot ps = players[id];
-		ps.frameNumber++;
+
 		ps._TimeStamp = time;
+
 
 		foreach (PlayerAction action in playerActions)
 		{
@@ -268,7 +267,6 @@ public class Server : MonoBehaviour
 				throw new NotImplementedException();
 				break;
 		}
-		
 	}
 
 	private byte[] SerializeWorld()
@@ -277,7 +275,7 @@ public class Server : MonoBehaviour
 		foreach (PlayerSnapshot playerSnapshot in playersnapshots)// players.Values
 		{
 			gms.Add(new PlayerSnapshotMessage(playerSnapshot));
-			Debug.Log(playerSnapshot.position.x +  " " + playerSnapshot.position.z);
+			Debug.Log(playerSnapshot.position.x +  " " + playerSnapshot.position.z + " " + playerSnapshot.position.y);
 		}
 		Debug.Log("Mundo de : " + gms.Count );
 		return (new Packet(gms)).serialize();
@@ -329,7 +327,7 @@ public class Server : MonoBehaviour
 		rq[id].ReceivedACK(gm.ackid);
 	}
 
-	public void SendReliableMessages(long frameNumber)
+	public void SendReliableMessages()
 	{
 		foreach (KeyValuePair<int, ServerReliableQueue> entry in rq)
 		{

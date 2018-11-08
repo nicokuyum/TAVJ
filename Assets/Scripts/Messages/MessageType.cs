@@ -3,5 +3,6 @@
     ClientConnect=1,
     PlayerSnapshot=2,
     PlayerInput=3,
-    ConnectConfirmation=4
+    ConnectConfirmation=4,
+    WorldSnapshot=5
 }

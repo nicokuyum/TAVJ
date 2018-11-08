@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class GlobalSettings{
 
-	public const int Fps = 60;
+	public const int Fps = 120;
 	public const float MaxPosition = 20.0f;
 	public const float PositionPrecision = 0.01f;
 	public const float MinPosition = -20.0f;
@@ -20,7 +20,6 @@ public class GlobalSettings{
 	public const float ReliableTimeout = 0.3f;
 
 	public const float BufferWindow = 3;
-	public const int PrintingSubFrameRate = 3;
 
 	public const int MaxPlayers = 32;
 
