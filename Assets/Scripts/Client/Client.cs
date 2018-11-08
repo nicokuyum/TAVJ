@@ -33,7 +33,8 @@ public class Client : MonoBehaviour
 	private Player player { get; set; }
 
 	// Use this for initialization
-	void Start () {
+	void Start ()
+	{
 		player = GameObject.Find("Player").GetComponent<Player>();
 		player.name = playerName;
 		outgoingMessages = new List<GameMessage>();
