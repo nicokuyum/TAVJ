@@ -26,7 +26,7 @@ public class Server : MonoBehaviour
 	private float time = 0f;
 	private float acumTime = 0f;
 	
-	private static int listenPort = GlobalSettings.GamePort;
+	private static int listenPort = GlobalSettings.ServerPort;
 	public int idCount = 1;
 	public float PacketLoss = 0.0f;
 

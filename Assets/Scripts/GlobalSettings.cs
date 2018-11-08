@@ -17,6 +17,7 @@ public class GlobalSettings{
 	public const float MouseSpeedVertical = 2.0f;
 	
 	public const int GamePort = 42069;
+	public const int ServerPort = 42070;
 
 	public const float maxRotation = 360.0f;
 
