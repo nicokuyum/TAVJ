@@ -18,7 +18,7 @@ public class Client : MonoBehaviour
 	public String DestIp;
 	public String playerName;
 	public bool prediction;
-	public static int DestPort = GlobalSettings.GamePort;
+	public static int DestPort = GlobalSettings.ServerPort;
 	public static int SourcePort = 8081;
 	public static int listenPort = GlobalSettings.GamePort;
 	
