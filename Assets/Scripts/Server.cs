@@ -36,11 +36,22 @@ public class Server : MonoBehaviour
 	public GameObject Prefab;
 	
 	
+	//All Snapshots
 	public List<PlayerSnapshot> playersnapshots = new List<PlayerSnapshot>();
+	
+	//ID to Player mapping
 	public Dictionary<int, PlayerSnapshot> players = new Dictionary<int, PlayerSnapshot>();
+	
+	//ID to Last ACK mapping
 	public Dictionary<int, int> lastAcks = new Dictionary<int, int>();
+	
+	//Connection to ID mapping
 	public Dictionary<Connection, int> connections = new Dictionary<Connection, int>();
+	
+	//ID to ReliableQueue mapping
 	public Dictionary<int, ServerReliableQueue> rq = new Dictionary<int, ServerReliableQueue>();
+	
+	//ID to PlayerActions
 	public Dictionary<int, HashSet<PlayerAction>> actions = new Dictionary<int, HashSet<PlayerAction>>();
 	
 	
@@ -102,7 +113,6 @@ public class Server : MonoBehaviour
 
 	private void processConnect(ClientConnectMessage ccm, Connection connection)
 	{
-		//Debug.Log("PROCESSING CONNECTION");
 		if (!connections.ContainsKey(connection))
 		{
 			EstablishConnection(connection, ccm._MessageId, ccm.name);
@@ -147,7 +157,6 @@ public class Server : MonoBehaviour
 	{
 		int id = idCount++;
 		connections.Add(connection, id);
-		//connections[connection] = id;
 		lastAcks.Add(id, messageId);
 		Random random = new Random();
 		

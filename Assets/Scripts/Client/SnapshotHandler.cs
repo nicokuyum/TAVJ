@@ -12,7 +12,6 @@ public class SnapshotHandler
     private SortedList<float, Dictionary<int, PlayerSnapshot>> worldSnapshots;
     
     private SortedList<float, PlayerSnapshot> snapshotBuffer;
-    //private SortedList<float, bool> timeStamps;
     
     private float start;
     private float end;
@@ -33,7 +32,6 @@ public class SnapshotHandler
         if (end < snapshot.frameNumber)
         {
             snapshotBuffer.Add(snapshot._TimeStamp, snapshot);
-            //timeStamps.Add(snapshot._TimeStamp, false);
         }
     }
 
@@ -132,6 +130,7 @@ public class SnapshotHandler
     public void deleteOldSnapshots()
     {
         List<float> messagesToDelete = new List<float>();
+        
         foreach (float snapshotBufferKey in snapshotBuffer.Keys)
         {
             if (snapshotBufferKey < start)
@@ -139,10 +138,12 @@ public class SnapshotHandler
                 messagesToDelete.Add(snapshotBufferKey);
             }
         }
+        
         foreach (float f in messagesToDelete)
         {
             snapshotBuffer.Remove(f);
         }
+        
     }
 
 
