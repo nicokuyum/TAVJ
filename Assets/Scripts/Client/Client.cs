@@ -13,7 +13,7 @@ public class Client : MonoBehaviour
 
 	private Dictionary<int, Player> otherPlayers;
 
-	public GameObject prefab { get; set; }
+	public GameObject prefab;
 	public String DestIp;
 	public String playerName;
 	public bool prediction;

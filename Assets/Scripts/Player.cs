@@ -79,6 +79,7 @@ public class Player : MonoBehaviour
 
 		if (Input.GetMouseButtonDown(0))
 		{
+			
 			actions.Enqueue(new PlayerInputMessage(PlayerAction.Shoot, time));
 		}
 		

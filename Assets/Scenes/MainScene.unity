@@ -1102,6 +1102,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8b6cb1e646ad64d54a73c2714f705214, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  prefab: {fileID: 1343396969763456, guid: 013db062fcc664b669930ddca2e48e93, type: 2}
   DestIp: 127.0.0.1
   playerName: kuyum
   prediction: 0

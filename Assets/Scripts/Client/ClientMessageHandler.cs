@@ -67,6 +67,11 @@ public class ClientMessageHandler
 		client.getOutgoingMessages().Add(new AckMessage(ccm._MessageId));
 	}
 
+	private void Instantiate(GameObject getPlayerPrefab)
+	{
+		throw new NotImplementedException();
+	}
+
 	private void handleWorldSnapshot(WorldSnapshotMessage wm)
 	{
 		float time = wm._playerSnapshots[0]._TimeStamp;
