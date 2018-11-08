@@ -272,7 +272,7 @@ public class Server : MonoBehaviour
 
 	private byte[] SerializeWorld()
 	{
-		List<GameMessage> gms = new List<GameMessage>();
+		/*List<GameMessage> gms = new List<GameMessage>();
 		foreach (PlayerSnapshot playerSnapshot in playersnapshots)// players.Values
 		{
 			gms.Add(new PlayerSnapshotMessage(playerSnapshot));
@@ -280,10 +280,10 @@ public class Server : MonoBehaviour
 		}
 		
 		Debug.Log("Mundo de : " + gms.Count );
-		return (new Packet(gms)).serialize();
-	/*	List<GameMessage> l = new List<GameMessage>();
+		return (new Packet(gms)).serialize();*/
+		List<GameMessage> l = new List<GameMessage>();
 		l.Add(new WorldSnapshotMessage(playersnapshots, time));
-		return (new Packet(l)).serialize();*/
+		return (new Packet(l)).serialize();
 	}
 
 	
