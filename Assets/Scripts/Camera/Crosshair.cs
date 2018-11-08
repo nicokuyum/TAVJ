@@ -3,6 +3,7 @@
 public class Crosshair : MonoBehaviour {
 
 	public Texture2D crosshair;
+	public Rect position;
 
 	public float scale;
 	// Use this for initialization
@@ -12,10 +13,11 @@ public class Crosshair : MonoBehaviour {
      
 	// Update is called once per frame
 	void Update () {
+		position = new Rect((Screen.width - crosshair.width) / 2, (Screen.height - crosshair.height) /2, crosshair.width * scale, crosshair.height);
 	}
 	
 	void OnGUI() {
-		GUI.DrawTexture (Rect.zero, crosshair);
+		//GUI.DrawTexture (position, crosshair);
 	}
 
 } 

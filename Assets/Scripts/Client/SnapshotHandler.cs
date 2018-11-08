@@ -117,6 +117,7 @@ public class SnapshotHandler
         {
             if (otherPlayers.ContainsKey(pair.Key))
             {
+                Debug.Log("Update other");
                 Player p = otherPlayers[pair.Key];
                 p.Health = pair.Value.Health;
                 p.Invulnerable = pair.Value.Invulnerable;
@@ -125,6 +126,7 @@ public class SnapshotHandler
             }
             else
             {
+                Debug.Log("Handling self");
                 handleSelfSnapshot(pair.Value);
             }
         }
@@ -140,6 +142,7 @@ public class SnapshotHandler
         //p.gameObject.transform.rotation = playerSnapshot.rotation;
         if (prediction)
         {
+            Debug.Log("Applying prediction");
             ReapplyActions(p,playerSnapshot._TimeStamp);
         }
     }

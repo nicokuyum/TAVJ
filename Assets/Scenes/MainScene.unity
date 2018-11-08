@@ -280,13 +280,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   crosshair: {fileID: 2800000, guid: 5699a28d5ec074d83a4b7553c67f8c3b, type: 3}
-  position:
-    serializedVersion: 2
-    x: 0
-    y: 0
-    width: 0
-    height: 0
-  scale: 0.1
+  scale: 1
 --- !u!1 &922165729
 GameObject:
   m_ObjectHideFlags: 0
@@ -1104,6 +1098,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   DestIp: 10.17.64.139
   playerName: kuyum
+  prediction: 0
 --- !u!4 &1907637407
 Transform:
   m_ObjectHideFlags: 0

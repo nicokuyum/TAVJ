@@ -38,7 +38,7 @@ public class Player : MonoBehaviour
 	void Update ()
 	{
 		time += Time.deltaTime;
-		
+		prediction(Time.deltaTime);
 		
 		if (Input.GetKeyDown(KeyCode.W))
 		{
@@ -51,29 +51,29 @@ public class Player : MonoBehaviour
 		}
 		if (Input.GetKeyDown(KeyCode.A))
 		{
-			liveActions.Add(PlayerAction.StartMoveBack);
+			liveActions.Add(PlayerAction.StartMoveLeft);
 			actions.Enqueue(new PlayerInputMessage(PlayerAction.StartMoveLeft, time));
 		} else if (Input.GetKeyUp(KeyCode.A))
 		{
-			liveActions.Remove(PlayerAction.StartMoveBack);
+			liveActions.Remove(PlayerAction.StartMoveLeft);
 			actions.Enqueue(new PlayerInputMessage(PlayerAction.StopMoveLeft, time));
 		}
 		if (Input.GetKeyDown(KeyCode.S))
 		{
-			liveActions.Add(PlayerAction.StartMoveRight);
+			liveActions.Add(PlayerAction.StartMoveBack);
 			actions.Enqueue(new PlayerInputMessage(PlayerAction.StartMoveBack, time));
 		} else if (Input.GetKeyUp(KeyCode.S))
 		{
-			liveActions.Remove(PlayerAction.StartMoveRight);
+			liveActions.Remove(PlayerAction.StartMoveBack);
 			actions.Enqueue(new PlayerInputMessage(PlayerAction.StopMoveBack, time));
 		}
 		if (Input.GetKeyDown(KeyCode.D))
 		{
-			liveActions.Add(PlayerAction.StartMoveLeft);
+			liveActions.Add(PlayerAction.StartMoveRight);
 			actions.Enqueue(new PlayerInputMessage(PlayerAction.StartMoveRight, time));
 		} else if (Input.GetKeyUp(KeyCode.D))
-		{
-			liveActions.Remove(PlayerAction.StartMoveLeft);
+		{ 
+			liveActions.Remove(PlayerAction.StartMoveRight);
 			actions.Enqueue(new PlayerInputMessage(PlayerAction.StopMoveRight, time));
 		}
 
@@ -82,26 +82,26 @@ public class Player : MonoBehaviour
 			actions.Enqueue(new PlayerInputMessage(PlayerAction.Shoot, time));
 		}
 		
-		this.gameObject.transform.rotation = this.gameObject.transform.GetChild(0).rotation;
+		//this.gameObject.transform.rotation = this.gameObject.transform.GetChild(0).rotation;
 	}
 
-	public void prediction()
+	public void prediction(float deltaTime)
 	{
 		foreach (PlayerAction action in liveActions)
 		{
 			switch (action)
 			{
 				case PlayerAction.StartMoveForward:
-					gameObject.transform.Translate(Vector3.forward * GlobalSettings.speed * time);
+					gameObject.transform.Translate(Vector3.forward * GlobalSettings.speed * deltaTime);
 					break;
 				case PlayerAction.StartMoveRight:
-					gameObject.transform.Translate(Vector3.right * GlobalSettings.speed * time);
+					gameObject.transform.Translate(Vector3.right * GlobalSettings.speed * deltaTime);
 					break;
 				case PlayerAction.StartMoveBack:
-					gameObject.transform.Translate(Vector3.back * GlobalSettings.speed * time);
+					gameObject.transform.Translate(Vector3.back * GlobalSettings.speed * deltaTime);
 					break;
 				case PlayerAction.StartMoveLeft:
-					gameObject.transform.Translate(Vector3.left * GlobalSettings.speed * time);
+					gameObject.transform.Translate(Vector3.left * GlobalSettings.speed * deltaTime);
 					break;
 			}
 		}
