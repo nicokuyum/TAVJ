@@ -24,9 +24,10 @@ public class ReliableQueue
     {
         while (MessageQueue.Count > 0 && MessageQueue[0]._MessageId <= ackid)
         {
+            ReliableMessage toRemove = MessageQueue[0];
             MessageQueue.RemoveAt(0);
-            SentFrames.Remove(gamemessages[ackid]);
-            gamemessages.Remove(ackid);
+            SentFrames.Remove(gamemessages[toRemove._MessageId]);
+            gamemessages.Remove(toRemove._MessageId);
         }
     }
 
