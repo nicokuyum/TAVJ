@@ -1,19 +1,11 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
 using System.Net;
 using System.Net.Sockets;
-using System.Text;
 using System.Threading;
 using Networking;
-using UnityEditor;
-using UnityEditor.Sprites;
-using UnityEditor.VersionControl;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
-using Random = System.Random;
 
 
 public class Server : MonoBehaviour
@@ -218,8 +210,6 @@ public class Server : MonoBehaviour
 	private void SendAck(Connection connection, int ack)
 	{
 		
-		Debug.Log("Sending ACK  " + ack);
-
 		List<GameMessage> gms = new List<GameMessage>();
 		
 		gms.Add( new AckMessage(ack));
@@ -232,8 +222,6 @@ public class Server : MonoBehaviour
 	{
 		foreach (GameMessage gm in packet.Messages)
 		{
-			
-			//Debug.Log("GM type : " + gm.type().ToString() );
 			if (gm.isReliable())
 			{
 				if (gm.type() == MessageType.ClientConnect)
@@ -252,14 +240,6 @@ public class Server : MonoBehaviour
 			{
 				ProcessMessage(gm,packet.connection);
 			}
-			
-			
-			//TODO Procesar si es reliable SOLAMENTE si el ack es inferior al que mande
-		/*	if (gm.isReliable())
-			{
-				ReliableMessage rm = (ReliableMessage) gm;
-				SendAck(packet.connection, rm._MessageId);
-			}*/
 		}
 
 	}

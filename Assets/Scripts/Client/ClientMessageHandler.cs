@@ -46,7 +46,7 @@ public class ClientMessageHandler
 
 	private void handleConnectionConfirmation(ClientConnectedMessage ccm)
 	{
-		Debug.Log("My name: " + client.getPlayer().name + " - received name: " + ccm.name);
+		Debug.Log("Received name: " + ccm.name + " with id " + ccm.id);
 		if (client.getPlayer().name.Equals(ccm.name))
 		{
 			client.setTime(ccm._TimeStamp);

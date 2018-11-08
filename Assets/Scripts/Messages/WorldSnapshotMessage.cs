@@ -15,6 +15,7 @@ public class WorldSnapshotMessage : GameMessage
         this._playerSnapshots = new List<PlayerSnapshot>();
         foreach (PlayerSnapshot playerSnapshot in playerSnapshots)
         {
+            Debug.Log("Sending snap for id " + playerSnapshot.id);
             _playerSnapshots.Add(playerSnapshot);
         }
 
