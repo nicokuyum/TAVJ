@@ -234,23 +234,27 @@ public class SnapshotHandler
         
     }
 
-    public void AddActionForPrediction(PlayerInputMessage input)
+    
+    public void AddActionForPrediction(Queue<PlayerInputMessage> input, float time)
     {
         if (lastActionTime == -1)
         {
             HashSet<PlayerAction> ac = new HashSet<PlayerAction>();
-            ac.Add(input.Action);
-            actions.Add(input._TimeStamp, ac);
+            foreach (PlayerInputMessage playerInputMessage in input)
+            {
+                ac.Add(playerInputMessage.Action);
+            }
+            actions.Add(time, ac);
         }
         else
         {
-            actions.Add(input._TimeStamp, ResultingActions(input));
+            actions.Add(time, ResultingActions(input));
         }
-
-        lastActionTime = input._TimeStamp;
+        lastActionTime = time;
     }
 
-    public HashSet<PlayerAction> ResultingActions(PlayerInputMessage input)
+    
+    public HashSet<PlayerAction> ResultingActions(Queue<PlayerInputMessage> input)
     {
         HashSet<PlayerAction> current = new HashSet<PlayerAction>();
         foreach (PlayerAction playerAction in actions[lastActionTime])
@@ -258,34 +262,37 @@ public class SnapshotHandler
             current.Add(playerAction);
         }
 
-        switch (input.Action)
+        foreach (PlayerInputMessage playerInputMessage in input)
         {
-            case PlayerAction.StartMoveForward:
-                current.Add(input.Action);
-                break;
-            case PlayerAction.StartMoveRight:
-                current.Add(input.Action);
-                break;
-            case PlayerAction.StartMoveBack:
-                current.Add(input.Action);
-                break;
-            case PlayerAction.StartMoveLeft:
-                current.Add(input.Action);
-                break;
-            case PlayerAction.StopMoveForward:
-                current.Remove(input.Action);
-                break;
-            case PlayerAction.StopMoveRight:
-                current.Remove(input.Action);
-                break;
-            case PlayerAction.StopMoveBack:
-                current.Remove(input.Action);
-                break;
-            case PlayerAction.StopMoveLeft:
-                current.Remove(input.Action);
-                break;
-            default:
-                break;
+            switch (playerInputMessage.Action)
+            {
+                case PlayerAction.StartMoveForward:
+                    current.Add(playerInputMessage.Action);
+                    break;
+                case PlayerAction.StartMoveRight:
+                    current.Add(playerInputMessage.Action);
+                    break;
+                case PlayerAction.StartMoveBack:
+                    current.Add(playerInputMessage.Action);
+                    break;
+                case PlayerAction.StartMoveLeft:
+                    current.Add(playerInputMessage.Action);
+                    break;
+                case PlayerAction.StopMoveForward:
+                    current.Remove(playerInputMessage.Action);
+                    break;
+                case PlayerAction.StopMoveRight:
+                    current.Remove(playerInputMessage.Action);
+                    break;
+                case PlayerAction.StopMoveBack:
+                    current.Remove(playerInputMessage.Action);
+                    break;
+                case PlayerAction.StopMoveLeft:
+                    current.Remove(playerInputMessage.Action);
+                    break;
+                default:
+                    break;
+            }
         }
 
         return current;

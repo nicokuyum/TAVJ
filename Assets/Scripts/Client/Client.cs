@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
@@ -70,8 +71,13 @@ public class Client : MonoBehaviour
 
 			foreach (var action in player.getActions())
 			{
-				SnapshotHandler.GetInstance().AddActionForPrediction(action);
+				
 				outgoingMessages.Add(action);
+			}
+
+			if (player.getActions().Count() > 0)
+			{
+				SnapshotHandler.GetInstance().AddActionForPrediction(player.getActions(),time);
 			}
 			
 			player.getActions().Clear();
