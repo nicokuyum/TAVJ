@@ -27,7 +27,6 @@ public class Server : MonoBehaviour
 	
 	private static int listenPort = GlobalSettings.GamePort;
 	public int idCount = 1;
-	public long frameNumber = 0;
 
 	private Boolean hasData;
 	private byte[] data;
@@ -73,13 +72,12 @@ public class Server : MonoBehaviour
 			UpdatePlayer(id);
 		}*/
 
-		SendReliableMessages(frameNumber);
+		SendReliableMessages();
 
 
 		if (acumTime >= (1.0f/ snapRate) && players.Count != 0)
 		{
 			//Debug.Log(time);
-			frameNumber++;
 			while (acumTime > (1.0f/snapRate))
 			{
 				acumTime -= (1.0f/snapRate);
@@ -178,7 +176,6 @@ public class Server : MonoBehaviour
 		HashSet<PlayerAction> playerActions = actions[id];
 		
 		PlayerSnapshot ps = players[id];
-		ps.frameNumber++;
 
 		foreach (PlayerAction action in playerActions)
 		{
@@ -294,7 +291,7 @@ public class Server : MonoBehaviour
 		}
 	}
 
-	public void SendReliableMessages(long frameNumber)
+	public void SendReliableMessages()
 	{
 		foreach (KeyValuePair<int, ServerReliableQueue> entry in rq)
 		{

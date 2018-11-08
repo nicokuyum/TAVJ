@@ -34,16 +34,16 @@ public class ReliableQueue
     public void AddQueue(ReliableMessage gm, float time)
     {
         MessageQueue.Add(gm);
-        /*if (SentFrames.ContainsKey(gm))
+        if (SentFrames.ContainsKey(gm))
         {
             SentFrames[gm] = 0;
             gamemessages[gm._MessageId] = gm;
         }
         else
-        {*/
-        SentFrames.Add(gm, 0);
-        gamemessages.Add(gm._MessageId, gm);
-        //}
+        {
+            SentFrames.Add(gm, 0);
+            gamemessages.Add(gm._MessageId, gm);
+        }
     }
 
 
@@ -54,7 +54,7 @@ public class ReliableQueue
         {
             if (time - SentFrames[rm] >= GlobalSettings.ReliableTimeout)
             {
-                Debug.Log("NEED ACK OF MESSAGE " + rm._MessageId);
+                //Debug.Log("NEED ACK OF MESSAGE " + rm._MessageId);
                 needResend.Add(rm);
                 SentFrames[rm] = time;
             }

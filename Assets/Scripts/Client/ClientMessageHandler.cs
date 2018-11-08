@@ -1,24 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class ClientMessageHandler
 {
+	private Client client;
 
-	private readonly ReliableQueue rq;
-	private List<GameMessage> outgoingGameMessages;
-	private Player player;
-	private Dictionary<int, Player> otherPlayers;
-	private GameObject playerPrefab;
-
-	public ClientMessageHandler(ReliableQueue rq, Player player, Dictionary<int, Player> otherPlayers,
-		List<GameMessage> outgoingGameMessages, GameObject playerPrefab)
+	public ClientMessageHandler(Client client)
 	{
-		this.player = player;
-		this.otherPlayers = otherPlayers;
-		this.rq = rq;
-		this.outgoingGameMessages = outgoingGameMessages;
-		this.playerPrefab = playerPrefab;
+		this.client = client;
 	}
 
 	public void Handle(GameMessage gm)
@@ -42,7 +31,7 @@ public class ClientMessageHandler
 	private void handleAck(AckMessage message)
 	{
 		//Debug.Log("Handling ack with ackid " + message.ackid);
-		rq.ReceivedACK(message.ackid);
+		client.GetReliableQueue().ReceivedACK(message.ackid);
 	}
 
 	private void handlePlayerSnapshotInterpolating(PlayerSnapshotMessage psm)
@@ -56,24 +45,25 @@ public class ClientMessageHandler
 
 	private void handleConnectionConfirmation(ClientConnectedMessage ccm)
 	{
-		if (player.name.Equals(ccm.name))
+		Debug.Log("My name: " + client.getPlayer().name + " - received name: " + ccm.name);
+		if (client.getPlayer().name.Equals(ccm.name))
 		{
-			this.player.id = ccm.id;
+			client.setTime(ccm._TimeStamp);
+			this.client.getPlayer().id = ccm.id;
 		}
 		else
 		{
-			if (!otherPlayers.ContainsKey(ccm.id))
+			if (!client.getOtherPlayers().ContainsKey(ccm.id))
 			{
-				GameObject go = GameObject.Instantiate(playerPrefab);
+				GameObject go = GameObject.Instantiate(client.getPlayerPrefab());
 				Player newPlayer = go.GetComponent<Player>();
 				newPlayer.id = ccm.id;
 				newPlayer.name = ccm.name;
-				otherPlayers.Add(ccm.id, newPlayer);
+				client.getOtherPlayers().Add(ccm.id, newPlayer);
 			}
 			// Else ignore
 		}
-		Debug.Log("Adding Ack for message id " + ccm._MessageId);
-		outgoingGameMessages.Add(new AckMessage(ccm._MessageId));
+		client.getOutgoingMessages().Add(new AckMessage(ccm._MessageId));
 	}
 
 }

@@ -6,7 +6,6 @@ public class PlayerSnapshot
 
     public int id;
     public float _TimeStamp;
-    public long frameNumber;
     public int Health;
     public bool Invulnerable;
     public Vector3 position;
@@ -16,8 +15,6 @@ public class PlayerSnapshot
     public PlayerSnapshot(int id, Vector3 position)
     {
         this.id = id;
-        frameNumber = 1;
-        
         Health = GlobalSettings.MaxHealth;
         Invulnerable = false;
         this.position = position;
@@ -26,19 +23,9 @@ public class PlayerSnapshot
     public PlayerSnapshot(int id)
     {
         this.id = id;
-        frameNumber = 1;
         Health = GlobalSettings.MaxHealth;
         Invulnerable = false;
         position = new Vector3(50, 50, 50);
-    }
-
-    public PlayerSnapshot(int id, int frameNumber)
-    {
-        this.id = id;
-        this.frameNumber = frameNumber;
-        Health = GlobalSettings.MaxHealth;
-        Invulnerable = false;
-        position = new Vector3(50,50,50);
     }
 
     public byte[] serialize()
@@ -46,7 +33,6 @@ public class PlayerSnapshot
         Compressor compressor = new Compressor();
         compressor.WriteNumber(id, GlobalSettings.MaxPlayers);
         CompressingUtils.WriteTime(compressor,_TimeStamp);
-        compressor.WriteNumber(frameNumber, 3600 * (long)GlobalSettings.Fps);
         compressor.WriteNumber(this.Health, GlobalSettings.MaxHealth);
         compressor.PutBit(this.Invulnerable);
         CompressingUtils.WritePosition(compressor, position);

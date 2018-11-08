@@ -20,7 +20,8 @@ public class SnapshotHandler
     private SnapshotHandler(float start, float end)
     {
         snapshotBuffer = new SortedList<float, PlayerSnapshot>();
-        
+        this.start = start;
+        this.end = end;
     }
 
     public static SnapshotHandler GetInstance()
@@ -30,7 +31,7 @@ public class SnapshotHandler
 
     public void ReceiveSnapshot(PlayerSnapshot snapshot)
     {
-        if (end < snapshot.frameNumber)
+        if (end < snapshot._TimeStamp)
         {
             snapshotBuffer.Add(snapshot._TimeStamp, snapshot);
             //timeStamps.Add(snapshot._TimeStamp, false);
@@ -46,12 +47,14 @@ public class SnapshotHandler
     {
         try
         {
+            //Debug.Log("In getSnapshot (end,time) " + end + "," + time);
             if (end < time)
             {
                 start = end;
                 bool endFound = false;
                 foreach(float f in snapshotBuffer.Keys)
                 {
+                    //Debug.Log("Checking key " + f);
                     if (!endFound)
                     {
                         if (f > time)
@@ -68,7 +71,7 @@ public class SnapshotHandler
 
                 if (!endFound)
                 {
-                    //TODO Could throw an exception or handle it more elegantly
+                    //Debug.Log("End not found");
                     return null;
                 }
                 
@@ -87,13 +90,14 @@ public class SnapshotHandler
 
     public PlayerSnapshot interpolate(PlayerSnapshot past, PlayerSnapshot future, float time)
     {
+        Debug.Log("past: " + past._TimeStamp + " - future: " + future._TimeStamp + " - time: " + time);
         float timeRatio = (time - past._TimeStamp) / (future._TimeStamp - past._TimeStamp);
         PlayerSnapshot interpolatedPlayerSnapshot = new PlayerSnapshot(past.id);
         interpolatedPlayerSnapshot._TimeStamp = time;
         interpolatedPlayerSnapshot.Health = past.Health;
         interpolatedPlayerSnapshot.Invulnerable = past.Invulnerable;
         interpolatedPlayerSnapshot.position = Vector3.Lerp(past.position, future.position, timeRatio);
-        interpolatedPlayerSnapshot.rotation = Quaternion.Lerp(past.rotation, future.rotation, timeRatio);
+        //interpolatedPlayerSnapshot.rotation = Quaternion.Lerp(past.rotation, future.rotation, timeRatio);
         return interpolatedPlayerSnapshot;
     }
 
@@ -101,8 +105,7 @@ public class SnapshotHandler
     {
         if (ps != null)
         {
-            Debug.Log("Updating player snapshot");
-            Player p = GameObject.Find("Player").GetComponent<Player>();
+            Player p = GameObject.FindWithTag("Player").GetComponent<Player>();
             p.Health = ps.Health;
             p.Invulnerable = ps.Invulnerable;
             p.gameObject.transform.position = ps.position;
