@@ -174,7 +174,19 @@ public class Server : MonoBehaviour
 		players.Add(id, ps);
 		playersnapshots.Add(ps);
 		Debug.Log("Broadcast de " + playerName);
+		NotifiyPreviousConnections(connection, id);
 		BroadCastConnectionMessage(id, playerName);
+	}
+
+	private void NotifiyPreviousConnections(Connection connection, int id)
+	{
+		foreach (KeyValuePair<Connection,int> keyValuePair in connections)
+		{
+			if (keyValuePair.Value != id)
+			{
+				rq[id].AddQueue(new ClientConnectedMessage(keyValuePair.Value, "ASD",time),time);
+			}
+		}
 	}
 
 	private void BroadCastConnectionMessage(int id, String playerName)
