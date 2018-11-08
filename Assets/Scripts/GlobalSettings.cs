@@ -24,11 +24,11 @@ public class GlobalSettings{
 
 	public const int MaxPlayers = 32;
 
-	public const int ServerSendRate = 10;
+	public const int ServerSendRate = 3;
 
 	public const float TimePrecision = 0.001f;
 	public const float MinTime = 0.0f;
 	public const float MaxTime = 3600.0f;
 
-	public const float speed = 1.0f;
+	public const float speed = 3.0f;
 }

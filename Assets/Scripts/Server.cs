@@ -18,8 +18,6 @@ public class Server : MonoBehaviour
 	static readonly object lockObject = new object();
 
 	public static float snapRate = GlobalSettings.ServerSendRate;
-	public static String DestIp;
-	public static int DestPort;
 	public static int SourcePort = 8081;
 	
 	private float time = 0f;
@@ -54,6 +52,9 @@ public class Server : MonoBehaviour
 	//ID to PlayerActions
 	public Dictionary<int, HashSet<PlayerAction>> actions = new Dictionary<int, HashSet<PlayerAction>>();
 	
+	//ID to stored ReliableMessageIdStored
+	public Dictionary<int, SortedList<ReliableMessage, bool>> bufferedMessages =
+		new Dictionary<int, SortedList<ReliableMessage, bool>>();
 	
 	
 	// Use this for initialization
@@ -86,7 +87,11 @@ public class Server : MonoBehaviour
 
 		SendReliableMessages(frameNumber);
 
-
+		for (int i = 1; i < idCount; i++)
+		{
+			UpdatePlayer(i, Time.deltaTime);
+		}
+		
 		if (acumTime >= (1.0f/ snapRate) && players.Count != 0)
 		{
 			//Debug.Log(time);
@@ -102,10 +107,7 @@ public class Server : MonoBehaviour
 				SendUdp(SourcePort, connection.srcIp.ToString(), GlobalSettings.GamePort, serializedWorld);
 			}
 
-			for (int i = 1; i < idCount; i++)
-			{
-				UpdatePlayer(i);
-			}
+
 		}
 	}
 
@@ -167,8 +169,10 @@ public class Server : MonoBehaviour
 		actions[id]= new HashSet<PlayerAction>();
 		PlayerSnapshot ps = new PlayerSnapshot(id, position);
 		rq.Add(id,new ServerReliableQueue(connection));
+		bufferedMessages.Add(id, new SortedList<ReliableMessage, bool>());
 		players.Add(id, ps);
 		playersnapshots.Add(ps);
+		Debug.Log("Broadcast de " + playerName);
 		BroadCastConnectionMessage(id, playerName);
 	}
 
@@ -181,25 +185,26 @@ public class Server : MonoBehaviour
 	}
 	
 
-	private void UpdatePlayer(int id)
+	private void UpdatePlayer(int id, float deltaTime)
 	{
 		//Debug.Log("Updating Player   "  + id);
 		HashSet<PlayerAction> playerActions = actions[id];
 		
 		PlayerSnapshot ps = players[id];
 		ps.frameNumber++;
+		ps._TimeStamp = time;
 
 		foreach (PlayerAction action in playerActions)
 		{
-			Mover.GetInstance().ApplyAction(ps,action);
+			Mover.GetInstance().ApplyAction(ps,action, deltaTime);
 		}
-		
+		//Debug.Log(ps.position.x  + " " + ps.position.z);
 	}
 
 	private void SendAck(Connection connection, int ack)
 	{
-		//TODO crearmensajedetipoACK
-		byte[] ackmsg = (new AckMessage(ack)).Serialize();
+		
+		Debug.Log("Sending ACK  " + ack);
 
 		List<GameMessage> gms = new List<GameMessage>();
 		
@@ -213,32 +218,57 @@ public class Server : MonoBehaviour
 	{
 		foreach (GameMessage gm in packet.Messages)
 		{
+			
 			//Debug.Log("GM type : " + gm.type().ToString() );
-			switch (gm.type())
+			if (gm.isReliable())
 			{
-				case MessageType.ClientConnect:
-					processConnect((ClientConnectMessage)gm,packet.connection);
-					break;
-				case MessageType.PlayerInput:
-					processInput((PlayerInputMessage)gm, packet.connection);
-					break;
-				case MessageType.Ack:
-					processAck((AckMessage) gm, packet.connection);
-					break;
-				default:
-					throw new NotImplementedException();
-					break;
+				if (gm.type() == MessageType.ClientConnect)
+				{
+					processConnect((ClientConnectMessage)gm, packet.connection);
+				}
+				else if (lastAcks[connections[packet.connection]] < ((ReliableMessage) gm)._MessageId)
+				{
+					ProcessMessage(gm, packet.connection);
+				}
+				SendAck(packet.connection, ((ReliableMessage) gm)._MessageId);
+				lastAcks[connections[packet.connection]] = ((ReliableMessage) gm)._MessageId;
+
+			}
+			else
+			{
+				ProcessMessage(gm,packet.connection);
 			}
 			
 			
 			//TODO Procesar si es reliable SOLAMENTE si el ack es inferior al que mande
-			if (gm.isReliable())
+		/*	if (gm.isReliable())
 			{
 				ReliableMessage rm = (ReliableMessage) gm;
 				SendAck(packet.connection, rm._MessageId);
-			}
+			}*/
 		}
 
+	}
+
+	private void ProcessMessage(GameMessage gm, Connection connection)
+	{			
+		Debug.Log(gm.type().ToString());
+		switch (gm.type())
+		{
+			case MessageType.ClientConnect:
+				processConnect((ClientConnectMessage)gm, connection);
+				break;
+			case MessageType.PlayerInput:
+				processInput((PlayerInputMessage)gm, connection);
+				break;
+			case MessageType.Ack:
+				processAck((AckMessage) gm, connection);
+				break;
+			default:
+				throw new NotImplementedException();
+				break;
+		}
+		
 	}
 
 	private byte[] SerializeWorld()
@@ -247,16 +277,16 @@ public class Server : MonoBehaviour
 		foreach (PlayerSnapshot playerSnapshot in playersnapshots)// players.Values
 		{
 			gms.Add(new PlayerSnapshotMessage(playerSnapshot));
+			Debug.Log(playerSnapshot.position.x +  " " + playerSnapshot.position.z);
 		}
+		Debug.Log("Mundo de : " + gms.Count );
 		return (new Packet(gms)).serialize();
 	}
 
 	
 	
 	private void processInput(PlayerInputMessage inputMessage, Connection connection)
-	{
-	
-		
+	{	
 		int id = connections[connection];
 		//Debug.Log(inputMessage.Action);
 		switch (inputMessage.Action)
@@ -296,11 +326,7 @@ public class Server : MonoBehaviour
 	public void processAck(AckMessage gm, Connection connection)
 	{
 		int id = connections[connection];
-		if (lastAcks[id] < gm.ackid)
-		{
-			lastAcks[id] = gm.ackid;
-			rq[id].ReceivedACK(gm.ackid);
-		}
+		rq[id].ReceivedACK(gm.ackid);
 	}
 
 	public void SendReliableMessages(long frameNumber)
@@ -314,6 +340,11 @@ public class Server : MonoBehaviour
 				SendUdp(SourcePort, entry.Value.connection.srcIp.ToString(), GlobalSettings.GamePort, packet.serialize());
 			}
 		}
+	}
+
+	public void processPendingReliables(Connection connection)
+	{
+		
 	}
 	
 }

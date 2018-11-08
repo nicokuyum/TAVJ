@@ -36,7 +36,7 @@ public class MessageSerializer {
 		int id = decompressor.GetNumber(int.MaxValue);
 		float time = CompressingUtils.GetTime(decompressor);
 		String name = decompressor.GetString();
-		return new ClientConnectMessage(decompressor.GetNumber(int.MaxValue),decompressor.GetString(), time);
+		return new ClientConnectMessage(name, time);
 	}
 
 	

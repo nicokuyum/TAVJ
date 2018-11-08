@@ -21,22 +21,22 @@ public class Mover {
         return _instance ?? (_instance = new Mover());
     }
 
-    public void ApplyAction(PlayerSnapshot ps, PlayerAction action)
+    public void ApplyAction(PlayerSnapshot ps, PlayerAction action, float deltaTime)
     {
         
         switch (action)
         {
             case PlayerAction.StartMoveForward:
-                ps.position.x = ps.position.x + 0.5f;
+                ps.position.x = ps.position.x + GlobalSettings.speed * deltaTime;
                 break;
             case PlayerAction.StartMoveRight:
-                ps.position.z = ps.position.z + 0.5f;
+                ps.position.z = ps.position.z + GlobalSettings.speed * deltaTime;
                 break;
             case PlayerAction.StartMoveBack:
-                ps.position.x = ps.position.x - 0.5f;
+                ps.position.x = ps.position.x - GlobalSettings.speed * deltaTime;
                 break;
             case PlayerAction.StartMoveLeft:
-                ps.position.z = ps.position.z - 0.5f;
+                ps.position.z = ps.position.z - GlobalSettings.speed * deltaTime;
                 break;
             case PlayerAction.Shoot:
                 break;

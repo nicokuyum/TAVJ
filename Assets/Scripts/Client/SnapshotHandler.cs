@@ -29,7 +29,7 @@ public class SnapshotHandler
 
     public void ReceiveSnapshot(PlayerSnapshot snapshot)
     {
-        if (end < snapshot.frameNumber)
+        if (end < snapshot._TimeStamp)
         {
             snapshotBuffer.Add(snapshot._TimeStamp, snapshot);
         }

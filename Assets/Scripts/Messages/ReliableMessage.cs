@@ -20,4 +20,9 @@
 	{
 		return _MessageId;
 	}
+
+	public override bool Equals(object obj)
+	{
+		return _MessageId.Equals(((ReliableMessage)obj)._MessageId);
+	}
 }
