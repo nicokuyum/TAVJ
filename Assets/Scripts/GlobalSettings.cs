@@ -34,5 +34,5 @@ public class GlobalSettings{
 	public const float MinTime = 0.0f;
 	public const float MaxTime = 3600.0f;
 
-	public const float speed = 3.0f;
+	public const float speed = 15.0f;
 }

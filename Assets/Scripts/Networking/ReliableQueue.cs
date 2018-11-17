@@ -41,6 +41,7 @@ public class ReliableQueue
 
         while (NoTimeOutQueue.Count() > 0 && NoTimeOutQueue[0]._MessageId <= ackid)
         {
+            Debug.Log("Removing from NoTimeoutQueue ackid " + ackid);
             NoTimeOutQueue.RemoveAt(0);
         }
     }

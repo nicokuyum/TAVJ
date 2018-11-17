@@ -73,11 +73,11 @@ public class Client : MonoBehaviour
 			}
 
 			
-			foreach (var action in player.getActions())
+			foreach (var action in player.toSend)
 			{
 				outgoingMessages.Add(action);
 			}
-
+			player.toSend.Clear();
 			
 			foreach (var gm in outgoingMessages)
 			{

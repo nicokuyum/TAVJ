@@ -21,6 +21,7 @@ public class Player : MonoBehaviour
 	public float time;
 	private float acumTime;
 
+	public List<PlayerInputMessage> toSend = new List<PlayerInputMessage>();
 	private Queue<PlayerInputMessage> actions = new Queue<PlayerInputMessage>();
 	private HashSet<PlayerAction> frameActions = new HashSet<PlayerAction>();
 	
@@ -41,25 +42,21 @@ public class Player : MonoBehaviour
 		time += Time.deltaTime;
 		acumTime += Time.deltaTime;
 		
-		if (Input.GetKeyDown(KeyCode.W))
+		if (Input.GetKey(KeyCode.W))
 		{
 			frameActions.Add(PlayerAction.MoveForward);
-			//actions.Enqueue(new PlayerInputMessage(PlayerAction.MoveForward, time));
 		} 
-		if (Input.GetKeyDown(KeyCode.A))
+		if (Input.GetKey(KeyCode.A))
 		{
 			frameActions.Add(PlayerAction.MoveLeft);
-			//actions.Enqueue(new PlayerInputMessage(PlayerAction.MoveLeft, time));
 		} 
-		if (Input.GetKeyDown(KeyCode.S))
+		if (Input.GetKey(KeyCode.S))
 		{
 			frameActions.Add(PlayerAction.MoveBack);
-			//actions.Enqueue(new PlayerInputMessage(PlayerAction.MoveBack, time));
 		} 
-		if (Input.GetKeyDown(KeyCode.D))
+		if (Input.GetKey(KeyCode.D))
 		{
 			frameActions.Add(PlayerAction.MoveRight);
-			//actions.Enqueue(new PlayerInputMessage(PlayerAction.MoveRight, time));
 		} 
 
 		if (Input.GetMouseButtonDown(0))
@@ -72,7 +69,14 @@ public class Player : MonoBehaviour
 			acumTime -= (1.0f / GlobalSettings.Fps);
 			foreach (var action in frameActions)
 			{
-				actions.Enqueue(new PlayerInputMessage(action, time));
+				PlayerInputMessage msg = new PlayerInputMessage(action, time);
+				toSend.Add(msg);
+				actions.Enqueue(msg);
+				if (SnapshotHandler.GetInstance().prediction)
+				{
+					applyAction(action);
+				}
+				applyAction(action);
 			}
 			frameActions.Clear();
 		}
@@ -82,29 +86,43 @@ public class Player : MonoBehaviour
 
 	public void prediction(int lastId, float deltaTime)
 	{
+		Debug.Log("In prediction function, last id is " + lastId);
 		while (actions.Any() && actions.Peek()._MessageId < lastId)
 		{
 			// Discard all messages that were applied by server
+			Debug.Log("Discarding action with id " + actions.Peek()._MessageId);
 			actions.Dequeue();
 		}
+		
+		Debug.Log("Actions size " + actions.Count);
+		if (actions.Any())
+		{
+			Debug.Log("First action id is " + actions.Peek()._MessageId);
+		}
+		
 
 		foreach (var actionMsg in actions)
 		{
-			switch (actionMsg.Action)
-			{
-				case PlayerAction.MoveForward:
-					gameObject.transform.Translate(Vector3.forward * GlobalSettings.speed * deltaTime);
-					break;
-				case PlayerAction.MoveRight:
-					gameObject.transform.Translate(Vector3.right * GlobalSettings.speed * deltaTime);
-					break;
-				case PlayerAction.MoveBack:
-					gameObject.transform.Translate(Vector3.back * GlobalSettings.speed * deltaTime);
-					break;
-				case PlayerAction.MoveLeft:
-					gameObject.transform.Translate(Vector3.left * GlobalSettings.speed * deltaTime);
-					break;
-			}
+			applyAction(actionMsg.Action);
+		}
+	}
+
+	public void applyAction(PlayerAction action)
+	{
+		switch (action)
+		{
+			case PlayerAction.MoveForward:
+				gameObject.transform.Translate(Vector3.forward * GlobalSettings.speed * (1.0f / GlobalSettings.Fps));
+				break;
+			case PlayerAction.MoveRight:
+				gameObject.transform.Translate(Vector3.right * GlobalSettings.speed * (1.0f / GlobalSettings.Fps));
+				break;
+			case PlayerAction.MoveBack:
+				gameObject.transform.Translate(Vector3.back * GlobalSettings.speed * (1.0f / GlobalSettings.Fps));
+				break;
+			case PlayerAction.MoveLeft:
+				gameObject.transform.Translate(Vector3.left * GlobalSettings.speed * (1.0f / GlobalSettings.Fps));
+				break;
 		}
 	}
 	
