@@ -217,10 +217,17 @@ public class SnapshotHandler
         {
             if (future.ContainsKey(keyValuePair.Key))
             {
-                PlayerSnapshot interpolatedPlayerSnapshot = interpolate(keyValuePair.Value,
-                    future[keyValuePair.Key], time);
+                if (self.id == keyValuePair.Key)
+                {
+                    interpolatedWorld.Add(keyValuePair.Key, future[keyValuePair.Key]);
+                }
+                else
+                {
+                    PlayerSnapshot interpolatedPlayerSnapshot = interpolate(keyValuePair.Value,
+                        future[keyValuePair.Key], time);   
+                    interpolatedWorld.Add(keyValuePair.Key,interpolatedPlayerSnapshot);
+                }
                     
-                interpolatedWorld.Add(keyValuePair.Key,interpolatedPlayerSnapshot);
             }
             
         }

@@ -47,7 +47,7 @@ public class Server : MonoBehaviour
 	public Dictionary<int, ServerReliableQueue> rq = new Dictionary<int, ServerReliableQueue>();
 	
 	//ID to PlayerActions
-	public Dictionary<int, List<PlayerAction>> actions = new Dictionary<int, List<PlayerAction>>();
+	public Dictionary<int, List<PlayerInputMessage>> actions = new Dictionary<int, List<PlayerInputMessage>>();
 	
 	//ID to stored ReliableMessageIdStored
 	public Dictionary<int, SortedList<ReliableMessage, bool>> bufferedMessages =
@@ -166,7 +166,7 @@ public class Server : MonoBehaviour
 		
 		Debug.Log("CREATED AT" + ps.position.x + " " + ps.position.y  + " " + ps.position.z);
 		rq.Add(id,new ServerReliableQueue(connection, GlobalSettings.ReliableTimeout));
-		actions[id] = new List<PlayerAction>();
+		actions[id] = new List<PlayerInputMessage>();
 		bufferedMessages.Add(id, new SortedList<ReliableMessage, bool>());
 		players.Add(id, ps);
 		playersnapshots.Add(ps);
@@ -198,7 +198,7 @@ public class Server : MonoBehaviour
 	private void UpdatePlayer(int id, float time)
 	{
 		//Debug.Log("Updating Player   "  + id);
-		List<PlayerAction> playerActions = actions[id];
+		List<PlayerInputMessage> playerActions = actions[id];
 		
 		PlayerSnapshot ps = players[id];
 
@@ -207,9 +207,11 @@ public class Server : MonoBehaviour
 
 		while (playerActions.Any())
 		{
-			PlayerAction action = playerActions[0];
+			PlayerInputMessage mssg = playerActions[0];
 			playerActions.RemoveAt(0);
-			Mover.GetInstance().ApplyAction(ps, action, time);
+			Mover.GetInstance().ApplyAction(ps, mssg.Action, time);
+			ps.lastId = mssg._MessageId;
+			Debug.Log("LAST ID : " + ps.lastId);
 		}
 		//foreach (PlayerAction action in playerActions)
 		//{
@@ -238,16 +240,19 @@ public class Server : MonoBehaviour
 			{
 				reliableFlag = true;
 				int id = ((ReliableMessage) gm)._MessageId;
+				Debug.Log("RM con ID : " + id );
 				if (gm.type() == MessageType.ClientConnect)
 				{
 					processConnect((ClientConnectMessage)gm, packet.connection);
 				}
-				else if (lastAcks[connections[packet.connection]] != id-1)
+				//Only process if the ack corresponds to the next package
+				else if (lastAcks[connections[packet.connection]] < id)
+				//else
 				{
+					Debug.Log("RM con ID : " + id + " LAST : " + lastAcks[connections[packet.connection]]);
 					ProcessMessage(gm, packet.connection);
 					lastAcks[connections[packet.connection]] = ((ReliableMessage) gm)._MessageId;
 				}
-				
 			}
 			else
 			{
@@ -294,28 +299,8 @@ public class Server : MonoBehaviour
 	private void processInput(PlayerInputMessage inputMessage, Connection connection)
 	{	
 		int id = connections[connection];
-		//Debug.Log(inputMessage.Action);
-		actions[id].Add(inputMessage.Action);
-		/*switch (inputMessage.Action)
-		{
-			case PlayerAction.MoveForward:
-				actions[id].Add(PlayerAction.MoveForward);
-				break;
-			case PlayerAction.MoveRight:
-				actions[id].Add(PlayerAction.MoveRight);
-				break;
-			case PlayerAction.MoveBack:
-				actions[id].Add(PlayerAction.MoveBack);
-				break;
-			case PlayerAction.MoveLeft:
-				actions[id].Add(PlayerAction.MoveLeft);
-				break;
-			case PlayerAction.Shoot:
-				actions[id].Add(PlayerAction.Shoot);
-				break;
-			default:
-				break;
-		}*/
+		actions[id].Add(inputMessage);
+
 	}
 
 	public void processAck(AckMessage gm, Connection connection)
