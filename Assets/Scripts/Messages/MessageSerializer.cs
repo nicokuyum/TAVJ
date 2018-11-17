@@ -51,6 +51,7 @@ public class MessageSerializer {
 		playerSnapshot.Invulnerable = decompressor.GetBoolean();
 		playerSnapshot.position = CompressingUtils.GetPosition(decompressor);
 		//Debug.Log("Received PS on position " + playerSnapshot.position);
+		playerSnapshot.lastId = decompressor.GetNumber(GlobalSettings.MaxACK);
 		return new PlayerSnapshotMessage(playerSnapshot);
 	}
 
@@ -93,6 +94,7 @@ public class MessageSerializer {
 		playerSnapshot.Health = decompressor.GetNumber(GlobalSettings.MaxHealth);
 		playerSnapshot.Invulnerable = decompressor.GetBoolean();
 		playerSnapshot.position = CompressingUtils.GetPosition(decompressor);
+		playerSnapshot.lastId = decompressor.GetNumber(GlobalSettings.MaxACK);
 		return playerSnapshot;
 	}
 

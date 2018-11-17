@@ -139,7 +139,7 @@ public class SnapshotHandler
         if (prediction)
         {
             Debug.Log("Applying prediction");
-            ReapplyActions(p,playerSnapshot._TimeStamp);
+            p.prediction(playerSnapshot.lastId, playerSnapshot._TimeStamp);
         }
     }
 
@@ -152,7 +152,7 @@ public class SnapshotHandler
         
         foreach (KeyValuePair<float,HashSet<PlayerAction>> action in actions)
         {
-            if (action.Key >= time)
+            if (action.Key > time)
             {
                 if (last != null)
                 {
@@ -247,11 +247,11 @@ public class SnapshotHandler
         
     }
 
-    
+
+
     public void AddActionForPrediction(HashSet<PlayerAction> input, float time)
     {
         actions.Add(time, new HashSet<PlayerAction>(input));
-        lastActionTime = time;
     }
 
 

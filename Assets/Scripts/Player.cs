@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Sockets;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -19,8 +20,6 @@ public class Player : MonoBehaviour
 	
 	public float time;
 
-	public HashSet<PlayerAction> liveActions = new HashSet<PlayerAction>();
-
 	private Queue<PlayerInputMessage> actions = new Queue<PlayerInputMessage>();
 	
 	// Se llama luego de haber sido constuido el GameObject y todos sus componentes
@@ -38,62 +37,56 @@ public class Player : MonoBehaviour
 	void Update ()
 	{
 		time += Time.deltaTime;
-		if (SnapshotHandler.GetInstance().prediction)
-		{
-			prediction(Time.deltaTime);
-		}
 		
+
 		if (Input.GetKeyDown(KeyCode.W))
 		{
-			liveActions.Add(PlayerAction.StartMoveForward);
 			actions.Enqueue(new PlayerInputMessage(PlayerAction.StartMoveForward, time));
 		} else if (Input.GetKeyUp(KeyCode.W))
 		{
-			liveActions.Remove(PlayerAction.StartMoveForward);
 			actions.Enqueue(new PlayerInputMessage(PlayerAction.StopMoveForward, time));
 		}
 		if (Input.GetKeyDown(KeyCode.A))
 		{
-			liveActions.Add(PlayerAction.StartMoveLeft);
 			actions.Enqueue(new PlayerInputMessage(PlayerAction.StartMoveLeft, time));
 		} else if (Input.GetKeyUp(KeyCode.A))
 		{
-			liveActions.Remove(PlayerAction.StartMoveLeft);
 			actions.Enqueue(new PlayerInputMessage(PlayerAction.StopMoveLeft, time));
 		}
 		if (Input.GetKeyDown(KeyCode.S))
 		{
-			liveActions.Add(PlayerAction.StartMoveBack);
 			actions.Enqueue(new PlayerInputMessage(PlayerAction.StartMoveBack, time));
 		} else if (Input.GetKeyUp(KeyCode.S))
 		{
-			liveActions.Remove(PlayerAction.StartMoveBack);
 			actions.Enqueue(new PlayerInputMessage(PlayerAction.StopMoveBack, time));
 		}
 		if (Input.GetKeyDown(KeyCode.D))
 		{
-			liveActions.Add(PlayerAction.StartMoveRight);
 			actions.Enqueue(new PlayerInputMessage(PlayerAction.StartMoveRight, time));
 		} else if (Input.GetKeyUp(KeyCode.D))
 		{ 
-			liveActions.Remove(PlayerAction.StartMoveRight);
 			actions.Enqueue(new PlayerInputMessage(PlayerAction.StopMoveRight, time));
 		}
 
 		if (Input.GetMouseButtonDown(0))
 		{
-			
 			actions.Enqueue(new PlayerInputMessage(PlayerAction.Shoot, time));
 		}
 		
 		//this.gameObject.transform.rotation = this.gameObject.transform.GetChild(0).rotation;
 	}
 
-	public void prediction(float deltaTime)
+	public void prediction(int lastId, float deltaTime)
 	{
-		foreach (PlayerAction action in liveActions)
+		while (actions.Any() && actions.Peek()._MessageId < lastId)
 		{
-			switch (action)
+			// Discard all messages that were applied by server
+			actions.Dequeue();
+		}
+
+		foreach (var actionMsg in actions)
+		{
+			switch (actionMsg.Action)
 			{
 				case PlayerAction.StartMoveForward:
 					gameObject.transform.Translate(Vector3.forward * GlobalSettings.speed * deltaTime);

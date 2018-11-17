@@ -12,6 +12,7 @@ public class PlayerSnapshot
     public Vector3 position;
     public Quaternion rotation;
     public ServerPlayer player;
+    public int lastId;
 
     public PlayerSnapshot(int id, Vector3 position)
     {
@@ -51,6 +52,7 @@ public class PlayerSnapshot
         compressor.WriteNumber(this.Health, GlobalSettings.MaxHealth);
         compressor.PutBit(this.Invulnerable);
         CompressingUtils.WritePosition(compressor, position);
+        compressor.WriteNumber(lastId, GlobalSettings.MaxACK);
         return compressor.GetBuffer();
     }
 

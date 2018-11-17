@@ -75,12 +75,6 @@ public class Server : MonoBehaviour
 			packet = PacketQueue.GetInstance().PollPacket();
 		}
 
-		//TODO 
-		/*foreach (int id in connections.Values)
-		{
-			UpdatePlayer(id);
-		}*/
-
 		SendReliableMessages();
 
 		for (int i = 1; i < idCount; i++)

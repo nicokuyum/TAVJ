@@ -74,23 +74,22 @@ public class Client : MonoBehaviour
 
 			foreach (var action in player.getActions())
 			{
-				
 				outgoingMessages.Add(action);
 			}
 
-			if (player.liveActions.Any())
-			{
-				SnapshotHandler.GetInstance().AddActionForPrediction(player.liveActions,time);
-			}
-			
-			player.getActions().Clear();
 			
 			foreach (var gm in outgoingMessages)
 			{
 				if (gm.isReliable())
 				{
-					//TODO check if there already is time sync between client and server (es necesario que lo haya?)
-					rq.AddQueueWithTimeout((ReliableMessage)gm, time);
+					if (MessageType.PlayerInput.Equals(gm.type()))
+					{
+						rq.AddQueueWithOutTimeout((ReliableMessage)gm,time);
+					}
+					else
+					{
+						rq.AddQueueWithTimeout((ReliableMessage)gm, time);					
+					}
 				}
 			}
 
@@ -123,7 +122,6 @@ public class Client : MonoBehaviour
 
 		while (true)
 		{
-		
 			IPEndPoint RemoteIpEndPoint = new IPEndPoint(IPAddress.Any, 0);
 			
 			byte[] receiveBytes = udpClient.Receive(ref RemoteIpEndPoint);
