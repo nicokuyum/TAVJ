@@ -24,16 +24,16 @@ public class Mover {
         
         switch (action)
         {
-            case PlayerAction.StartMoveForward:
+            case PlayerAction.MoveForward:
                 ps.player.transform.Translate(Vector3.forward * GlobalSettings.speed * deltaTime);
                 break;
-            case PlayerAction.StartMoveRight:
+            case PlayerAction.MoveRight:
                 ps.player.transform.Translate(Vector3.right * GlobalSettings.speed * deltaTime);
                 break;
-            case PlayerAction.StartMoveBack:
+            case PlayerAction.MoveBack:
                 ps.player.transform.Translate(Vector3.back * GlobalSettings.speed * deltaTime);
                 break;
-            case PlayerAction.StartMoveLeft:
+            case PlayerAction.MoveLeft:
                 ps.player.transform.Translate(Vector3.left * GlobalSettings.speed * deltaTime);
                 break;
             case PlayerAction.Shoot:

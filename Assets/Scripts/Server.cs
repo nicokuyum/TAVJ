@@ -298,29 +298,17 @@ public class Server : MonoBehaviour
 		actions[id].Add(inputMessage.Action);
 		/*switch (inputMessage.Action)
 		{
-			case PlayerAction.StartMoveForward:
-				actions[id].Add(PlayerAction.StartMoveForward);
+			case PlayerAction.MoveForward:
+				actions[id].Add(PlayerAction.MoveForward);
 				break;
-			case PlayerAction.StartMoveRight:
-				actions[id].Add(PlayerAction.StartMoveRight);
+			case PlayerAction.MoveRight:
+				actions[id].Add(PlayerAction.MoveRight);
 				break;
-			case PlayerAction.StartMoveBack:
-				actions[id].Add(PlayerAction.StartMoveBack);
+			case PlayerAction.MoveBack:
+				actions[id].Add(PlayerAction.MoveBack);
 				break;
-			case PlayerAction.StartMoveLeft:
-				actions[id].Add(PlayerAction.StartMoveLeft);
-				break;
-			case PlayerAction.StopMoveForward:
-				actions[id].Remove(PlayerAction.StartMoveForward);
-				break;
-			case PlayerAction.StopMoveRight:
-				actions[id].Remove(PlayerAction.StartMoveRight);
-				break;
-			case PlayerAction.StopMoveBack:
-				actions[id].Remove(PlayerAction.StartMoveBack);
-				break;
-			case PlayerAction.StopMoveLeft:
-				actions[id].Remove(PlayerAction.StartMoveLeft);
+			case PlayerAction.MoveLeft:
+				actions[id].Add(PlayerAction.MoveLeft);
 				break;
 			case PlayerAction.Shoot:
 				actions[id].Add(PlayerAction.Shoot);

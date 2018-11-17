@@ -19,8 +19,10 @@ public class Player : MonoBehaviour
 	public bool Invulnerable;
 	
 	public float time;
+	private float acumTime;
 
 	private Queue<PlayerInputMessage> actions = new Queue<PlayerInputMessage>();
+	private HashSet<PlayerAction> frameActions = new HashSet<PlayerAction>();
 	
 	// Se llama luego de haber sido constuido el GameObject y todos sus componentes
 	void Awake () {
@@ -37,40 +39,41 @@ public class Player : MonoBehaviour
 	void Update ()
 	{
 		time += Time.deltaTime;
+		acumTime += Time.deltaTime;
 		
-
 		if (Input.GetKeyDown(KeyCode.W))
 		{
-			actions.Enqueue(new PlayerInputMessage(PlayerAction.StartMoveForward, time));
-		} else if (Input.GetKeyUp(KeyCode.W))
-		{
-			actions.Enqueue(new PlayerInputMessage(PlayerAction.StopMoveForward, time));
-		}
+			frameActions.Add(PlayerAction.MoveForward);
+			//actions.Enqueue(new PlayerInputMessage(PlayerAction.MoveForward, time));
+		} 
 		if (Input.GetKeyDown(KeyCode.A))
 		{
-			actions.Enqueue(new PlayerInputMessage(PlayerAction.StartMoveLeft, time));
-		} else if (Input.GetKeyUp(KeyCode.A))
-		{
-			actions.Enqueue(new PlayerInputMessage(PlayerAction.StopMoveLeft, time));
-		}
+			frameActions.Add(PlayerAction.MoveLeft);
+			//actions.Enqueue(new PlayerInputMessage(PlayerAction.MoveLeft, time));
+		} 
 		if (Input.GetKeyDown(KeyCode.S))
 		{
-			actions.Enqueue(new PlayerInputMessage(PlayerAction.StartMoveBack, time));
-		} else if (Input.GetKeyUp(KeyCode.S))
-		{
-			actions.Enqueue(new PlayerInputMessage(PlayerAction.StopMoveBack, time));
-		}
+			frameActions.Add(PlayerAction.MoveBack);
+			//actions.Enqueue(new PlayerInputMessage(PlayerAction.MoveBack, time));
+		} 
 		if (Input.GetKeyDown(KeyCode.D))
 		{
-			actions.Enqueue(new PlayerInputMessage(PlayerAction.StartMoveRight, time));
-		} else if (Input.GetKeyUp(KeyCode.D))
-		{ 
-			actions.Enqueue(new PlayerInputMessage(PlayerAction.StopMoveRight, time));
-		}
+			frameActions.Add(PlayerAction.MoveRight);
+			//actions.Enqueue(new PlayerInputMessage(PlayerAction.MoveRight, time));
+		} 
 
 		if (Input.GetMouseButtonDown(0))
 		{
 			actions.Enqueue(new PlayerInputMessage(PlayerAction.Shoot, time));
+		}
+
+		if (acumTime >= (1.0f / GlobalSettings.Fps))
+		{
+			acumTime -= (1.0f / GlobalSettings.Fps);
+			foreach (var action in frameActions)
+			{
+				actions.Enqueue(new PlayerInputMessage(action, time));
+			}
 		}
 		
 		//this.gameObject.transform.rotation = this.gameObject.transform.GetChild(0).rotation;
@@ -88,16 +91,16 @@ public class Player : MonoBehaviour
 		{
 			switch (actionMsg.Action)
 			{
-				case PlayerAction.StartMoveForward:
+				case PlayerAction.MoveForward:
 					gameObject.transform.Translate(Vector3.forward * GlobalSettings.speed * deltaTime);
 					break;
-				case PlayerAction.StartMoveRight:
+				case PlayerAction.MoveRight:
 					gameObject.transform.Translate(Vector3.right * GlobalSettings.speed * deltaTime);
 					break;
-				case PlayerAction.StartMoveBack:
+				case PlayerAction.MoveBack:
 					gameObject.transform.Translate(Vector3.back * GlobalSettings.speed * deltaTime);
 					break;
-				case PlayerAction.StartMoveLeft:
+				case PlayerAction.MoveLeft:
 					gameObject.transform.Translate(Vector3.left * GlobalSettings.speed * deltaTime);
 					break;
 			}
