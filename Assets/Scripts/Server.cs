@@ -82,11 +82,11 @@ public class Server : MonoBehaviour
 
 
 
-		if (inputTime >= (1.0f / GlobalSettings.Ifps) && players.Count != 0)
+		if (inputTime >= (1.0f / GlobalSettings.Fps) && players.Count != 0)
 		{
-			while (inputTime > 1.0f / GlobalSettings.Ifps)
+			while (inputTime > 1.0f / GlobalSettings.Fps)
 			{
-				inputTime -= 1.0f / GlobalSettings.Ifps;
+				inputTime -= 1.0f / GlobalSettings.Fps;
 			}
 			for (int i = 1; i < idCount; i++)
 			{

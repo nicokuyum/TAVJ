@@ -74,6 +74,7 @@ public class Player : MonoBehaviour
 			{
 				actions.Enqueue(new PlayerInputMessage(action, time));
 			}
+			frameActions.Clear();
 		}
 		
 		//this.gameObject.transform.rotation = this.gameObject.transform.GetChild(0).rotation;
