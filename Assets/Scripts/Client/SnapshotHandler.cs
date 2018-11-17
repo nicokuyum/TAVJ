@@ -143,7 +143,7 @@ public class SnapshotHandler
         if (prediction)
         {
             Debug.Log("Applying prediction");
-            ReapplyActions(p,playerSnapshot._TimeStamp);
+            p.prediction(playerSnapshot.lastId, playerSnapshot._TimeStamp);
         }
     }
 
@@ -155,7 +155,7 @@ public class SnapshotHandler
         float lt=0;
         foreach (KeyValuePair<float,HashSet<PlayerAction>> action in actions)
         {
-            if (action.Key >= time)
+            if (action.Key > time)
             {
                 if (last != null)
                 {
@@ -234,68 +234,10 @@ public class SnapshotHandler
         
     }
 
-    
-    public void AddActionForPrediction(Queue<PlayerInputMessage> input, float time)
+
+    public void AddActionForPrediction(HashSet<PlayerAction> input, float time)
     {
-        if (lastActionTime == -1)
-        {
-            HashSet<PlayerAction> ac = new HashSet<PlayerAction>();
-            foreach (PlayerInputMessage playerInputMessage in input)
-            {
-                ac.Add(playerInputMessage.Action);
-            }
-            actions.Add(time, ac);
-        }
-        else
-        {
-            actions.Add(time, ResultingActions(input));
-        }
-        lastActionTime = time;
-    }
-
-    
-    public HashSet<PlayerAction> ResultingActions(Queue<PlayerInputMessage> input)
-    {
-        HashSet<PlayerAction> current = new HashSet<PlayerAction>();
-        foreach (PlayerAction playerAction in actions[lastActionTime])
-        {
-            current.Add(playerAction);
-        }
-
-        foreach (PlayerInputMessage playerInputMessage in input)
-        {
-            switch (playerInputMessage.Action)
-            {
-                case PlayerAction.StartMoveForward:
-                    current.Add(playerInputMessage.Action);
-                    break;
-                case PlayerAction.StartMoveRight:
-                    current.Add(playerInputMessage.Action);
-                    break;
-                case PlayerAction.StartMoveBack:
-                    current.Add(playerInputMessage.Action);
-                    break;
-                case PlayerAction.StartMoveLeft:
-                    current.Add(playerInputMessage.Action);
-                    break;
-                case PlayerAction.StopMoveForward:
-                    current.Remove(playerInputMessage.Action);
-                    break;
-                case PlayerAction.StopMoveRight:
-                    current.Remove(playerInputMessage.Action);
-                    break;
-                case PlayerAction.StopMoveBack:
-                    current.Remove(playerInputMessage.Action);
-                    break;
-                case PlayerAction.StopMoveLeft:
-                    current.Remove(playerInputMessage.Action);
-                    break;
-                default:
-                    break;
-            }
-        }
-
-        return current;
+        actions.Add(time, new HashSet<PlayerAction>(input));
     }
 
 }

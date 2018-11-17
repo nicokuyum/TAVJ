@@ -71,16 +71,8 @@ public class Client : MonoBehaviour
 
 			foreach (var action in player.getActions())
 			{
-				
 				outgoingMessages.Add(action);
 			}
-
-			if (player.getActions().Count() > 0)
-			{
-				SnapshotHandler.GetInstance().AddActionForPrediction(player.getActions(),time);
-			}
-			
-			player.getActions().Clear();
 			
 			foreach (var gm in outgoingMessages)
 			{
@@ -120,7 +112,6 @@ public class Client : MonoBehaviour
 
 		while (true)
 		{
-		
 			IPEndPoint RemoteIpEndPoint = new IPEndPoint(IPAddress.Any, 0);
 			
 			byte[] receiveBytes = udpClient.Receive(ref RemoteIpEndPoint);
