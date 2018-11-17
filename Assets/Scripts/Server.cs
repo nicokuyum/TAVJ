@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
@@ -17,6 +18,7 @@ public class Server : MonoBehaviour
 	
 	private float time = 0f;
 	private float acumTime = 0f;
+	private float inputTime = 0f;
 	
 	private static int listenPort = GlobalSettings.ServerPort;
 	public int idCount = 1;
@@ -45,12 +47,12 @@ public class Server : MonoBehaviour
 	public Dictionary<int, ServerReliableQueue> rq = new Dictionary<int, ServerReliableQueue>();
 	
 	//ID to PlayerActions
-	public Dictionary<int, HashSet<PlayerAction>> actions = new Dictionary<int, HashSet<PlayerAction>>();
+	public Dictionary<int, List<PlayerAction>> actions = new Dictionary<int, List<PlayerAction>>();
 	
 	//ID to stored ReliableMessageIdStored
 	public Dictionary<int, SortedList<ReliableMessage, bool>> bufferedMessages =
 		new Dictionary<int, SortedList<ReliableMessage, bool>>();
-	
+
 	
 	// Use this for initialization
 	void Start()
@@ -65,6 +67,7 @@ public class Server : MonoBehaviour
 	{
 		time += Time.deltaTime;
 		acumTime += Time.deltaTime;
+		inputTime += Time.deltaTime;
 
 		Packet packet = PacketQueue.GetInstance().PollPacket();
 		//Debug.Log("PACKET IS NULL? " + packet ==null);
@@ -77,9 +80,18 @@ public class Server : MonoBehaviour
 
 		SendReliableMessages();
 
-		for (int i = 1; i < idCount; i++)
+
+
+		if (inputTime >= (1.0f / GlobalSettings.Ifps) && players.Count != 0)
 		{
-			UpdatePlayer(i, Time.deltaTime);
+			while (inputTime > 1.0f / GlobalSettings.Ifps)
+			{
+				inputTime -= 1.0f / GlobalSettings.Ifps;
+			}
+			for (int i = 1; i < idCount; i++)
+			{
+				UpdatePlayer(i, 1.0f / GlobalSettings.Ifps);
+			}
 		}
 		
 		if (acumTime >= (1.0f/ snapRate) && players.Count != 0)
@@ -106,7 +118,6 @@ public class Server : MonoBehaviour
 		{
 			EstablishConnection(connection, ccm._MessageId, ccm.name);
 		}
-
 	}
 
 
@@ -155,7 +166,7 @@ public class Server : MonoBehaviour
 		
 		Debug.Log("CREATED AT" + ps.position.x + " " + ps.position.y  + " " + ps.position.z);
 		rq.Add(id,new ServerReliableQueue(connection, GlobalSettings.ReliableTimeout));
-		actions[id] = new HashSet<PlayerAction>();
+		actions[id] = new List<PlayerAction>();
 		bufferedMessages.Add(id, new SortedList<ReliableMessage, bool>());
 		players.Add(id, ps);
 		playersnapshots.Add(ps);
@@ -184,20 +195,26 @@ public class Server : MonoBehaviour
 	}
 	
 
-	private void UpdatePlayer(int id, float deltaTime)
+	private void UpdatePlayer(int id, float time)
 	{
 		//Debug.Log("Updating Player   "  + id);
-		HashSet<PlayerAction> playerActions = actions[id];
+		List<PlayerAction> playerActions = actions[id];
 		
 		PlayerSnapshot ps = players[id];
 
-		ps._TimeStamp = time;
+		ps._TimeStamp = this.time;
 
 
-		foreach (PlayerAction action in playerActions)
+		while (playerActions.Any())
 		{
-			Mover.GetInstance().ApplyAction(ps,action, deltaTime);
+			PlayerAction action = playerActions[0];
+			playerActions.RemoveAt(0);
+			Mover.GetInstance().ApplyAction(ps, action, time);
 		}
+		//foreach (PlayerAction action in playerActions)
+		//{
+		//	Mover.GetInstance().ApplyAction(ps,action, time);
+		//}
 		//Debug.Log(ps.position.x  + " " + ps.position.z);
 	}
 
@@ -221,16 +238,13 @@ public class Server : MonoBehaviour
 			{
 				reliableFlag = true;
 				int id = ((ReliableMessage) gm)._MessageId;
-				if (lastAcks[connections[packet.connection]] < id )
+				if (gm.type() == MessageType.ClientConnect)
 				{
-					if (gm.type() == MessageType.ClientConnect)
-					{
-						processConnect((ClientConnectMessage)gm, packet.connection);
-					}
-					else if (lastAcks[connections[packet.connection]] < ((ReliableMessage) gm)._MessageId)
-					{
-						ProcessMessage(gm, packet.connection);
-					}
+					processConnect((ClientConnectMessage)gm, packet.connection);
+				}
+				else if (lastAcks[connections[packet.connection]] != id-1)
+				{
+					ProcessMessage(gm, packet.connection);
 					lastAcks[connections[packet.connection]] = ((ReliableMessage) gm)._MessageId;
 				}
 				
@@ -243,6 +257,7 @@ public class Server : MonoBehaviour
 
 		if (reliableFlag)
 		{
+			Debug.Log("Sending ACK : " + lastAcks[connections[packet.connection]]);
 			SendAck(packet.connection, lastAcks[connections[packet.connection]]);
 		}
 	}
@@ -280,7 +295,8 @@ public class Server : MonoBehaviour
 	{	
 		int id = connections[connection];
 		//Debug.Log(inputMessage.Action);
-		switch (inputMessage.Action)
+		actions[id].Add(inputMessage.Action);
+		/*switch (inputMessage.Action)
 		{
 			case PlayerAction.StartMoveForward:
 				actions[id].Add(PlayerAction.StartMoveForward);
@@ -311,7 +327,7 @@ public class Server : MonoBehaviour
 				break;
 			default:
 				break;
-		}
+		}*/
 	}
 
 	public void processAck(AckMessage gm, Connection connection)

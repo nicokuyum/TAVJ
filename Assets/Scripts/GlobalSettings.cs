@@ -6,6 +6,7 @@ using UnityEngine;
 public class GlobalSettings{
 
 	public const int Fps = 120;
+	public const int Ifps = 60;
 	public const float MaxPosition = 18.0f;
 	public const float PositionPrecision = 0.01f;
 	public const float MinPosition = -18.0f;
