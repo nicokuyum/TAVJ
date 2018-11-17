@@ -84,7 +84,7 @@ public class Client : MonoBehaviour
 				{
 					if (MessageType.PlayerInput.Equals(gm.type()))
 					{
-						rq.AddQueueWithOutTimeout((ReliableMessage)gm,time);
+						rq.AddQueueWithOutTimeout((ReliableMessage)gm);
 					}
 					else
 					{

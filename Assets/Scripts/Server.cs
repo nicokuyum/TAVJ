@@ -214,21 +214,26 @@ public class Server : MonoBehaviour
 
 	private void ProcessPacket( Packet packet)
 	{
+		bool reliableFlag = false;
 		foreach (GameMessage gm in packet.Messages)
 		{
 			if (gm.isReliable())
 			{
-				if (gm.type() == MessageType.ClientConnect)
+				reliableFlag = true;
+				int id = ((ReliableMessage) gm)._MessageId;
+				if (lastAcks[connections[packet.connection]] < id )
 				{
-					processConnect((ClientConnectMessage)gm, packet.connection);
+					if (gm.type() == MessageType.ClientConnect)
+					{
+						processConnect((ClientConnectMessage)gm, packet.connection);
+					}
+					else if (lastAcks[connections[packet.connection]] < ((ReliableMessage) gm)._MessageId)
+					{
+						ProcessMessage(gm, packet.connection);
+					}
+					lastAcks[connections[packet.connection]] = ((ReliableMessage) gm)._MessageId;
 				}
-				else if (lastAcks[connections[packet.connection]] < ((ReliableMessage) gm)._MessageId)
-				{
-					ProcessMessage(gm, packet.connection);
-				}
-				SendAck(packet.connection, ((ReliableMessage) gm)._MessageId);
-				lastAcks[connections[packet.connection]] = ((ReliableMessage) gm)._MessageId;
-
+				
 			}
 			else
 			{
@@ -236,6 +241,10 @@ public class Server : MonoBehaviour
 			}
 		}
 
+		if (reliableFlag)
+		{
+			SendAck(packet.connection, lastAcks[connections[packet.connection]]);
+		}
 	}
 
 	private void ProcessMessage(GameMessage gm, Connection connection)
@@ -260,15 +269,6 @@ public class Server : MonoBehaviour
 
 	private byte[] SerializeWorld()
 	{
-		/*List<GameMessage> gms = new List<GameMessage>();
-		foreach (PlayerSnapshot playerSnapshot in playersnapshots)// players.Values
-		{
-			gms.Add(new PlayerSnapshotMessage(playerSnapshot));
-			Debug.Log(playerSnapshot.position.x +  " " + playerSnapshot.position.z + " " + playerSnapshot.position.y);
-		}
-		
-		Debug.Log("Mundo de : " + gms.Count );
-		return (new Packet(gms)).serialize();*/
 		List<GameMessage> l = new List<GameMessage>();
 		l.Add(new WorldSnapshotMessage(playersnapshots, time));
 		return (new Packet(l)).serialize();
@@ -333,6 +333,8 @@ public class Server : MonoBehaviour
 		}
 	}
 
+	
+	//TODO COMPLETE
 	public void processPendingReliables(Connection connection)
 	{
 		

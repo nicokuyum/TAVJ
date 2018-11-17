@@ -14,14 +14,6 @@ public class PlayerSnapshot
     public ServerPlayer player;
     public int lastId;
 
-    public PlayerSnapshot(int id, Vector3 position)
-    {
-        this.id = id;
-        Health = GlobalSettings.MaxHealth;
-        Invulnerable = false;
-        this.position = position;
-    }
-
     public PlayerSnapshot(int id)
     {
         this.id = id;
@@ -56,17 +48,4 @@ public class PlayerSnapshot
         return compressor.GetBuffer();
     }
 
-    public void apply(InputKey key)
-    {
-        throw new System.NotImplementedException();
-    }
-
-    public PlayerSnapshot RandomPositionSnapshot(int id)
-    {
-        Random random = new Random();
-        int range = (int)(GlobalSettings.MaxPosition - GlobalSettings.MinPosition);
-        Vector3 position = new Vector3(random.Next(range) + GlobalSettings.MinPosition
-            ,0,  random.Next(range) + GlobalSettings.MinPosition);
-        return new PlayerSnapshot(id, position);
-    }
 }
