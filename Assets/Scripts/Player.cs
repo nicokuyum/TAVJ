@@ -41,6 +41,7 @@ public class Player : MonoBehaviour
 		time += Time.deltaTime;
 		acumTime += Time.deltaTime;
 		
+	
 		if (Input.GetKeyDown(KeyCode.W))
 		{
 			frameActions.Add(PlayerAction.MoveForward);

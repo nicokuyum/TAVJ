@@ -226,12 +226,9 @@ public class SnapshotHandler
                     PlayerSnapshot interpolatedPlayerSnapshot = interpolate(keyValuePair.Value,
                         future[keyValuePair.Key], time);   
                     interpolatedWorld.Add(keyValuePair.Key,interpolatedPlayerSnapshot);
-                }
-                    
+                }    
             }
-            
         }
-
         return interpolatedWorld;
     }
 
