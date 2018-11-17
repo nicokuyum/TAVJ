@@ -8,7 +8,7 @@ public class ServerReliableQueue : ReliableQueue
 
     public Connection connection;
 
-    public ServerReliableQueue(Connection connection) : base()
+    public ServerReliableQueue(Connection connection, float timeout) : base(timeout)
     {
         this.connection = connection;
     }

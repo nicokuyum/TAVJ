@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class ReliableQueue
@@ -12,10 +13,18 @@ public class ReliableQueue
     
     //ACKID to message mapping
     private Dictionary<int, ReliableMessage> gamemessages;
+    
+    //No timeout messages
+    private List<ReliableMessage> NoTimeOutQueue;
 
-    public ReliableQueue()
+    
+    private float timeout;
+
+    public ReliableQueue(float timeout)
     {
+        this.timeout = timeout;
         MessageQueue = new List<ReliableMessage>();
+        NoTimeOutQueue = new List<ReliableMessage>();
         SentFrames = new Dictionary<ReliableMessage, float>();
         gamemessages = new Dictionary<int, ReliableMessage>();
     }
@@ -29,10 +38,15 @@ public class ReliableQueue
             SentFrames.Remove(gamemessages[toRemove._MessageId]);
             gamemessages.Remove(toRemove._MessageId);
         }
+
+        while (NoTimeOutQueue.Count() > 0 && NoTimeOutQueue[0]._MessageId <= ackid)
+        {
+            NoTimeOutQueue.RemoveAt(0);
+        }
     }
 
     
-    public void AddQueue(ReliableMessage gm, float time)
+    public void AddQueueWithTimeout(ReliableMessage gm, float time)
     {
         MessageQueue.Add(gm);
         if (SentFrames.ContainsKey(gm))
@@ -47,13 +61,18 @@ public class ReliableQueue
         }
     }
 
+    public void AddQueueWithOutTimeout(ReliableMessage gm, float time)
+    {
+        NoTimeOutQueue.Add(gm);
+    }
+
 
     public List<GameMessage> MessageToResend(float time)
     {
         List<GameMessage> needResend = new List<GameMessage>();
         foreach (ReliableMessage rm in MessageQueue)
         {
-            if (time - SentFrames[rm] >= GlobalSettings.ReliableTimeout)
+            if (time - SentFrames[rm] >= timeout)
             {
                 //Debug.Log("NEED ACK OF MESSAGE " + rm._MessageId);
                 needResend.Add(rm);

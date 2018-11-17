@@ -74,6 +74,7 @@ public class MessageSerializer {
 	public static GameMessage WorldSnapshotDeserialize(Decompressor decompressor)
 	{
 		float time = CompressingUtils.GetTime(decompressor);
+		Debug.Log("SERVER TIME : " + time);
 		int numberOfPlayers = decompressor.GetNumber(GlobalSettings.MaxPlayers);
 		List<PlayerSnapshot> playerSnapshots = new List<PlayerSnapshot>();
 		for (int i = 0; i < numberOfPlayers; i++)

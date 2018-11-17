@@ -38,7 +38,10 @@ public class Player : MonoBehaviour
 	void Update ()
 	{
 		time += Time.deltaTime;
-		prediction(Time.deltaTime);
+		if (SnapshotHandler.GetInstance().prediction)
+		{
+			prediction(Time.deltaTime);
+		}
 		
 		if (Input.GetKeyDown(KeyCode.W))
 		{

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class SnapshotHandler
@@ -44,10 +45,6 @@ public class SnapshotHandler
         {
             worldSnapshots.Add(time, worldSnap);
         }
-        /*if (end < snapshot._TimeStamp)
-        {
-            snapshotBuffer.Add(snapshot._TimeStamp, snapshot);
-        }*/
     }
 
     public bool ready()
@@ -59,7 +56,6 @@ public class SnapshotHandler
     {
         try
         {
-            //Debug.Log("In getSnapshot (end,time) " + end + "," + time);
             if (end < time)
             {
                 start = end;
@@ -153,6 +149,7 @@ public class SnapshotHandler
     {
         HashSet<PlayerAction> last = null;
         float lt=0;
+        
         foreach (KeyValuePair<float,HashSet<PlayerAction>> action in actions)
         {
             if (action.Key >= time)
@@ -161,6 +158,8 @@ public class SnapshotHandler
                 {
                     foreach (PlayerAction playerAction in last)
                     {
+                        
+                        Debug.Log("||||||||||||||||||||||||");
                         //Ojo aca, puede llegar a pifear
                         ApplyAction(p, playerAction,  action.Key-lt);
                     }
@@ -174,6 +173,20 @@ public class SnapshotHandler
                 last = action.Value;
             }
         }
+
+        List<float> toRemove = new List<float>();
+        foreach (float key in actions.Keys)
+        {
+            if (key < time && key < lastActionTime)
+            {
+                toRemove.Add(key);
+            }
+        }
+        foreach (float f in toRemove)
+        {
+            actions.Remove(f);
+        }
+        
     }
 
     public void ApplyAction(Player p,PlayerAction playerAction ,float time)
@@ -235,67 +248,11 @@ public class SnapshotHandler
     }
 
     
-    public void AddActionForPrediction(Queue<PlayerInputMessage> input, float time)
+    public void AddActionForPrediction(HashSet<PlayerAction> input, float time)
     {
-        if (lastActionTime == -1)
-        {
-            HashSet<PlayerAction> ac = new HashSet<PlayerAction>();
-            foreach (PlayerInputMessage playerInputMessage in input)
-            {
-                ac.Add(playerInputMessage.Action);
-            }
-            actions.Add(time, ac);
-        }
-        else
-        {
-            actions.Add(time, ResultingActions(input));
-        }
+        actions.Add(time, new HashSet<PlayerAction>(input));
         lastActionTime = time;
     }
 
-    
-    public HashSet<PlayerAction> ResultingActions(Queue<PlayerInputMessage> input)
-    {
-        HashSet<PlayerAction> current = new HashSet<PlayerAction>();
-        foreach (PlayerAction playerAction in actions[lastActionTime])
-        {
-            current.Add(playerAction);
-        }
-
-        foreach (PlayerInputMessage playerInputMessage in input)
-        {
-            switch (playerInputMessage.Action)
-            {
-                case PlayerAction.StartMoveForward:
-                    current.Add(playerInputMessage.Action);
-                    break;
-                case PlayerAction.StartMoveRight:
-                    current.Add(playerInputMessage.Action);
-                    break;
-                case PlayerAction.StartMoveBack:
-                    current.Add(playerInputMessage.Action);
-                    break;
-                case PlayerAction.StartMoveLeft:
-                    current.Add(playerInputMessage.Action);
-                    break;
-                case PlayerAction.StopMoveForward:
-                    current.Remove(playerInputMessage.Action);
-                    break;
-                case PlayerAction.StopMoveRight:
-                    current.Remove(playerInputMessage.Action);
-                    break;
-                case PlayerAction.StopMoveBack:
-                    current.Remove(playerInputMessage.Action);
-                    break;
-                case PlayerAction.StopMoveLeft:
-                    current.Remove(playerInputMessage.Action);
-                    break;
-                default:
-                    break;
-            }
-        }
-
-        return current;
-    }
 
 }

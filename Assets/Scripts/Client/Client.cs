@@ -31,6 +31,8 @@ public class Client : MonoBehaviour
 	private ClientMessageHandler handler;
 	private ReliableQueue rq { get; set; }
 
+	private ReliableQueue inputQueue;
+
 	private Player player { get; set; }
 
 	// Use this for initialization
@@ -39,10 +41,11 @@ public class Client : MonoBehaviour
 		player = GameObject.Find("Player").GetComponent<Player>();
 		player.name = playerName;
 		outgoingMessages = new List<GameMessage>();
-		rq = new ReliableQueue();
+		rq = new ReliableQueue(GlobalSettings.ReliableTimeout);
 		outgoingMessages.Add(new ClientConnectMessage(playerName, time));
 		otherPlayers = new Dictionary<int, Player>();
 		handler = new ClientMessageHandler(this);
+		inputQueue = new ReliableQueue(0.0f);
 		SnapshotHandler.GetInstance().otherPlayers = this.otherPlayers;
 		SnapshotHandler.GetInstance().self = this.player;
 		SnapshotHandler.GetInstance().prediction = this.prediction;
@@ -75,9 +78,9 @@ public class Client : MonoBehaviour
 				outgoingMessages.Add(action);
 			}
 
-			if (player.getActions().Count() > 0)
+			if (player.liveActions.Any())
 			{
-				SnapshotHandler.GetInstance().AddActionForPrediction(player.getActions(),time);
+				SnapshotHandler.GetInstance().AddActionForPrediction(player.liveActions,time);
 			}
 			
 			player.getActions().Clear();
@@ -87,7 +90,7 @@ public class Client : MonoBehaviour
 				if (gm.isReliable())
 				{
 					//TODO check if there already is time sync between client and server (es necesario que lo haya?)
-					rq.AddQueue((ReliableMessage)gm, time);
+					rq.AddQueueWithTimeout((ReliableMessage)gm, time);
 				}
 			}
 

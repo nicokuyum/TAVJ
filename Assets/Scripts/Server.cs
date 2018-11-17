@@ -160,7 +160,7 @@ public class Server : MonoBehaviour
 		PlayerSnapshot ps = new PlayerSnapshot(id, newPlayer, time);
 		
 		Debug.Log("CREATED AT" + ps.position.x + " " + ps.position.y  + " " + ps.position.z);
-		rq.Add(id,new ServerReliableQueue(connection));
+		rq.Add(id,new ServerReliableQueue(connection, GlobalSettings.ReliableTimeout));
 		actions[id] = new HashSet<PlayerAction>();
 		bufferedMessages.Add(id, new SortedList<ReliableMessage, bool>());
 		players.Add(id, ps);
@@ -176,7 +176,7 @@ public class Server : MonoBehaviour
 		{
 			if (keyValuePair.Value != id)
 			{
-				rq[id].AddQueue(new ClientConnectedMessage(keyValuePair.Value, "ASD",time),time);
+				rq[id].AddQueueWithTimeout(new ClientConnectedMessage(keyValuePair.Value, "ASD",time),time);
 			}
 		}
 	}
@@ -185,7 +185,7 @@ public class Server : MonoBehaviour
 	{
 		foreach (int playerId in players.Keys)
 		{
-			rq[playerId].AddQueue(new ClientConnectedMessage(id, playerName, time), time);
+			rq[playerId].AddQueueWithTimeout(new ClientConnectedMessage(id, playerName, time), time);
 		}
 	}
 	
