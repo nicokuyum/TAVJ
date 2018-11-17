@@ -193,16 +193,16 @@ public class SnapshotHandler
     {
         switch (playerAction)
         {
-            case PlayerAction.StartMoveForward:
+            case PlayerAction.MoveForward:
                 p.gameObject.transform.Translate(Vector3.forward * GlobalSettings.speed * time);
                 break;
-            case PlayerAction.StartMoveRight:
+            case PlayerAction.MoveRight:
                 p.gameObject.transform.Translate(Vector3.right * GlobalSettings.speed * time);
                 break;
-            case PlayerAction.StartMoveBack:
+            case PlayerAction.MoveBack:
                 p.gameObject.transform.Translate(Vector3.back * GlobalSettings.speed * time);
                 break;
-            case PlayerAction.StartMoveLeft:
+            case PlayerAction.MoveLeft:
                 p.gameObject.transform.Translate(Vector3.left * GlobalSettings.speed * time);
                 break;
         }
