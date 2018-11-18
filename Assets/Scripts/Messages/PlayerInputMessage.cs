@@ -5,12 +5,12 @@ public class PlayerInputMessage : ReliableMessage
 
     public PlayerAction Action;
 
-    public PlayerInputMessage(PlayerAction action, float timeStamp): base(timeStamp)
+    public PlayerInputMessage(PlayerAction action, float timeStamp, bool increaseCoumter): base(timeStamp, increaseCoumter)
     {
         this.Action = action;
     }
 
-    public PlayerInputMessage(PlayerAction action, int id, float timeStamp): base(timeStamp)
+    public PlayerInputMessage(PlayerAction action, int id, float timeStamp, bool increaseCounter): base(timeStamp, increaseCounter)
     {
         _MessageId = id;
         Action = action;

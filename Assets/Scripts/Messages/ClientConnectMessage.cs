@@ -7,13 +7,13 @@ public class ClientConnectMessage : ReliableMessage
 {
     public String name;
 
-    public ClientConnectMessage(int _MessageId, String name, float timeStamp): base(timeStamp)
+    public ClientConnectMessage(int _MessageId, String name, float timeStamp, bool increaseCounter): base(timeStamp, increaseCounter)
     {
         this._MessageId = _MessageId;
         this.name = name;
     }
     
-    public ClientConnectMessage(String name, float timeStamp): base(timeStamp)
+    public ClientConnectMessage(String name, float timeStamp, bool increaseCounter): base(timeStamp, increaseCounter)
     {
         this.name = name;
     }

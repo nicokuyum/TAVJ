@@ -11,7 +11,7 @@ public class ClientConnectedMessage : ReliableMessage
     public int id;
     public String name;
 
-    public ClientConnectedMessage(int id, String name, float timeStamp): base(timeStamp)
+    public ClientConnectedMessage(int id, String name, float timeStamp, bool increaseCounter): base(timeStamp, increaseCounter)
     {
         this.id = id;
         this.name = name;

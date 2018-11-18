@@ -38,7 +38,7 @@ public class MessageSerializer {
 		int id = decompressor.GetNumber(int.MaxValue);
 		float time = CompressingUtils.GetTime(decompressor);
 		String name = decompressor.GetString();
-		return new ClientConnectMessage(decompressor.GetNumber(int.MaxValue),name, time);
+		return new ClientConnectMessage(decompressor.GetNumber(int.MaxValue),name, time, false);
 	}
 
 	
@@ -61,7 +61,7 @@ public class MessageSerializer {
 		int id = decompressor.GetNumber(int.MaxValue);
 		float time = CompressingUtils.GetTime(decompressor);
 		PlayerAction action = (PlayerAction)decompressor.GetNumber(Enum.GetNames(typeof(PlayerAction)).Length);	
-		return new PlayerInputMessage(action, id, time);
+		return new PlayerInputMessage(action, id, time, false);
 	}
 
 
@@ -70,7 +70,7 @@ public class MessageSerializer {
 		int id = decompressor.GetNumber(GlobalSettings.MaxPlayers);
 		float timeStamp = CompressingUtils.GetTime(decompressor);
 		String name = decompressor.GetString();
-		return new ClientConnectedMessage(id, name, timeStamp);
+		return new ClientConnectedMessage(id, name, timeStamp, false);
 	}
 
 	public static GameMessage WorldSnapshotDeserialize(Decompressor decompressor)
