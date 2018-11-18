@@ -61,7 +61,7 @@ public class Player : MonoBehaviour
 
 		if (Input.GetMouseButtonDown(0))
 		{
-			actions.Enqueue(new PlayerInputMessage(PlayerAction.Shoot, time));
+			actions.Enqueue(new PlayerInputMessage(PlayerAction.Shoot, time, true));
 		}
 
 		if (acumTime >= (1.0f / GlobalSettings.Fps))
@@ -69,7 +69,7 @@ public class Player : MonoBehaviour
 			acumTime -= (1.0f / GlobalSettings.Fps);
 			foreach (var action in frameActions)
 			{
-				PlayerInputMessage msg = new PlayerInputMessage(action, time);
+				PlayerInputMessage msg = new PlayerInputMessage(action, time, true);
 				toSend.Add(msg);
 				actions.Enqueue(msg);
 				if (SnapshotHandler.GetInstance().prediction)

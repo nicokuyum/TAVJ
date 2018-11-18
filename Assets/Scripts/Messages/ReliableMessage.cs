@@ -5,9 +5,12 @@
 	public int _MessageId;
 	public float _TimeStamp;
 	
-	protected ReliableMessage(float timeStamp)
+	protected ReliableMessage(float timeStamp, bool increase)
 	{
-		this._MessageId = idCounter++;
+		if (increase)
+		{
+			this._MessageId = idCounter++;
+		}
 		this._TimeStamp = timeStamp;
 	}
 

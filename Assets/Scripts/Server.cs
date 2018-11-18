@@ -176,7 +176,7 @@ public class Server : MonoBehaviour
 		{
 			if (keyValuePair.Value != id)
 			{
-				rq[id].AddQueueWithTimeout(new ClientConnectedMessage(keyValuePair.Value, "ASD",time),time);
+				rq[id].AddQueueWithTimeout(new ClientConnectedMessage(keyValuePair.Value, "ASD",time, true),time);
 			}
 		}
 	}
@@ -185,7 +185,7 @@ public class Server : MonoBehaviour
 	{
 		foreach (int playerId in players.Keys)
 		{
-			rq[playerId].AddQueueWithTimeout(new ClientConnectedMessage(id, playerName, time), time);
+			rq[playerId].AddQueueWithTimeout(new ClientConnectedMessage(id, playerName, time, true), time);
 		}
 	}
 	
@@ -206,7 +206,7 @@ public class Server : MonoBehaviour
 			playerActions.RemoveAt(0);
 			Mover.GetInstance().ApplyAction(ps, mssg.Action, time);
 			ps.lastId = mssg._MessageId;
-			Debug.Log("LAST ID : " + ps.lastId);
+			//Debug.Log("LAST ID : " + ps.lastId);
 		}
 
 	}
@@ -225,19 +225,25 @@ public class Server : MonoBehaviour
 	private void ProcessPacket( Packet packet)
 	{
 		bool reliableFlag = false;
+		
+
+		
 		foreach (GameMessage gm in packet.Messages)
 		{
 			if (gm.isReliable())
 			{
+				if (gm.type() == MessageType.PlayerInput)
+				{
+					PlayerInputMessage rm = (PlayerInputMessage) gm;
+					Debug.Log("MSSG : " + rm._MessageId + " - "  +  rm.Action);
+				}
 				reliableFlag = true;
 				int id = ((ReliableMessage) gm)._MessageId;
 				if (gm.type() == MessageType.ClientConnect)
 				{
 					processConnect((ClientConnectMessage)gm, packet.connection);
 				}
-				//Only process if the ack corresponds to the next package
 				else if (lastAcks[connections[packet.connection]] < id)
-				//else
 				{
 					ProcessMessage(gm, packet.connection);
 					lastAcks[connections[packet.connection]] = ((ReliableMessage) gm)._MessageId;
@@ -248,7 +254,6 @@ public class Server : MonoBehaviour
 				ProcessMessage(gm,packet.connection);
 			}
 		}
-
 		if (reliableFlag)
 		{
 			SendAck(packet.connection, lastAcks[connections[packet.connection]]);
@@ -257,7 +262,7 @@ public class Server : MonoBehaviour
 
 	private void ProcessMessage(GameMessage gm, Connection connection)
 	{			
-		Debug.Log(gm.type().ToString());
+		//Debug.Log(gm.type().ToString());
 		switch (gm.type())
 		{
 			case MessageType.ClientConnect:
@@ -286,6 +291,7 @@ public class Server : MonoBehaviour
 	
 	private void processInput(PlayerInputMessage inputMessage, Connection connection)
 	{	
+		Debug.Log("Action  : " + inputMessage.Action.ToString());
 		int id = connections[connection];
 		actions[id].Add(inputMessage);
 
