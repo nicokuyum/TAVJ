@@ -22,7 +22,7 @@ public class GlobalSettings{
 
 	public const float maxRotation = 360.0f;
 
-	public const float ReliableTimeout = 0.0f;
+	public const float ReliableTimeout = 0.3f;
 
 	public const float BufferWindow = 3;
 

@@ -31,6 +31,7 @@ public class ReliableQueue
 
     public void ReceivedACK(int ackid)
     {
+        var a = 5;
         while (MessageQueue.Count > 0 && MessageQueue[0]._MessageId <= ackid)
         {
             ReliableMessage toRemove = MessageQueue[0];
@@ -77,14 +78,20 @@ public class ReliableQueue
             {
                 needResend.Add(rm);
                 SentFrames[rm] = time;
+                Debug.Log(rm.type().ToString());
             }
         }
 
         foreach (ReliableMessage rm in NoTimeOutQueue)
         {
+            Debug.Log(rm.type().ToString());
             needResend.Add(rm);
         }
         return needResend;
     }
-    
+
+    public int getCount()
+    {
+        return MessageQueue.Count + NoTimeOutQueue.Count;
+    }
 }
