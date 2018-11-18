@@ -50,8 +50,8 @@ public class Server : MonoBehaviour
 	public Dictionary<int, List<PlayerInputMessage>> actions = new Dictionary<int, List<PlayerInputMessage>>();
 	
 	//ID to stored ReliableMessageIdStored
-	public Dictionary<int, SortedList<ReliableMessage, bool>> bufferedMessages =
-		new Dictionary<int, SortedList<ReliableMessage, bool>>();
+	public Dictionary<int, SortedList<int, ReliableMessage>> bufferedMessages =
+		new Dictionary<int, SortedList<int, ReliableMessage>>();
 
 	
 	// Use this for initialization
@@ -88,7 +88,7 @@ public class Server : MonoBehaviour
 			}
 			for (int i = 1; i < idCount; i++)
 			{
-				UpdatePlayer(i, 1.0f / GlobalSettings.Ifps);
+				UpdatePlayer(i, 1.0f / GlobalSettings.Fps);
 			}
 		}
 		
@@ -162,7 +162,7 @@ public class Server : MonoBehaviour
 		
 		rq.Add(id,new ServerReliableQueue(connection, GlobalSettings.ReliableTimeout));
 		actions[id] = new List<PlayerInputMessage>();
-		bufferedMessages.Add(id, new SortedList<ReliableMessage, bool>());
+		bufferedMessages.Add(id, new SortedList<int, ReliableMessage>());
 		players.Add(id, ps);
 		playersnapshots.Add(ps);
 		Debug.Log("Broadcast de " + playerName);
@@ -200,13 +200,13 @@ public class Server : MonoBehaviour
 		ps._TimeStamp = this.time;
 
 
-		while (playerActions.Any())
+		while (playerActions.Count>0)
 		{
 			PlayerInputMessage mssg = playerActions[0];
 			playerActions.RemoveAt(0);
 			Mover.GetInstance().ApplyAction(ps, mssg.Action, time);
 			ps.lastId = mssg._MessageId;
-			//Debug.Log("LAST ID : " + ps.lastId);
+			Debug.Log("Applied  : " + mssg.Action);
 		}
 
 	}
@@ -243,10 +243,15 @@ public class Server : MonoBehaviour
 				{
 					processConnect((ClientConnectMessage)gm, packet.connection);
 				}
-				else if (lastAcks[connections[packet.connection]] < id)
+				else if (lastAcks[connections[packet.connection]] == id - 1 )
 				{
 					ProcessMessage(gm, packet.connection);
 					lastAcks[connections[packet.connection]] = ((ReliableMessage) gm)._MessageId;
+					processBufferedMessages(packet.connection);
+				}
+				else if (lastAcks[connections[packet.connection]] < id)
+				{
+					bufferMessage((ReliableMessage) gm, packet.connection);
 				}
 			}
 			else
@@ -261,8 +266,7 @@ public class Server : MonoBehaviour
 	}
 
 	private void ProcessMessage(GameMessage gm, Connection connection)
-	{			
-		//Debug.Log(gm.type().ToString());
+	{
 		switch (gm.type())
 		{
 			case MessageType.ClientConnect:
@@ -291,7 +295,6 @@ public class Server : MonoBehaviour
 	
 	private void processInput(PlayerInputMessage inputMessage, Connection connection)
 	{	
-		Debug.Log("Action  : " + inputMessage.Action.ToString());
 		int id = connections[connection];
 		actions[id].Add(inputMessage);
 
@@ -316,11 +319,28 @@ public class Server : MonoBehaviour
 		}
 	}
 
+	public void bufferMessage(ReliableMessage rm, Connection connection)
+	{
+		int userId = connections[connection];
+		
+		if(!bufferedMessages[userId].ContainsKey(rm._MessageId))
+		{
+			bufferedMessages[userId].Add(rm._MessageId, rm);
+		}
+	}
 	
 	//TODO COMPLETE
-	public void processPendingReliables(Connection connection)
+	public void processBufferedMessages(Connection connection)
 	{
-		
+		int userId = connections[connection];
+
+		while (bufferedMessages[userId].ContainsKey(lastAcks[userId] + 1))
+		{
+			ReliableMessage rm = bufferedMessages[userId][lastAcks[userId]+1];
+			lastAcks[userId] = rm._MessageId;
+			bufferedMessages[userId].Remove(rm._MessageId);
+			ProcessMessage((GameMessage)rm, connection);
+		}
 	}
 	
 }
