@@ -76,7 +76,6 @@ public class Player : MonoBehaviour
 				{
 					applyAction(action);
 				}
-				applyAction(action);
 			}
 			frameActions.Clear();
 		}
