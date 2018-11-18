@@ -22,7 +22,7 @@ public class Packet
         {    
             Messages.Add(MessageSerializer.deserialize(decompressor));
         }
-
+        Debug.Log("Got packet");
     }
 
     public Packet(List<GameMessage> messages)

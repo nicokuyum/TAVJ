@@ -42,7 +42,7 @@ public class Client : MonoBehaviour
 		player.name = playerName;
 		outgoingMessages = new List<GameMessage>();
 		rq = new ReliableQueue(GlobalSettings.ReliableTimeout);
-		outgoingMessages.Add(new ClientConnectMessage(playerName, time, true));
+		rq.AddQueueWithTimeout(new ClientConnectMessage(playerName, time, true),0);
 		otherPlayers = new Dictionary<int, Player>();
 		handler = new ClientMessageHandler(this);
 		inputQueue = new ReliableQueue(0.0f);

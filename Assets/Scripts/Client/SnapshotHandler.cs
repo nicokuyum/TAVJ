@@ -126,7 +126,6 @@ public class SnapshotHandler
 
     public void handleSelfSnapshot(PlayerSnapshot playerSnapshot)
     {
-        
         Player p = self;
         p.Health = playerSnapshot.Health;
         p.Invulnerable = playerSnapshot.Invulnerable;
@@ -139,72 +138,6 @@ public class SnapshotHandler
         }
     }
 
-
-
-    public void ReapplyActions(Player p, float time)
-    {
-        HashSet<PlayerAction> last = null;
-        float lt=0;
-        
-        foreach (KeyValuePair<float,HashSet<PlayerAction>> action in actions)
-        {
-            if (action.Key > time)
-            {
-                if (last != null)
-                {
-                    foreach (PlayerAction playerAction in last)
-                    {
-                        
-                        Debug.Log("||||||||||||||||||||||||");
-                        //Ojo aca, puede llegar a pifear
-                        ApplyAction(p, playerAction,  action.Key-lt);
-                    }
-                }
-                last = action.Value;
-                lt = action.Key;
-            }
-            else
-            {
-                lt = action.Key;
-                last = action.Value;
-            }
-        }
-
-        List<float> toRemove = new List<float>();
-        foreach (float key in actions.Keys)
-        {
-            if (key < time && key < lastActionTime)
-            {
-                toRemove.Add(key);
-            }
-        }
-        foreach (float f in toRemove)
-        {
-            actions.Remove(f);
-        }
-        
-    }
-
-    public void ApplyAction(Player p,PlayerAction playerAction ,float time)
-    {
-        switch (playerAction)
-        {
-            case PlayerAction.MoveForward:
-                p.gameObject.transform.Translate(Vector3.forward * GlobalSettings.speed * time);
-                break;
-            case PlayerAction.MoveRight:
-                p.gameObject.transform.Translate(Vector3.right * GlobalSettings.speed * time);
-                break;
-            case PlayerAction.MoveBack:
-                p.gameObject.transform.Translate(Vector3.back * GlobalSettings.speed * time);
-                break;
-            case PlayerAction.MoveLeft:
-                p.gameObject.transform.Translate(Vector3.left * GlobalSettings.speed * time);
-                break;
-        }
-    }
-    
-
     public Dictionary<int, PlayerSnapshot> interpolateWorld(Dictionary<int, PlayerSnapshot> past,
         Dictionary<int, PlayerSnapshot> future, float time)
     {
@@ -215,6 +148,7 @@ public class SnapshotHandler
             {
                 if (self.id == keyValuePair.Key)
                 {
+                    Debug.Log("*** Last id from self is " + future[keyValuePair.Key].lastId);
                     interpolatedWorld.Add(keyValuePair.Key, future[keyValuePair.Key]);
                 }
                 else

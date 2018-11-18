@@ -61,19 +61,20 @@ public class Player : MonoBehaviour
 
 		if (Input.GetMouseButtonDown(0))
 		{
-			actions.Enqueue(new PlayerInputMessage(PlayerAction.Shoot, time, true));
+			toSend.Add(new PlayerInputMessage(PlayerAction.Shoot, time, true));
 		}
 
 		if (acumTime >= (1.0f / GlobalSettings.Fps))
 		{
 			acumTime -= (1.0f / GlobalSettings.Fps);
+			Debug.Log("FrameActions size " + frameActions.Count);
 			foreach (var action in frameActions)
 			{
 				PlayerInputMessage msg = new PlayerInputMessage(action, time, true);
 				toSend.Add(msg);
-				actions.Enqueue(msg);
 				if (SnapshotHandler.GetInstance().prediction)
 				{
+					actions.Enqueue(msg);
 					applyAction(action);
 				}
 			}
@@ -86,7 +87,7 @@ public class Player : MonoBehaviour
 	public void prediction(int lastId, float deltaTime)
 	{
 		Debug.Log("In prediction function, last id is " + lastId);
-		while (actions.Any() && actions.Peek()._MessageId < lastId)
+		while (actions.Count > 0 && actions.Peek()._MessageId < lastId)
 		{
 			// Discard all messages that were applied by server
 			Debug.Log("Discarding action with id " + actions.Peek()._MessageId);
@@ -94,7 +95,7 @@ public class Player : MonoBehaviour
 		}
 		
 		Debug.Log("Actions size " + actions.Count);
-		if (actions.Any())
+		if (actions.Count > 0)
 		{
 			Debug.Log("First action id is " + actions.Peek()._MessageId);
 		}
