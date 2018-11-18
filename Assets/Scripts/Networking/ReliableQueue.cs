@@ -75,7 +75,6 @@ public class ReliableQueue
         {
             if (time - SentFrames[rm] >= timeout)
             {
-                //Debug.Log("NEED ACK OF MESSAGE " + rm._MessageId);
                 needResend.Add(rm);
                 SentFrames[rm] = time;
             }

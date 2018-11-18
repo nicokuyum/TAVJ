@@ -27,7 +27,7 @@ public class Player : MonoBehaviour
 	
 	// Se llama luego de haber sido constuido el GameObject y todos sus componentes
 	void Awake () {
-//		Debug.Log ("Health = " + Health);
+
 	}
 
 	// Se llama antes del primer update (siempre despues de awake)

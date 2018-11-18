@@ -70,10 +70,8 @@ public class Server : MonoBehaviour
 		inputTime += Time.deltaTime;
 
 		Packet packet = PacketQueue.GetInstance().PollPacket();
-		//Debug.Log("PACKET IS NULL? " + packet ==null);
 		while (packet != null)
 		{
-			//Debug.Log("POR PROCESAR PAQUETE");
 			ProcessPacket(packet);
 			packet = PacketQueue.GetInstance().PollPacket();
 		}
@@ -96,7 +94,6 @@ public class Server : MonoBehaviour
 		
 		if (acumTime >= (1.0f/ snapRate) && players.Count != 0)
 		{
-			//Debug.Log(time);
 			while (acumTime > (1.0f/snapRate))
 			{
 				acumTime -= (1.0f/snapRate);
@@ -104,7 +101,6 @@ public class Server : MonoBehaviour
 			byte[] serializedWorld = SerializeWorld();
 			foreach (Connection connection in connections.Keys)
 			{
-				//Debug.Log("SENDING WORLD");	
 				SendUdp(SourcePort, connection.srcIp.ToString(), GlobalSettings.GamePort, serializedWorld);
 			}
 		}
@@ -164,7 +160,6 @@ public class Server : MonoBehaviour
 		ServerPlayer newPlayer = go.GetComponent<ServerPlayer>();
 		PlayerSnapshot ps = new PlayerSnapshot(id, newPlayer, time);
 		
-		Debug.Log("CREATED AT" + ps.position.x + " " + ps.position.y  + " " + ps.position.z);
 		rq.Add(id,new ServerReliableQueue(connection, GlobalSettings.ReliableTimeout));
 		actions[id] = new List<PlayerInputMessage>();
 		bufferedMessages.Add(id, new SortedList<ReliableMessage, bool>());
@@ -197,7 +192,7 @@ public class Server : MonoBehaviour
 
 	private void UpdatePlayer(int id, float time)
 	{
-		//Debug.Log("Updating Player   "  + id);
+		
 		List<PlayerInputMessage> playerActions = actions[id];
 		
 		PlayerSnapshot ps = players[id];
@@ -213,11 +208,7 @@ public class Server : MonoBehaviour
 			ps.lastId = mssg._MessageId;
 			Debug.Log("LAST ID : " + ps.lastId);
 		}
-		//foreach (PlayerAction action in playerActions)
-		//{
-		//	Mover.GetInstance().ApplyAction(ps,action, time);
-		//}
-		//Debug.Log(ps.position.x  + " " + ps.position.z);
+
 	}
 
 	private void SendAck(Connection connection, int ack)
@@ -240,7 +231,6 @@ public class Server : MonoBehaviour
 			{
 				reliableFlag = true;
 				int id = ((ReliableMessage) gm)._MessageId;
-				Debug.Log("RM con ID : " + id );
 				if (gm.type() == MessageType.ClientConnect)
 				{
 					processConnect((ClientConnectMessage)gm, packet.connection);
@@ -249,7 +239,6 @@ public class Server : MonoBehaviour
 				else if (lastAcks[connections[packet.connection]] < id)
 				//else
 				{
-					Debug.Log("RM con ID : " + id + " LAST : " + lastAcks[connections[packet.connection]]);
 					ProcessMessage(gm, packet.connection);
 					lastAcks[connections[packet.connection]] = ((ReliableMessage) gm)._MessageId;
 				}
@@ -262,7 +251,6 @@ public class Server : MonoBehaviour
 
 		if (reliableFlag)
 		{
-			Debug.Log("Sending ACK : " + lastAcks[connections[packet.connection]]);
 			SendAck(packet.connection, lastAcks[connections[packet.connection]]);
 		}
 	}

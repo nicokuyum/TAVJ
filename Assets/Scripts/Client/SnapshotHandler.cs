@@ -62,7 +62,6 @@ public class SnapshotHandler
                 bool endFound = false;
                 foreach(float f in worldSnapshots.Keys)
                 {
-                    //Debug.Log("Checking key " + f);
                     if (!endFound)
                     {
                         if (f > time)
@@ -78,7 +77,6 @@ public class SnapshotHandler
                 }
                 if (!endFound)
                 {
-                    //Debug.Log("End not found");
                     return null;
                 }
             }
@@ -96,14 +94,12 @@ public class SnapshotHandler
 
     public PlayerSnapshot interpolate(PlayerSnapshot past, PlayerSnapshot future, float time)
     {
-        //Debug.Log("past: " + past._TimeStamp + " - future: " + future._TimeStamp + " - time: " + time);
         float timeRatio = (time - past._TimeStamp) / (future._TimeStamp - past._TimeStamp);
         PlayerSnapshot interpolatedPlayerSnapshot = new PlayerSnapshot(past.id);
         interpolatedPlayerSnapshot._TimeStamp = time;
         interpolatedPlayerSnapshot.Health = past.Health;
         interpolatedPlayerSnapshot.Invulnerable = past.Invulnerable;
         interpolatedPlayerSnapshot.position = Vector3.Lerp(past.position, future.position, timeRatio);
-        //interpolatedPlayerSnapshot.rotation = Quaternion.Lerp(past.rotation, future.rotation, timeRatio);
         return interpolatedPlayerSnapshot;
     }
 

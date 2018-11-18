@@ -22,7 +22,6 @@ public class Enemy : MonoBehaviour
 		{
 			lock (lockObject)
 			{
-				Debug.Log("Received message: " + data);
 				data = "";
 				hasData = false;
 			}

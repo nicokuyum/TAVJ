@@ -106,11 +106,7 @@ public class Client : MonoBehaviour
 			if (outgoingMessages.Count > 0)
 			{
 				Packet p = new Packet(outgoingMessages);
-				//Debug.Log("p size = " + p.MessageCount);
 				byte[] bytes = p.serialize();
-				//Debug.Log("bytes = " + Encoding.Default.GetString(bytes));
-				//Packet test = new Packet(bytes, null);
-				//Debug.Log("test size = " + test.MessageCount);
 				SendUdp(bytes);
 				outgoingMessages.Clear();
 			}
