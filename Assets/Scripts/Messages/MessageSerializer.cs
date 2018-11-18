@@ -38,7 +38,7 @@ public class MessageSerializer {
 		int id = decompressor.GetNumber(int.MaxValue);
 		float time = CompressingUtils.GetTime(decompressor);
 		String name = decompressor.GetString();
-		return new ClientConnectMessage(decompressor.GetNumber(int.MaxValue),name, time, false);
+		return new ClientConnectMessage(id, name, time, false);
 	}
 
 	
@@ -66,11 +66,12 @@ public class MessageSerializer {
 
 
 	public static GameMessage ConnectedClientDeserialize(Decompressor decompressor)
-	{	
+	{
+		int mssgid = decompressor.GetNumber(GlobalSettings.MaxACK);
 		int id = decompressor.GetNumber(GlobalSettings.MaxPlayers);
 		float timeStamp = CompressingUtils.GetTime(decompressor);
 		String name = decompressor.GetString();
-		return new ClientConnectedMessage(id, name, timeStamp, false);
+		return new ClientConnectedMessage(mssgid, id, name, timeStamp, false);
 	}
 
 	public static GameMessage WorldSnapshotDeserialize(Decompressor decompressor)

@@ -45,6 +45,7 @@ public class PlayerSnapshot
         compressor.PutBit(this.Invulnerable);
         CompressingUtils.WritePosition(compressor, position);
         compressor.WriteNumber(lastId, GlobalSettings.MaxACK);
+        //Debug.Log(lastId);
         return compressor.GetBuffer();
     }
 

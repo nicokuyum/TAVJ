@@ -172,6 +172,7 @@ public class Server : MonoBehaviour
 
 	private void NotifiyPreviousConnections(Connection connection, int id)
 	{
+		
 		foreach (KeyValuePair<Connection,int> keyValuePair in connections)
 		{
 			if (keyValuePair.Value != id)
@@ -185,7 +186,11 @@ public class Server : MonoBehaviour
 	{
 		foreach (int playerId in players.Keys)
 		{
-			rq[playerId].AddQueueWithTimeout(new ClientConnectedMessage(id, playerName, time, true), time);
+			Debug.Log("SENDING CONNECT CONFIRMATION");
+			ClientConnectedMessage cm = new ClientConnectedMessage(id, playerName, time, true);
+			Debug.Log("SE CREO CON ID : " + cm.id);
+			rq[playerId].AddQueueWithTimeout(cm, time);
+			Debug.Log("ADDED AND LENGTH " + rq[playerId].getCount());
 		}
 	}
 	
@@ -206,7 +211,7 @@ public class Server : MonoBehaviour
 			playerActions.RemoveAt(0);
 			Mover.GetInstance().ApplyAction(ps, mssg.Action, time);
 			ps.lastId = mssg._MessageId;
-			Debug.Log("Applied  : " + mssg.Action);
+			Debug.Log(mssg._MessageId + " : " + mssg.Action);
 		}
 
 	}
@@ -235,7 +240,7 @@ public class Server : MonoBehaviour
 				if (gm.type() == MessageType.PlayerInput)
 				{
 					PlayerInputMessage rm = (PlayerInputMessage) gm;
-					Debug.Log("MSSG : " + rm._MessageId + " - "  +  rm.Action);
+					//Debug.Log("MSSG : " + rm._MessageId + " - "  +  rm.Action);
 				}
 				reliableFlag = true;
 				int id = ((ReliableMessage) gm)._MessageId;
@@ -276,6 +281,7 @@ public class Server : MonoBehaviour
 				processInput((PlayerInputMessage)gm, connection);
 				break;
 			case MessageType.Ack:
+				Debug.Log("Received ACK " +  ((AckMessage)gm).ackid);
 				processAck((AckMessage) gm, connection);
 				break;
 			default:
@@ -288,6 +294,7 @@ public class Server : MonoBehaviour
 	{
 		List<GameMessage> l = new List<GameMessage>();
 		l.Add(new WorldSnapshotMessage(playersnapshots, time));
+		//Debug.Log("Sending time : " + time);
 		return (new Packet(l)).serialize();
 	}
 
@@ -313,7 +320,16 @@ public class Server : MonoBehaviour
 			List<GameMessage> messagesToSend = entry.Value.MessageToResend(time);
 			if (messagesToSend.Count > 0)
 			{
+				foreach (GameMessage mssg in messagesToSend)
+				{
+					Debug.Log(mssg.type());
+					if (mssg.type() == MessageType.ConnectConfirmation)
+					{
+						Debug.Log("WAITING FOR " + ((ClientConnectedMessage)mssg)._MessageId);
+					}
+				}
 				Packet packet = new Packet(messagesToSend);
+				Debug.Log(entry.Value.connection.srcIp.ToString());
 				SendUdp(SourcePort, entry.Value.connection.srcIp.ToString(), GlobalSettings.GamePort, packet.serialize());
 			}
 		}

@@ -2,11 +2,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ServerMessageHandler {
+public class ServerMessageHandler
+{
 
-    public ServerMessageHandler()
+    private Server server;
+    
+    public ServerMessageHandler(Server server)
     {
-        
+        this.server = server;
     }
 
 
