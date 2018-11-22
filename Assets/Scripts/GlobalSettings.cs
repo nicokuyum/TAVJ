@@ -11,7 +11,7 @@ public class GlobalSettings{
 	public const float PositionPrecision = 0.01f;
 	public const float MinPosition = -18.0f;
 	public const float MaxAngle = 360.0f;
-	public const float MinAngle = 360.0f;
+	public const float MinAngle = 0.0f;
 	public const float AnglePrecision = 0.1f;
 	
 	public const int MaxHealth = 100;

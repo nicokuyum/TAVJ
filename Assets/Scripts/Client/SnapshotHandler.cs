@@ -134,7 +134,7 @@ public class SnapshotHandler
         if (prediction)
         {
             Debug.Log("Applying prediction");
-            p.prediction(playerSnapshot.lastId, playerSnapshot._TimeStamp);
+            p.prediction(playerSnapshot.lastId);
         }
     }
 

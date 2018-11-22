@@ -3,14 +3,9 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
-
-	private float yaw = 0.0f;
-	private float pitch = 0.0f;
-
 	private GameObject camera;
 	
 	public int id;
-	public int MaxHealth;
 	public int Health;
 	public bool Invulnerable;
 	
@@ -64,7 +59,6 @@ public class Player : MonoBehaviour
 		if (acumTime >= (1.0f / GlobalSettings.Fps))
 		{
 			acumTime -= (1.0f / GlobalSettings.Fps);
-			Debug.Log("FrameActions size " + frameActions.Count);
 			foreach (var action in frameActions)
 			{
 				PlayerInputMessage msg = new PlayerInputMessage(action, time, true);
@@ -83,13 +77,11 @@ public class Player : MonoBehaviour
 		camera.transform.rotation = this.gameObject.transform.rotation;
 	}
 
-	public void prediction(int lastId, float deltaTime)
+	public void prediction(int lastId)
 	{
-		Debug.Log("In prediction function, last id is " + lastId);
 		while (actions.Count > 0 && actions.Peek()._MessageId < lastId)
 		{
 			// Discard all messages that were applied by server
-			Debug.Log("Discarding action with id " + actions.Peek()._MessageId);
 			actions.Dequeue();
 		}
 

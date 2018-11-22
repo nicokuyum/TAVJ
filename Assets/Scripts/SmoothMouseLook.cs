@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.Experimental.UIElements;
 
 /// MouseLook rotates the transform based on the mouse delta.
 /// Minimum and Maximum values can be used to constrain the possible rotation
@@ -33,10 +34,9 @@ public class SmoothMouseLook : MonoBehaviour {
 
     float rotationY = 0F;
     
-    void Start ()
+    void Awake ()
     {
         player = GameObject.Find("Player");
-        OnMouseDown();
     }
 
     private void OnMouseDown()
@@ -58,6 +58,11 @@ public class SmoothMouseLook : MonoBehaviour {
         if (Input.GetKeyDown(KeyCode.Escape))
         {
             UnlockMouse();
+        }
+
+        if (Input.GetMouseButtonDown(0))
+        {
+            OnMouseDown();
         }
 
         if (mouseLocked)
@@ -82,7 +87,7 @@ public class SmoothMouseLook : MonoBehaviour {
 
                 transform.localEulerAngles = new Vector3(-rotationY, transform.localEulerAngles.y, 0);
             }
-
+ 
             player.transform.localEulerAngles = this.transform.localEulerAngles;
         }
     }
