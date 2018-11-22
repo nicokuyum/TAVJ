@@ -10,7 +10,7 @@ public class SnapshotHandler
     private static SnapshotHandler _instance;
 
     public Player self;
-    public Dictionary<int, Player> otherPlayers;
+    public Dictionary<int, ServerPlayer> otherPlayers;
     
     private SortedList<float, Dictionary<int, PlayerSnapshot>> worldSnapshots;
     
@@ -110,7 +110,7 @@ public class SnapshotHandler
             if (otherPlayers.ContainsKey(pair.Key))
             {
                 Debug.Log("Update other");
-                Player p = otherPlayers[pair.Key];
+                ServerPlayer p = otherPlayers[pair.Key];
                 p.Health = pair.Value.Health;
                 p.Invulnerable = pair.Value.Invulnerable;
                 p.gameObject.transform.position = pair.Value.position;

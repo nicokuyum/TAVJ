@@ -30,7 +30,6 @@ public class Packet
         this.MessageCount = messages.Count;
         this.Messages = messages;
     }
-    
 
     public byte[] serialize()
     {

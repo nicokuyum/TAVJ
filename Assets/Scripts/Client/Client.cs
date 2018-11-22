@@ -12,9 +12,11 @@ public class Client : MonoBehaviour
 
 	private List<GameMessage> outgoingMessages;
 
-	private Dictionary<int, Player> otherPlayers;
+	private Dictionary<int, ServerPlayer> otherPlayers;
 
 	public GameObject prefab;
+	public GameObject otherPlayersPrefab;
+	
 	public String DestIp;
 	public String playerName;
 	public bool prediction;
@@ -43,7 +45,7 @@ public class Client : MonoBehaviour
 		outgoingMessages = new List<GameMessage>();
 		rq = new ReliableQueue(GlobalSettings.ReliableTimeout);
 		rq.AddQueueWithTimeout(new ClientConnectMessage(playerName, time, true),0);
-		otherPlayers = new Dictionary<int, Player>();
+		otherPlayers = new Dictionary<int, ServerPlayer>();
 		handler = new ClientMessageHandler(this);
 		inputQueue = new ReliableQueue(0.0f);
 		SnapshotHandler.GetInstance().otherPlayers = this.otherPlayers;
@@ -147,7 +149,7 @@ public class Client : MonoBehaviour
 		return this.prefab;
 	}
 
-	public Dictionary<int, Player> getOtherPlayers()
+	public Dictionary<int, ServerPlayer> getOtherPlayers()
 	{
 		return otherPlayers;
 	}
