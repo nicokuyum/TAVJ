@@ -75,7 +75,7 @@ public class Player : MonoBehaviour
 					applyAction(action);
 				}
 			}
-			toSend.Add(new RotationMessage(id, this.gameObject.transform.eulerAngles));
+			toSend.Add(new RotationMessage(this.gameObject.transform.eulerAngles));
 			frameActions.Clear();
 		}
 
@@ -92,13 +92,6 @@ public class Player : MonoBehaviour
 			Debug.Log("Discarding action with id " + actions.Peek()._MessageId);
 			actions.Dequeue();
 		}
-		
-		Debug.Log("Actions size " + actions.Count);
-		if (actions.Count > 0)
-		{
-			Debug.Log("First action id is " + actions.Peek()._MessageId);
-		}
-		
 
 		foreach (var actionMsg in actions)
 		{

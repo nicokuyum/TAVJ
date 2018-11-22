@@ -3,12 +3,10 @@ using UnityEngine;
 
 public class RotationMessage : GameMessage
 {
-    public int playerId;
     public Vector3 rot;
     
-    public RotationMessage(int id, Vector3 rot)
+    public RotationMessage(Vector3 rot)
     {
-        this.playerId = id;
         this.rot = rot;
     }
     
@@ -26,7 +24,6 @@ public class RotationMessage : GameMessage
     {
         Compressor c = new Compressor();
         c.WriteNumber((int)MessageType.Rotation,Enum.GetNames(typeof(MessageType)).Length);
-        c.WriteNumber(playerId, GlobalSettings.MaxPlayers);
         CompressingUtils.WritePosition(c, rot);
         return c.GetBuffer();
     }
@@ -34,7 +31,6 @@ public class RotationMessage : GameMessage
     public override void SerializeWithCompressor(Compressor c)
     {
         c.WriteNumber((int)MessageType.Rotation,Enum.GetNames(typeof(MessageType)).Length);
-        c.WriteNumber(playerId, GlobalSettings.MaxPlayers);
         CompressingUtils.WritePosition(c, rot);
     }
 }

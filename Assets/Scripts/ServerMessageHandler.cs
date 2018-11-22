@@ -69,7 +69,7 @@ public class ServerMessageHandler
 
     private void processRotation(RotationMessage rm, Connection connection)
     {
-        server.players[rm.playerId].rotation = Quaternion.Euler(rm.rot);
-        server.players[rm.playerId].player.transform.eulerAngles = rm.rot;
+        server.players[server.connections[connection]].rotation = Quaternion.Euler(rm.rot);
+        server.players[server.connections[connection]].player.transform.eulerAngles = rm.rot;
     }
 }
