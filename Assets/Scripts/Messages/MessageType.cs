@@ -5,5 +5,6 @@
     PlayerInput=3,
     ConnectConfirmation=4,
     WorldSnapshot=5,
-    Shot=6
+    Shot=6,
+    Rotation=7
 }

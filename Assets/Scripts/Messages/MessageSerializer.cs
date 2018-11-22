@@ -26,6 +26,8 @@ public class MessageSerializer {
 					return WorldSnapshotDeserialize(decompressor);
 				case MessageType.Shot:
 					return ShotDeserialize(decompressor);
+				case MessageType.Rotation:
+					return RotationDeserialize(decompressor);
 				default: return null;
 		}
 	}
@@ -109,4 +111,10 @@ public class MessageSerializer {
 		return playerSnapshot;
 	}
 
+	public static GameMessage RotationDeserialize(Decompressor decompressor)
+	{
+		int id = decompressor.GetNumber(GlobalSettings.MaxPlayers);
+		Vector3 rot = CompressingUtils.GetPosition(decompressor);
+		return new RotationMessage(id, rot);
+	}
 }

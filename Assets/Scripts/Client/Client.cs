@@ -74,7 +74,6 @@ public class Client : MonoBehaviour
 				packet = PacketQueue.GetInstance().PollPacket();
 			}
 
-			
 			foreach (var action in player.toSend)
 			{
 				outgoingMessages.Add(action);
