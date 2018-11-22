@@ -31,6 +31,9 @@ public class ServerMessageHandler
                 Debug.Log("Received Shot on " + ((ShotMessage)gm).targetId);
                 processShot((ShotMessage) gm, connection);
                 break;
+            case MessageType.Rotation:
+                processRotation((RotationMessage) gm, connection);
+                break;
             default:
                 throw new NotImplementedException();
                 break;
@@ -62,5 +65,11 @@ public class ServerMessageHandler
         int id = server.connections[connection];
         int target = sm.targetId;
         server.players[target].Health -= 20;
+    }
+
+    private void processRotation(RotationMessage rm, Connection connection)
+    {
+        server.players[rm.playerId].rotation = Quaternion.Euler(rm.rot);
+        server.players[rm.playerId].player.transform.eulerAngles = rm.rot;
     }
 }

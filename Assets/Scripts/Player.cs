@@ -1,17 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Sockets;
-using System.Runtime.CompilerServices;
-using System.Text;
+﻿using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Experimental.UIElements;
 
 public class Player : MonoBehaviour
 {
 
 	private float yaw = 0.0f;
 	private float pitch = 0.0f;
+
+	private GameObject camera;
 	
 	public int id;
 	public int MaxHealth;
@@ -21,7 +17,7 @@ public class Player : MonoBehaviour
 	public float time;
 	private float acumTime;
 
-	public List<PlayerInputMessage> toSend = new List<PlayerInputMessage>();
+	public List<GameMessage> toSend = new List<GameMessage>();
 	private Queue<PlayerInputMessage> actions = new Queue<PlayerInputMessage>();
 	private HashSet<PlayerAction> frameActions = new HashSet<PlayerAction>();
 	
@@ -33,7 +29,7 @@ public class Player : MonoBehaviour
 	// Se llama antes del primer update (siempre despues de awake)
 	// Use this for initialization
 	void Start () {
-		
+		camera = GameObject.Find("Camera");
 	}
 	
 	// Update is called once per frame
@@ -79,10 +75,12 @@ public class Player : MonoBehaviour
 					applyAction(action);
 				}
 			}
+			toSend.Add(new RotationMessage(id, this.gameObject.transform.eulerAngles));
 			frameActions.Clear();
 		}
-		
-		//this.gameObject.transform.rotation = this.gameObject.transform.GetChild(0).rotation;
+
+		camera.transform.position = this.gameObject.transform.position;
+		camera.transform.rotation = this.gameObject.transform.rotation;
 	}
 
 	public void prediction(int lastId, float deltaTime)
@@ -147,10 +145,8 @@ public class Player : MonoBehaviour
 			if (hit.collider.tag == "serverplayer")
 			{
 				ServerPlayer player = hit.collider.gameObject.GetComponent<ServerPlayer>();
-				hit.collider.gameObject.SetActive(false);
-				Debug.Log("LE PEGUE");
 				ShotMessage shot = new ShotMessage(player.id, time, true);
-				//TODO SEND MESSAGE
+				toSend.Add(shot);
 			}
 		}
 	}
