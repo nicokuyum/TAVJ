@@ -35,4 +35,7 @@ public class GlobalSettings{
 	public const float MaxTime = 3600.0f;
 
 	public const float speed = 15.0f;
+
+	public const int AIDuration = 10;
+	public const int AIPlayers = 15;
 }

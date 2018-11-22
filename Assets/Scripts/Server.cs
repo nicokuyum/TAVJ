@@ -19,6 +19,7 @@ public class Server : MonoBehaviour
 	private float time = 0f;
 	private float acumTime = 0f;
 	private float inputTime = 0f;
+	public float lag = 0f;
 	
 	private static int listenPort = GlobalSettings.ServerPort;
 	public int idCount = 1;
@@ -55,7 +56,10 @@ public class Server : MonoBehaviour
 	public Dictionary<int, SortedList<int, ReliableMessage>> bufferedMessages =
 		new Dictionary<int, SortedList<int, ReliableMessage>>();
 
+	//ID to Username
 	public Dictionary<int, String> usernames = new Dictionary<int, string>();
+	
+	
 	
 	// Use  this for initialization
 	void Start()
@@ -69,8 +73,12 @@ public class Server : MonoBehaviour
 
 	private void SimulateConnections()
 	{
-		EstablishConnection(new Connection(new IPAddress(52351234123), 5656), 1, "p1");
-		EstablishConnection(new Connection(new IPAddress(52123434123), 5656), 1, "p2");
+
+		while (idCount <= GlobalSettings.AIPlayers)
+		{
+			AI.add(idCount);
+			EstablishAIConnection(new Connection(new IPAddress(52351234123+idCount), 5656), 1, "AIPlayer" + idCount);
+		}
 	}
 
 	// Update is called once per frame
@@ -96,6 +104,10 @@ public class Server : MonoBehaviour
 		for (int i = 1; i < idCount; i++)
 		{
 			UpdatePlayer(i, 1.0f / GlobalSettings.Fps);
+			if (i <= GlobalSettings.AIPlayers)
+			{
+				AI.act(players[i]);
+			}
 		}
 		
 		if (acumTime >= (1.0f/ snapRate) && players.Count != 0)
@@ -107,7 +119,10 @@ public class Server : MonoBehaviour
 			byte[] serializedWorld = SerializeWorld();
 			foreach (Connection connection in connections.Keys)
 			{
-				SendUdp(SourcePort, connection.srcIp.ToString(), GlobalSettings.GamePort, serializedWorld);
+				if (connections[connection] > GlobalSettings.AIPlayers)
+				{
+					SendUdp(SourcePort, connection.srcIp.ToString(), GlobalSettings.GamePort, serializedWorld);
+				}
 			}
 		}
 	}
@@ -155,6 +170,25 @@ public class Server : MonoBehaviour
 	}
 
 
+	public void EstablishAIConnection(Connection connection, int messageId, String playerName)
+	{
+		int id = idCount++;
+		connections.Add(connection, id);
+		lastAcks.Add(id, messageId);
+
+		
+		GameObject go = Instantiate(prefab);
+		ServerPlayer newPlayer = go.GetComponent<ServerPlayer>();
+		PlayerSnapshot ps = new PlayerSnapshot(id, newPlayer, time);
+		
+		rq.Add(id,new ServerReliableQueue(connection, GlobalSettings.ReliableTimeout));
+		actions[id] = new List<PlayerInputMessage>();
+		bufferedMessages.Add(id, new SortedList<int, ReliableMessage>());
+		players.Add(id, ps);
+		usernames.Add(id, playerName);
+		playersnapshots.Add(ps);
+	}
+	
 	public void EstablishConnection(Connection connection, int messageId, String playerName)
 	{
 		int id = idCount++;
@@ -275,42 +309,13 @@ public class Server : MonoBehaviour
 		}
 	}
 
-	/*private void ProcessMessage(GameMessage gm, Connection connection)
-	{
-		switch (gm.type())
-		{
-			case MessageType.ClientConnect:
-				processConnect((ClientConnectMessage)gm, connection);
-				break;
-			case MessageType.PlayerInput:
-				processInput((PlayerInputMessage)gm, connection);
-				break;
-			case MessageType.Ack:
-				Debug.Log("Received ACK " +  ((AckMessage)gm).ackid);
-				processAck((AckMessage) gm, connection);
-				break;
-			case MessageType.Shot:
-				Debug.Log("Received Shot on " + ((ShotMessage)gm).targetId);
-				break;
-			default:
-				throw new NotImplementedException();
-				break;
-		}
-	}*/
 
 	private byte[] SerializeWorld()
 	{
 		List<GameMessage> l = new List<GameMessage>();
 		l.Add(new WorldSnapshotMessage(playersnapshots, time));
-		//Debug.Log("Sending time : " + time);
-		Packet p = new Packet(l);
-		byte[] b = p.serialize();
-		Packet PO = new Packet(b, new Connection(new IPAddress(213512635), 52));
 		return (new Packet(l)).serialize();
 	}
-	
-	
-	
 	
 
 	public void SendReliableMessages()
@@ -344,7 +349,6 @@ public class Server : MonoBehaviour
 		}
 	}
 	
-	//TODO COMPLETE
 	public void processBufferedMessages(Connection connection)
 	{
 		int userId = connections[connection];
