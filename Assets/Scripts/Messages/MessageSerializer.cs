@@ -93,7 +93,6 @@ public class MessageSerializer {
 		List<PlayerSnapshot> playerSnapshots = new List<PlayerSnapshot>();
 		for (int i = 0; i < numberOfPlayers; i++)
 		{
-			//Should use snapshotdeserialize
 			playerSnapshots.Add(SnapshotDeserialize(decompressor));
 		}
 		return new WorldSnapshotMessage(playerSnapshots,time);

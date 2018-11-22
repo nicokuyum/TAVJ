@@ -18,9 +18,6 @@ public class ClientMessageHandler
 			case MessageType.Ack:
 				handleAck((AckMessage) gm);
 				break;
-			case MessageType.PlayerSnapshot:
-				handlePlayerSnapshotInterpolating((PlayerSnapshotMessage) gm);
-				break;
 			case MessageType.ConnectConfirmation:
 				handleConnectionConfirmation((ClientConnectedMessage) gm);
 				break;
@@ -37,15 +34,8 @@ public class ClientMessageHandler
 		client.GetReliableQueue().ReceivedACK(message.ackid);
 	}
 
-	private void handlePlayerSnapshotInterpolating(PlayerSnapshotMessage psm)
-	{
-		throw new NotImplementedException();
-		//SnapshotHandler.GetInstance().ReceiveSnapshot(psm.Snapshot);
-	}
-
 	private void handleConnectionConfirmation(ClientConnectedMessage ccm)
 	{
-		Debug.Log("Received name: " + ccm.name + " with id " + ccm.id);
 		if (client.getPlayer().name.Equals(ccm.name))
 		{
 			client.setTime(ccm._TimeStamp);
@@ -65,11 +55,6 @@ public class ClientMessageHandler
 			// Else ignore
 		}
 		client.getOutgoingMessages().Add(new AckMessage(ccm._MessageId));
-	}
-
-	private void Instantiate(GameObject getPlayerPrefab)
-	{
-		throw new NotImplementedException();
 	}
 
 	private void handleWorldSnapshot(WorldSnapshotMessage wm)

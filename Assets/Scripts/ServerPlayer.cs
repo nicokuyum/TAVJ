@@ -23,9 +23,5 @@ public class ServerPlayer : MonoBehaviour {
 		{
 			this.gameObject.SetActive(false);
 		}
-		else
-		{
-			this.gameObject.SetActive(true);
-		}
 	}
 }

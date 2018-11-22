@@ -33,8 +33,6 @@ public class Client : MonoBehaviour
 	private ClientMessageHandler handler;
 	private ReliableQueue rq { get; set; }
 
-	private ReliableQueue inputQueue;
-
 	private Player player { get; set; }
 
 	// Use this for initialization
@@ -47,7 +45,6 @@ public class Client : MonoBehaviour
 		rq.AddQueueWithTimeout(new ClientConnectMessage(playerName, time, true),0);
 		otherPlayers = new Dictionary<int, ServerPlayer>();
 		handler = new ClientMessageHandler(this);
-		inputQueue = new ReliableQueue(0.0f);
 		SnapshotHandler.GetInstance().otherPlayers = this.otherPlayers;
 		SnapshotHandler.GetInstance().self = this.player;
 		SnapshotHandler.GetInstance().prediction = this.prediction;
@@ -95,7 +92,6 @@ public class Client : MonoBehaviour
 				}
 			}
 
-			//TODO Fijarse de no empezar a pedir esto hasta que se haya bufferizado un poco
 			Dictionary<int,PlayerSnapshot> currentSnapshot = SnapshotHandler.GetInstance().getSnapshot(time);
 			if (currentSnapshot != null)
 			{
