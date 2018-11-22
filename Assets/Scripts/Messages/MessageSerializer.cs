@@ -113,7 +113,7 @@ public class MessageSerializer {
 
 	public static GameMessage RotationDeserialize(Decompressor decompressor)
 	{
-		Vector3 rot = CompressingUtils.GetPosition(decompressor);
+		Vector3 rot = CompressingUtils.GetRotation(decompressor);
 		return new RotationMessage(rot);
 	}
 }

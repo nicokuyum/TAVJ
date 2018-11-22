@@ -24,13 +24,13 @@ public class RotationMessage : GameMessage
     {
         Compressor c = new Compressor();
         c.WriteNumber((int)MessageType.Rotation,Enum.GetNames(typeof(MessageType)).Length);
-        CompressingUtils.WritePosition(c, rot);
+        CompressingUtils.WriteRotation(c, rot);
         return c.GetBuffer();
     }
 
     public override void SerializeWithCompressor(Compressor c)
     {
         c.WriteNumber((int)MessageType.Rotation,Enum.GetNames(typeof(MessageType)).Length);
-        CompressingUtils.WritePosition(c, rot);
+        CompressingUtils.WriteRotation(c, rot);
     }
 }
