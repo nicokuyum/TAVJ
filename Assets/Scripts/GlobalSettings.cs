@@ -7,11 +7,11 @@ public class GlobalSettings{
 
 	public const int Fps = 120;
 	public const int Ifps = 60;
-	public const float MaxPosition = 18.0f;
+	public const float MaxPosition = 22.0f;
 	public const float PositionPrecision = 0.01f;
-	public const float MinPosition = -18.0f;
+	public const float MinPosition = -22.0f;
 	public const float MaxAngle = 360.0f;
-	public const float MinAngle = 360.0f;
+	public const float MinAngle = 0.0f;
 	public const float AnglePrecision = 0.1f;
 	
 	public const int MaxHealth = 100;
@@ -32,14 +32,14 @@ public class GlobalSettings{
 
 	public const int MaxPlayers = 32;
 
-	public const int ServerSendRate = 30;
+	public const int ServerSendRate = 10;
 
 	public const float TimePrecision = 0.001f;
 	public const float MinTime = 0.0f;
 	public const float MaxTime = 3600.0f;
 
-	public const float speed = 15.0f;
+	public const float speed = 10.0f;
 
 	public const int AIDuration = 10;
-	public const int AIPlayers = 0;
+	public const int AIPlayers = 1;
 }

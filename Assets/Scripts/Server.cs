@@ -7,6 +7,7 @@ using System.Threading;
 using Networking;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
+using Random = System.Random;
 
 
 public class Server : MonoBehaviour
@@ -180,7 +181,8 @@ public class Server : MonoBehaviour
 		GameObject go = Instantiate(prefab);
 		ServerPlayer newPlayer = go.GetComponent<ServerPlayer>();
 		PlayerSnapshot ps = new PlayerSnapshot(id, newPlayer, time);
-		
+		ps.position = new Vector3(0,2,0);
+		ps.player.transform.position = new Vector3(0,2,0);
 		rq.Add(id,new ServerReliableQueue(connection, GlobalSettings.ReliableTimeout));
 		actions[id] = new List<PlayerInputMessage>();
 		bufferedMessages.Add(id, new SortedList<int, ReliableMessage>());
@@ -218,6 +220,7 @@ public class Server : MonoBehaviour
 		{
 			if (keyValuePair.Value != id)
 			{
+				Debug.Log("Notifying about player : " + keyValuePair.Value);
 				rq[id].AddQueueWithTimeout(new ClientConnectedMessage(keyValuePair.Value, 
 					usernames[keyValuePair.Value],time, true),time);
 			}
@@ -228,8 +231,11 @@ public class Server : MonoBehaviour
 	{
 		foreach (int playerId in players.Keys)
 		{
-			ClientConnectedMessage cm = new ClientConnectedMessage(id, playerName, time, true);
-			rq[playerId].AddQueueWithTimeout(cm, time);
+			if (playerId > GlobalSettings.AIPlayers)
+			{
+				ClientConnectedMessage cm = new ClientConnectedMessage(id, playerName, time, true);
+				rq[playerId].AddQueueWithTimeout(cm, time);
+			}
 		}
 	}
 	

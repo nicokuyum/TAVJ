@@ -78,7 +78,8 @@ public class ReliableQueue
             {
                 needResend.Add(rm);
                 SentFrames[rm] = time;
-                Debug.Log(rm.type().ToString());
+                //Debug.Log(rm.type().ToString());
+                Debug.Log("Need ACK: " + rm._MessageId);
             }
         }
 

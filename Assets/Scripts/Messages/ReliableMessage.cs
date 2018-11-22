@@ -1,6 +1,6 @@
 ﻿public abstract class ReliableMessage : GameMessage {
 
-	private static int idCounter = 555;
+	private static int idCounter = 560;
     
 	public int _MessageId;
 	public float _TimeStamp;
