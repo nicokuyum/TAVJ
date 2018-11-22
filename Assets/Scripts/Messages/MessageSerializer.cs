@@ -9,6 +9,7 @@ public class MessageSerializer {
 
 	public static GameMessage deserialize(Decompressor decompressor)
 	{
+		Debug.Log("DESERIALIZING");
 		MessageType type = (MessageType) decompressor.GetNumber(Enum.GetNames(typeof(MessageType)).Length);
 		switch (type)
 		{
@@ -24,8 +25,18 @@ public class MessageSerializer {
 					return ConnectedClientDeserialize(decompressor);
 				case MessageType.WorldSnapshot:
 					return WorldSnapshotDeserialize(decompressor);
+				case MessageType.Shot:
+					return ShotDeserialize(decompressor);
 				default: return null;
 		}
+	}
+
+	private static GameMessage ShotDeserialize(Decompressor decompressor)
+	{
+		int id = decompressor.GetNumber(GlobalSettings.MaxACK);
+		float time = CompressingUtils.GetTime(decompressor);
+		int targetid = decompressor.GetNumber(GlobalSettings.MaxPlayers);
+		return new ShotMessage(id, targetid, time, false);
 	}
 
 	public static GameMessage AckDeserialize(Decompressor decompressor)
@@ -77,7 +88,9 @@ public class MessageSerializer {
 	public static GameMessage WorldSnapshotDeserialize(Decompressor decompressor)
 	{
 		float time = CompressingUtils.GetTime(decompressor);
+		
 		int numberOfPlayers = decompressor.GetNumber(GlobalSettings.MaxPlayers);
+		Debug.Log("PlayerCOUNT:  " + numberOfPlayers);
 		List<PlayerSnapshot> playerSnapshots = new List<PlayerSnapshot>();
 		for (int i = 0; i < numberOfPlayers; i++)
 		{
@@ -96,6 +109,7 @@ public class MessageSerializer {
 		playerSnapshot.Invulnerable = decompressor.GetBoolean();
 		playerSnapshot.position = CompressingUtils.GetPosition(decompressor);
 		playerSnapshot.lastId = decompressor.GetNumber(GlobalSettings.MaxACK);
+		Debug.Log("POSITION DE "+ id + " " + playerSnapshot.position.x + " : " + playerSnapshot.position.z);
 		Debug.Log("Received last ID " + playerSnapshot.lastId);
 		return playerSnapshot;
 	}

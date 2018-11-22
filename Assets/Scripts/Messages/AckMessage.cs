@@ -29,5 +29,10 @@ public class AckMessage : GameMessage
         compressor.WriteNumber(ackid, GlobalSettings.MaxACK);
         return compressor.GetBuffer();
     }
-    
+
+    public override void SerializeWithCompressor(Compressor c)
+    {
+        c.WriteNumber((int)MessageType.Ack, Enum.GetNames(typeof(MessageType)).Length);
+        c.WriteNumber(ackid, GlobalSettings.MaxACK);
+    }
 }

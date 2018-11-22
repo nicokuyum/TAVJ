@@ -45,8 +45,18 @@ public class PlayerSnapshot
         compressor.PutBit(this.Invulnerable);
         CompressingUtils.WritePosition(compressor, position);
         compressor.WriteNumber(lastId, GlobalSettings.MaxACK);
-        //Debug.Log(lastId);
+        Debug.Log("REAL POS : " + position.x  + "  " + position.z);
         return compressor.GetBuffer();
+    }
+
+    public void serializeWithCompressor(Compressor c)
+    {
+        c.WriteNumber(id, GlobalSettings.MaxPlayers);
+        CompressingUtils.WriteTime(c,_TimeStamp);
+        c.WriteNumber(this.Health, GlobalSettings.MaxHealth);
+        c.PutBit(this.Invulnerable);
+        CompressingUtils.WritePosition(c, position);
+        c.WriteNumber(lastId, GlobalSettings.MaxACK);
     }
 
 }

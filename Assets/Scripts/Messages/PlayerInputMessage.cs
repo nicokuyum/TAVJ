@@ -35,4 +35,12 @@ public class PlayerInputMessage : ReliableMessage
         compressor.WriteNumber((int)Action, Enum.GetNames(typeof(PlayerAction)).Length);
         return compressor.GetBuffer();
     }
+
+    public override void SerializeWithCompressor(Compressor c)
+    {
+        c.WriteNumber((int)MessageType.PlayerInput,Enum.GetNames(typeof(MessageType)).Length);
+        c.WriteNumber(_MessageId, int.MaxValue);
+        CompressingUtils.WriteTime(c, _TimeStamp);
+        c.WriteNumber((int)Action, Enum.GetNames(typeof(PlayerAction)).Length);
+    }
 }

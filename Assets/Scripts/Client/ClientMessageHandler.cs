@@ -56,6 +56,7 @@ public class ClientMessageHandler
 			if (!client.getOtherPlayers().ContainsKey(ccm.id))
 			{
 				GameObject go = GameObject.Instantiate(client.otherPlayersPrefab);
+				go.tag = "serverplayer";
 				ServerPlayer newPlayer = go.GetComponent<ServerPlayer>();
 				newPlayer.id = ccm.id;
 				newPlayer.name = ccm.name;

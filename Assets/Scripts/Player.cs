@@ -146,10 +146,11 @@ public class Player : MonoBehaviour
 		if (Physics.Raycast(ray, out hit,500)) {
 			if (hit.collider.tag == "serverplayer")
 			{
-				hit.collider.gameObject.GetComponent<Rigidbody>().velocity = Vector3.zero;
-				hit.collider.gameObject.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
+				ServerPlayer player = hit.collider.gameObject.GetComponent<ServerPlayer>();
 				hit.collider.gameObject.SetActive(false);
 				Debug.Log("LE PEGUE");
+				ShotMessage shot = new ShotMessage(player.id, time, true);
+				//TODO SEND MESSAGE
 			}
 		}
 	}

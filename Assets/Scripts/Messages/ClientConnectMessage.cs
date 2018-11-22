@@ -32,5 +32,12 @@ public class ClientConnectMessage : ReliableMessage
         compressor.WriteString(name);
         return compressor.GetBuffer();
     }
-    
+
+    public override void SerializeWithCompressor(Compressor c)
+    {
+        c.WriteNumber((int)MessageType.ClientConnect,Enum.GetNames(typeof(MessageType)).Length);
+        c.WriteNumber(_MessageId, int.MaxValue);
+        CompressingUtils.WriteTime(c, _TimeStamp);
+        c.WriteString(name);
+    }
 }

@@ -30,4 +30,9 @@ public class PlayerSnapshotMessage : GameMessage
         compressor.WriteData(Snapshot.serialize());
         return compressor.GetBuffer();
     }
+
+    public override void SerializeWithCompressor(Compressor c)
+    {
+        throw new NotImplementedException();
+    }
 }

@@ -4,5 +4,6 @@
     PlayerSnapshot=2,
     PlayerInput=3,
     ConnectConfirmation=4,
-    WorldSnapshot=5
+    WorldSnapshot=5,
+    Shot=6
 }

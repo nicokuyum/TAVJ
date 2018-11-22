@@ -47,4 +47,13 @@ public class ClientConnectedMessage : ReliableMessage
         compressor.WriteString(name);
         return compressor.GetBuffer();
     }
+
+    public override void SerializeWithCompressor(Compressor c)
+    {
+        c.WriteNumber((int)MessageType.ConnectConfirmation, Enum.GetNames(typeof(MessageType)).Length);
+        c.WriteNumber(_MessageId, GlobalSettings.MaxACK);
+        c.WriteNumber(id, GlobalSettings.MaxPlayers);
+        CompressingUtils.WriteTime(c, _TimeStamp);
+        c.WriteString(name);
+    }
 }

@@ -27,6 +27,8 @@ public class Server : MonoBehaviour
 	private Boolean hasData;
 	private byte[] data;
 
+	private ServerMessageHandler MessageHandler;
+
 
 	public GameObject prefab;
 	
@@ -53,13 +55,22 @@ public class Server : MonoBehaviour
 	public Dictionary<int, SortedList<int, ReliableMessage>> bufferedMessages =
 		new Dictionary<int, SortedList<int, ReliableMessage>>();
 
+	public Dictionary<int, String> usernames = new Dictionary<int, string>();
 	
-	// Use this for initialization
+	// Use  this for initialization
 	void Start()
 	{
 		PacketQueue.GetInstance().packetLoss = PacketLoss;
+		MessageHandler = new ServerMessageHandler(this);
 		Thread thread = new Thread(new ThreadStart(ThreadMethod));
 		thread.Start();
+		SimulateConnections();
+	}
+
+	private void SimulateConnections()
+	{
+		EstablishConnection(new Connection(new IPAddress(52351234123), 5656), 1, "p1");
+		EstablishConnection(new Connection(new IPAddress(52123434123), 5656), 1, "p2");
 	}
 
 	// Update is called once per frame
@@ -78,18 +89,21 @@ public class Server : MonoBehaviour
 
 		SendReliableMessages();
 
+		SerializeWorld();
 
 		//Test for updating player on a higher frequency (maybe no inputtime)
-		if (inputTime >= (1.0f / GlobalSettings.Fps) && players.Count != 0)
+		/*if (inputTime >= (1.0f / GlobalSettings.Fps) && players.Count != 0)
 		{
 			while (inputTime > 1.0f / GlobalSettings.Fps)
 			{
 				inputTime -= 1.0f / GlobalSettings.Fps;
 			}
-			for (int i = 1; i < idCount; i++)
-			{
-				UpdatePlayer(i, 1.0f / GlobalSettings.Fps);
-			}
+
+		}*/
+		/*
+		for (int i = 1; i < idCount; i++)
+		{
+			UpdatePlayer(i, 1.0f / GlobalSettings.Fps);
 		}
 		
 		if (acumTime >= (1.0f/ snapRate) && players.Count != 0)
@@ -103,7 +117,7 @@ public class Server : MonoBehaviour
 			{
 				SendUdp(SourcePort, connection.srcIp.ToString(), GlobalSettings.GamePort, serializedWorld);
 			}
-		}
+		}*/
 	}
 
 
@@ -149,7 +163,7 @@ public class Server : MonoBehaviour
 	}
 
 
-	private void EstablishConnection(Connection connection, int messageId, String playerName)
+	public void EstablishConnection(Connection connection, int messageId, String playerName)
 	{
 		int id = idCount++;
 		connections.Add(connection, id);
@@ -164,6 +178,7 @@ public class Server : MonoBehaviour
 		actions[id] = new List<PlayerInputMessage>();
 		bufferedMessages.Add(id, new SortedList<int, ReliableMessage>());
 		players.Add(id, ps);
+		usernames.Add(id, playerName);
 		playersnapshots.Add(ps);
 		Debug.Log("Broadcast de " + playerName);
 		NotifiyPreviousConnections(connection, id);
@@ -177,7 +192,8 @@ public class Server : MonoBehaviour
 		{
 			if (keyValuePair.Value != id)
 			{
-				rq[id].AddQueueWithTimeout(new ClientConnectedMessage(keyValuePair.Value, "ASD",time, true),time);
+				rq[id].AddQueueWithTimeout(new ClientConnectedMessage(keyValuePair.Value, 
+					usernames[keyValuePair.Value],time, true),time);
 			}
 		}
 	}
@@ -186,11 +202,8 @@ public class Server : MonoBehaviour
 	{
 		foreach (int playerId in players.Keys)
 		{
-			Debug.Log("SENDING CONNECT CONFIRMATION");
 			ClientConnectedMessage cm = new ClientConnectedMessage(id, playerName, time, true);
-			Debug.Log("SE CREO CON ID : " + cm.id);
 			rq[playerId].AddQueueWithTimeout(cm, time);
-			Debug.Log("ADDED AND LENGTH " + rq[playerId].getCount());
 		}
 	}
 	
@@ -250,7 +263,7 @@ public class Server : MonoBehaviour
 				}
 				else if (lastAcks[connections[packet.connection]] == id - 1 )
 				{
-					ProcessMessage(gm, packet.connection);
+					MessageHandler.ProcessMessage(gm, packet.connection);
 					lastAcks[connections[packet.connection]] = ((ReliableMessage) gm)._MessageId;
 					processBufferedMessages(packet.connection);
 				}
@@ -261,7 +274,7 @@ public class Server : MonoBehaviour
 			}
 			else
 			{
-				ProcessMessage(gm,packet.connection);
+				MessageHandler.ProcessMessage(gm,packet.connection);
 			}
 		}
 		if (reliableFlag)
@@ -270,7 +283,7 @@ public class Server : MonoBehaviour
 		}
 	}
 
-	private void ProcessMessage(GameMessage gm, Connection connection)
+	/*private void ProcessMessage(GameMessage gm, Connection connection)
 	{
 		switch (gm.type())
 		{
@@ -284,34 +297,29 @@ public class Server : MonoBehaviour
 				Debug.Log("Received ACK " +  ((AckMessage)gm).ackid);
 				processAck((AckMessage) gm, connection);
 				break;
+			case MessageType.Shot:
+				Debug.Log("Received Shot on " + ((ShotMessage)gm).targetId);
+				break;
 			default:
 				throw new NotImplementedException();
 				break;
 		}
-	}
+	}*/
 
 	private byte[] SerializeWorld()
 	{
 		List<GameMessage> l = new List<GameMessage>();
 		l.Add(new WorldSnapshotMessage(playersnapshots, time));
 		//Debug.Log("Sending time : " + time);
+		Packet p = new Packet(l);
+		byte[] b = p.serialize();
+		Packet PO = new Packet(b, new Connection(new IPAddress(213512635), 52));
 		return (new Packet(l)).serialize();
 	}
-
 	
 	
-	private void processInput(PlayerInputMessage inputMessage, Connection connection)
-	{	
-		int id = connections[connection];
-		actions[id].Add(inputMessage);
-
-	}
-
-	public void processAck(AckMessage gm, Connection connection)
-	{
-		int id = connections[connection];
-		rq[id].ReceivedACK(gm.ackid);
-	}
+	
+	
 
 	public void SendReliableMessages()
 	{
@@ -325,11 +333,10 @@ public class Server : MonoBehaviour
 					Debug.Log(mssg.type());
 					if (mssg.type() == MessageType.ConnectConfirmation)
 					{
-						Debug.Log("WAITING FOR " + ((ClientConnectedMessage)mssg)._MessageId);
+						//Debug.Log("WAITING FOR " + ((ClientConnectedMessage)mssg)._MessageId);
 					}
 				}
 				Packet packet = new Packet(messagesToSend);
-				Debug.Log(entry.Value.connection.srcIp.ToString());
 				SendUdp(SourcePort, entry.Value.connection.srcIp.ToString(), GlobalSettings.GamePort, packet.serialize());
 			}
 		}
@@ -355,7 +362,7 @@ public class Server : MonoBehaviour
 			ReliableMessage rm = bufferedMessages[userId][lastAcks[userId]+1];
 			lastAcks[userId] = rm._MessageId;
 			bufferedMessages[userId].Remove(rm._MessageId);
-			ProcessMessage((GameMessage)rm, connection);
+			MessageHandler.ProcessMessage((GameMessage)rm, connection);
 		}
 	}
 	

@@ -40,8 +40,14 @@ public class WorldSnapshotMessage : GameMessage
         compressor.WriteNumber(_numberOfPlayers, GlobalSettings.MaxPlayers);
         foreach (PlayerSnapshot playerSnapshot in _playerSnapshots)
         {
-            compressor.WriteData(playerSnapshot.serialize());
+            playerSnapshot.serializeWithCompressor(compressor);
+            //compressor.WriteData(playerSnapshot.serialize());
         }
         return compressor.GetBuffer();
+    }
+
+    public override void SerializeWithCompressor(Compressor c)
+    {
+        throw new NotImplementedException();
     }
 }

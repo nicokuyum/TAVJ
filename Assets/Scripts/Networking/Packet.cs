@@ -37,7 +37,8 @@ public class Packet
         compressor.WriteNumber(MessageCount, MaxMessagesNum);
         foreach (var gm in Messages)
         {
-            compressor.WriteData(gm.Serialize());
+            gm.SerializeWithCompressor(compressor);
+            //compressor.WriteData(gm.Serialize());
         }
 
         return compressor.GetBuffer();
