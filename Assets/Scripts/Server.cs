@@ -91,16 +91,8 @@ public class Server : MonoBehaviour
 
 		SerializeWorld();
 
-		//Test for updating player on a higher frequency (maybe no inputtime)
-		/*if (inputTime >= (1.0f / GlobalSettings.Fps) && players.Count != 0)
-		{
-			while (inputTime > 1.0f / GlobalSettings.Fps)
-			{
-				inputTime -= 1.0f / GlobalSettings.Fps;
-			}
 
-		}*/
-		/*
+		
 		for (int i = 1; i < idCount; i++)
 		{
 			UpdatePlayer(i, 1.0f / GlobalSettings.Fps);
@@ -117,7 +109,7 @@ public class Server : MonoBehaviour
 			{
 				SendUdp(SourcePort, connection.srcIp.ToString(), GlobalSettings.GamePort, serializedWorld);
 			}
-		}*/
+		}
 	}
 
 
@@ -180,7 +172,7 @@ public class Server : MonoBehaviour
 		players.Add(id, ps);
 		usernames.Add(id, playerName);
 		playersnapshots.Add(ps);
-		Debug.Log("Broadcast de " + playerName);
+		//Debug.Log("Broadcast de " + playerName);
 		NotifiyPreviousConnections(connection, id);
 		BroadCastConnectionMessage(id, playerName);
 	}
@@ -224,7 +216,7 @@ public class Server : MonoBehaviour
 			playerActions.RemoveAt(0);
 			Mover.GetInstance().ApplyAction(ps, mssg.Action, time);
 			ps.lastId = mssg._MessageId;
-			Debug.Log(mssg._MessageId + " : " + mssg.Action);
+			//Debug.Log(mssg._MessageId + " : " + mssg.Action);
 		}
 
 	}
@@ -330,7 +322,7 @@ public class Server : MonoBehaviour
 			{
 				foreach (GameMessage mssg in messagesToSend)
 				{
-					Debug.Log(mssg.type());
+					//Debug.Log(mssg.type());
 					if (mssg.type() == MessageType.ConnectConfirmation)
 					{
 						//Debug.Log("WAITING FOR " + ((ClientConnectedMessage)mssg)._MessageId);

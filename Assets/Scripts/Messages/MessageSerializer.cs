@@ -9,7 +9,6 @@ public class MessageSerializer {
 
 	public static GameMessage deserialize(Decompressor decompressor)
 	{
-		Debug.Log("DESERIALIZING");
 		MessageType type = (MessageType) decompressor.GetNumber(Enum.GetNames(typeof(MessageType)).Length);
 		switch (type)
 		{
@@ -63,7 +62,6 @@ public class MessageSerializer {
 		playerSnapshot.position = CompressingUtils.GetPosition(decompressor);
 		
 		playerSnapshot.lastId = decompressor.GetNumber(GlobalSettings.MaxACK);
-		Debug.Log("Received last ID " + playerSnapshot.lastId);
 		return new PlayerSnapshotMessage(playerSnapshot);
 	}
 
@@ -90,7 +88,6 @@ public class MessageSerializer {
 		float time = CompressingUtils.GetTime(decompressor);
 		
 		int numberOfPlayers = decompressor.GetNumber(GlobalSettings.MaxPlayers);
-		Debug.Log("PlayerCOUNT:  " + numberOfPlayers);
 		List<PlayerSnapshot> playerSnapshots = new List<PlayerSnapshot>();
 		for (int i = 0; i < numberOfPlayers; i++)
 		{
@@ -109,8 +106,6 @@ public class MessageSerializer {
 		playerSnapshot.Invulnerable = decompressor.GetBoolean();
 		playerSnapshot.position = CompressingUtils.GetPosition(decompressor);
 		playerSnapshot.lastId = decompressor.GetNumber(GlobalSettings.MaxACK);
-		Debug.Log("POSITION DE "+ id + " " + playerSnapshot.position.x + " : " + playerSnapshot.position.z);
-		Debug.Log("Received last ID " + playerSnapshot.lastId);
 		return playerSnapshot;
 	}
 

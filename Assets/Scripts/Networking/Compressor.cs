@@ -89,9 +89,7 @@ public class Compressor : Encoder
     {
         if (value.Length > _maxStringLength)
         {
-            Debug.Log("Attempting to write string with size " + value.Length + " when max length allowed is " +
-                      _maxStringLength);
-            value = value.Substring(0, _maxStringLength);
+           value = value.Substring(0, _maxStringLength);
         }
 
         WriteNumber(value.Length, _maxStringLength);

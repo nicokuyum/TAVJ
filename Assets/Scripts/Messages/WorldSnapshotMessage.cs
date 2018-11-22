@@ -48,6 +48,13 @@ public class WorldSnapshotMessage : GameMessage
 
     public override void SerializeWithCompressor(Compressor c)
     {
-        throw new NotImplementedException();
+        c.WriteNumber((int)MessageType.WorldSnapshot,Enum.GetNames(typeof(MessageType)).Length);
+        CompressingUtils.WriteTime(c, time);
+        c.WriteNumber(_numberOfPlayers, GlobalSettings.MaxPlayers);
+        foreach (PlayerSnapshot playerSnapshot in _playerSnapshots)
+        {
+            playerSnapshot.serializeWithCompressor(c);
+            //compressor.WriteData(playerSnapshot.serialize());
+        }
     }
 }

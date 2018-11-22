@@ -25,7 +25,6 @@ public class ServerMessageHandler
                 processInput((PlayerInputMessage)gm, connection);
                 break;
             case MessageType.Ack:
-                Debug.Log("Received ACK " +  ((AckMessage)gm).ackid);
                 processAck((AckMessage) gm, connection);
                 break;
             case MessageType.Shot:
