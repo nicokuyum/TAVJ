@@ -54,6 +54,7 @@ public class SnapshotHandler
 
     public Dictionary<int,PlayerSnapshot> getSnapshot(float time)
     {
+        time -= 3.0f * 1.0f / (GlobalSettings.ServerSendRate);
         try
         {
             if (end < time)
@@ -100,6 +101,8 @@ public class SnapshotHandler
         interpolatedPlayerSnapshot.Health = past.Health;
         interpolatedPlayerSnapshot.Invulnerable = past.Invulnerable;
         interpolatedPlayerSnapshot.position = Vector3.Lerp(past.position, future.position, timeRatio);
+        Vector3 interpolatedRotation = Vector3.Lerp(past.rotation.eulerAngles, future.rotation.eulerAngles, timeRatio);
+        interpolatedPlayerSnapshot.rotation = Quaternion.Euler(interpolatedRotation);
         return interpolatedPlayerSnapshot;
     }
 
@@ -109,7 +112,6 @@ public class SnapshotHandler
         {
             if (otherPlayers.ContainsKey(pair.Key))
             {
-                Debug.Log("Update other");
                 ServerPlayer p = otherPlayers[pair.Key];
                 p.Health = pair.Value.Health;
                 p.Invulnerable = pair.Value.Invulnerable;
@@ -118,7 +120,6 @@ public class SnapshotHandler
             }
             else
             {
-                Debug.Log("Handling self");
                 handleSelfSnapshot(pair.Value);
             }
         }
@@ -130,11 +131,9 @@ public class SnapshotHandler
         p.Health = playerSnapshot.Health;
         p.Invulnerable = playerSnapshot.Invulnerable;
         p.gameObject.transform.position = playerSnapshot.position;
-        //p.gameObject.transform.rotation = playerSnapshot.rotation;
         if (prediction)
         {
-            Debug.Log("Applying prediction");
-            p.prediction(playerSnapshot.lastId, playerSnapshot._TimeStamp);
+            p.prediction(playerSnapshot.lastId);
         }
     }
 
@@ -148,7 +147,6 @@ public class SnapshotHandler
             {
                 if (self.id == keyValuePair.Key)
                 {
-                    Debug.Log("*** Last id from self is " + future[keyValuePair.Key].lastId);
                     interpolatedWorld.Add(keyValuePair.Key, future[keyValuePair.Key]);
                 }
                 else

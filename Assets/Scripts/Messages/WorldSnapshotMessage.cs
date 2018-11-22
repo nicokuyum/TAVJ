@@ -41,7 +41,6 @@ public class WorldSnapshotMessage : GameMessage
         foreach (PlayerSnapshot playerSnapshot in _playerSnapshots)
         {
             playerSnapshot.serializeWithCompressor(compressor);
-            //compressor.WriteData(playerSnapshot.serialize());
         }
         return compressor.GetBuffer();
     }
@@ -54,7 +53,6 @@ public class WorldSnapshotMessage : GameMessage
         foreach (PlayerSnapshot playerSnapshot in _playerSnapshots)
         {
             playerSnapshot.serializeWithCompressor(c);
-            //compressor.WriteData(playerSnapshot.serialize());
         }
     }
 }
