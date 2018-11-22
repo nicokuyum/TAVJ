@@ -61,6 +61,7 @@ public class Player : MonoBehaviour
 
 		if (Input.GetMouseButtonDown(0))
 		{
+			Shoot();
 			toSend.Add(new PlayerInputMessage(PlayerAction.Shoot, time, true));
 		}
 
@@ -135,5 +136,21 @@ public class Player : MonoBehaviour
 	{
 		return "Health: " + Health + "\nInvulnerable: " + Invulnerable + " 		Position: " +
 		       this.gameObject.transform.position;
+	}
+
+	public void Shoot()
+	{
+		
+		Ray ray = new Ray(transform.position, transform.forward);
+		RaycastHit hit;
+		if (Physics.Raycast(ray, out hit,500)) {
+			if (hit.collider.tag == "serverplayer")
+			{
+				hit.collider.gameObject.GetComponent<Rigidbody>().velocity = Vector3.zero;
+				hit.collider.gameObject.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
+				hit.collider.gameObject.SetActive(false);
+				Debug.Log("LE PEGUE");
+			}
+		}
 	}
 }

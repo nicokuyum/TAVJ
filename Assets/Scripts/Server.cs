@@ -79,7 +79,7 @@ public class Server : MonoBehaviour
 		SendReliableMessages();
 
 
-
+		//Test for updating player on a higher frequency (maybe no inputtime)
 		if (inputTime >= (1.0f / GlobalSettings.Fps) && players.Count != 0)
 		{
 			while (inputTime > 1.0f / GlobalSettings.Fps)
