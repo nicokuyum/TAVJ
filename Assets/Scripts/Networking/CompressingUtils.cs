@@ -35,4 +35,25 @@ public class CompressingUtils  {
         return new Vector3(x,y,z);
     }
     
+    public static void WriteRotation(Compressor compressor, Vector3 position)
+    {
+        compressor.WriteFloat(position.x, GlobalSettings.MaxAngle,
+            GlobalSettings.MinAngle, GlobalSettings.AnglePrecision);
+        compressor.WriteFloat(position.y, GlobalSettings.MaxAngle,
+            GlobalSettings.MinAngle, GlobalSettings.AnglePrecision);
+        compressor.WriteFloat(position.z, GlobalSettings.MaxAngle,
+            GlobalSettings.MinAngle, GlobalSettings.AnglePrecision);
+    }
+    
+    
+    public static Vector3 GetRotation(Decompressor decompressor)
+    {
+        float x = decompressor.GetFloat(GlobalSettings.MaxAngle, 
+            GlobalSettings.MinAngle, GlobalSettings.AnglePrecision);
+        float y = decompressor.GetFloat(GlobalSettings.MaxAngle, 
+            GlobalSettings.MinAngle, GlobalSettings.AnglePrecision);
+        float z = decompressor.GetFloat(GlobalSettings.MaxAngle, 
+            GlobalSettings.MinAngle, GlobalSettings.AnglePrecision);
+        return new Vector3(x,y,z);
+    }
 }

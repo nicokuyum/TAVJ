@@ -10,6 +10,10 @@ public class GlobalSettings{
 	public const float MaxPosition = 18.0f;
 	public const float PositionPrecision = 0.01f;
 	public const float MinPosition = -18.0f;
+	public const float MaxAngle = 360.0f;
+	public const float MinAngle = 360.0f;
+	public const float AnglePrecision = 0.1f;
+	
 	public const int MaxHealth = 100;
 	public const int MaxMatchDuration = 3600;
 	public const int MaxACK = int.MaxValue;
@@ -37,5 +41,5 @@ public class GlobalSettings{
 	public const float speed = 15.0f;
 
 	public const int AIDuration = 10;
-	public const int AIPlayers = 15;
+	public const int AIPlayers = 0;
 }
