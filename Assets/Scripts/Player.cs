@@ -1,37 +1,30 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net.Sockets;
-using System.Runtime.CompilerServices;
-using System.Text;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
-public class Player : MonoBehaviour, Serializable<Player>
+public class Player : MonoBehaviour
 {
-	public String username;
+	private GameObject camera;
+	
 	public int id;
-	public int MaxHealth;
 	public int Health;
 	public bool Invulnerable;
-	public String DestIp;
-	public int SourcePort;
-	public int DestPort;
+	
+	public float time;
+	private float acumTime;
 
-	private float time = 0.0f;
-	private float acumTime = 0.0f;
-	private float fps = 60.0f;
-	private long frameNumber = 0l;
-
-	private Queue<PlayerSnapshot> snaps = new Queue<PlayerSnapshot>();
+	public List<GameMessage> toSend = new List<GameMessage>();
+	private Queue<PlayerInputMessage> actions = new Queue<PlayerInputMessage>();
+	private HashSet<PlayerAction> frameActions = new HashSet<PlayerAction>();
 	
 	// Se llama luego de haber sido constuido el GameObject y todos sus componentes
 	void Awake () {
-//		Debug.Log ("Health = " + Health);
+
 	}
 
 	// Se llama antes del primer update (siempre despues de awake)
 	// Use this for initialization
 	void Start () {
-		
+		camera = GameObject.Find("Camera");
 	}
 	
 	// Update is called once per frame
@@ -42,71 +35,104 @@ public class Player : MonoBehaviour, Serializable<Player>
 		
 		if (Input.GetKey(KeyCode.W))
 		{
-			this.gameObject.transform.Translate(Vector3.forward * Time.deltaTime);
-		} else if (Input.GetKey(KeyCode.A))
+			frameActions.Add(PlayerAction.MoveForward);
+		} 
+		if (Input.GetKey(KeyCode.A))
 		{
-			this.gameObject.transform.Translate(Vector3.left * Time.deltaTime);
-		} else if (Input.GetKey(KeyCode.S))
+			frameActions.Add(PlayerAction.MoveLeft);
+		} 
+		if (Input.GetKey(KeyCode.S))
 		{
-			this.gameObject.transform.Translate(Vector3.back * Time.deltaTime);
-		} else if (Input.GetKey(KeyCode.D))
+			frameActions.Add(PlayerAction.MoveBack);
+		} 
+		if (Input.GetKey(KeyCode.D))
 		{
-			this.gameObject.transform.Translate(Vector3.right * Time.deltaTime);
+			frameActions.Add(PlayerAction.MoveRight);
+		} 
+
+		if (Input.GetMouseButtonDown(0))
+		{
+			Shoot();
+			toSend.Add(new PlayerInputMessage(PlayerAction.Shoot, time, true));
 		}
 
-		
-		if (acumTime >= (1.0f/60.0f))
+		if (acumTime >= (1.0f / GlobalSettings.Fps))
 		{
-			frameNumber++;
-			Debug.Log(1.0f/fps);
-			acumTime -= (1.0f/60.0f);
-			SendUdp(SourcePort, DestIp, DestPort, serialize());
+			acumTime -= (1.0f / GlobalSettings.Fps);
+			foreach (var action in frameActions)
+			{
+				PlayerInputMessage msg = new PlayerInputMessage(action, time, true);
+				toSend.Add(msg);
+				if (SnapshotHandler.GetInstance().prediction)
+				{
+					actions.Enqueue(msg);
+					applyAction(action);
+				}
+			}
+			toSend.Add(new RotationMessage(this.gameObject.transform.eulerAngles));
+			frameActions.Clear();
 		}
-		
-	}
-	
-	static void SendUdp(int srcPort, string dstIp, int dstPort, byte[] data)
-	{
-		using (UdpClient c = new UdpClient(srcPort))
-			c.Send(data, data.Length, dstIp, dstPort);
+
+		camera.transform.position = this.gameObject.transform.position;
+		camera.transform.rotation = this.gameObject.transform.rotation;
 	}
 
-	public byte[] serialize()
+	public void prediction(int lastId)
 	{
-		Compressor compressor = new Compressor();
-		
-		Vector3 pos = this.transform.position;
-		Quaternion rotation = this.transform.rotation;
-		compressor.WriteString(username);
-		compressor.WriteNumber(frameNumber, compressor.GetBitsRequired(3600 * (long)fps ));
-		compressor.WriteNumber(this.Health, compressor.GetBitsRequired(this.MaxHealth));
-		compressor.PutBit(this.Invulnerable);
-		compressor.WriteFloat(pos.x, 100, 0, 0.1f);
-		compressor.WriteFloat(pos.y, 100, 0, 0.1f);
-		compressor.WriteFloat(pos.z, 100, 0, 0.1f);
-//		compressor.WriteFloat(rotation.w);
-		return compressor.GetBuffer();
+		while (actions.Count > 0 && actions.Peek()._MessageId < lastId)
+		{
+			// Discard all messages that were applied by server
+			actions.Dequeue();
+		}
+
+		foreach (var actionMsg in actions)
+		{
+			applyAction(actionMsg.Action);
+		}
 	}
 
-	public void deserialize(byte[] data)
+	public void applyAction(PlayerAction action)
 	{
-		Vector3 pos = new Vector3();
-		Decompressor decompressor = new Decompressor(data);
-		this.username = decompressor.GetString();
-		this.frameNumber = decompressor.GetNumber(3600 * (long) fps);
-		this.Health = decompressor.GetNumber(this.MaxHealth);
-		this.Invulnerable = decompressor.GetBoolean();
-		pos.x = decompressor.GetFloat(100, 0, 0.1f);
-		pos.y = decompressor.GetFloat(100, 0, 0.1f);
-		pos.z = decompressor.GetFloat(100, 0, 0.1f);
-		this.gameObject.transform.position = pos;
+		switch (action)
+		{
+			case PlayerAction.MoveForward:
+				gameObject.transform.Translate(Vector3.forward * GlobalSettings.speed * (1.0f / GlobalSettings.Fps));
+				break;
+			case PlayerAction.MoveRight:
+				gameObject.transform.Translate(Vector3.right * GlobalSettings.speed * (1.0f / GlobalSettings.Fps));
+				break;
+			case PlayerAction.MoveBack:
+				gameObject.transform.Translate(Vector3.back * GlobalSettings.speed * (1.0f / GlobalSettings.Fps));
+				break;
+			case PlayerAction.MoveLeft:
+				gameObject.transform.Translate(Vector3.left * GlobalSettings.speed * (1.0f / GlobalSettings.Fps));
+				break;
+		}
 	}
 	
-	 
+	public Queue<PlayerInputMessage> getActions()
+	{
+		return actions;
+	} 
 
 	public override string ToString()
 	{
 		return "Health: " + Health + "\nInvulnerable: " + Invulnerable + " 		Position: " +
 		       this.gameObject.transform.position;
+	}
+
+	public void Shoot()
+	{
+		
+		Ray ray = new Ray(transform.position, transform.forward);
+		RaycastHit hit;
+		if (Physics.Raycast(ray, out hit,500)) {
+			if (hit.collider.tag == "serverplayer")
+			{
+				ServerPlayer player = hit.collider.gameObject.GetComponent<ServerPlayer>();
+				ShotMessage shot = new ShotMessage(player.id, time, true);
+				toSend.Add(shot);
+			}
+		}
 	}
 }
