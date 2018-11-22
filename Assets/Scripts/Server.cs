@@ -206,7 +206,6 @@ public class Server : MonoBehaviour
 		players.Add(id, ps);
 		usernames.Add(id, playerName);
 		playersnapshots.Add(ps);
-		//Debug.Log("Broadcast de " + playerName);
 		NotifiyPreviousConnections(connection, id);
 		BroadCastConnectionMessage(id, playerName);
 	}
@@ -250,7 +249,6 @@ public class Server : MonoBehaviour
 			playerActions.RemoveAt(0);
 			Mover.GetInstance().ApplyAction(ps, mssg.Action, time);
 			ps.lastId = mssg._MessageId;
-			//Debug.Log(mssg._MessageId + " : " + mssg.Action);
 		}
 
 	}
@@ -279,7 +277,6 @@ public class Server : MonoBehaviour
 				if (gm.type() == MessageType.PlayerInput)
 				{
 					PlayerInputMessage rm = (PlayerInputMessage) gm;
-					//Debug.Log("MSSG : " + rm._MessageId + " - "  +  rm.Action);
 				}
 				reliableFlag = true;
 				int id = ((ReliableMessage) gm)._MessageId;
@@ -325,14 +322,6 @@ public class Server : MonoBehaviour
 			List<GameMessage> messagesToSend = entry.Value.MessageToResend(time);
 			if (messagesToSend.Count > 0)
 			{
-				foreach (GameMessage mssg in messagesToSend)
-				{
-					//Debug.Log(mssg.type());
-					if (mssg.type() == MessageType.ConnectConfirmation)
-					{
-						//Debug.Log("WAITING FOR " + ((ClientConnectedMessage)mssg)._MessageId);
-					}
-				}
 				Packet packet = new Packet(messagesToSend);
 				SendUdp(SourcePort, entry.Value.connection.srcIp.ToString(), GlobalSettings.GamePort, packet.serialize());
 			}
