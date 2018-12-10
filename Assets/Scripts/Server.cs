@@ -19,7 +19,7 @@ public class Server : MonoBehaviour
 	private float time = 0f;
 	private float acumTime = 0f;
 	private float inputTime = 0f;
-	public float lag = 0f;
+	public long lag_ms = 0L;
 	
 	private static int listenPort = GlobalSettings.ServerPort;
 	public int idCount = 1;
@@ -64,6 +64,7 @@ public class Server : MonoBehaviour
 	// Use  this for initialization
 	void Start()
 	{
+		PacketQueue.GetInstance().lag_ms = lag_ms;
 		PacketQueue.GetInstance().packetLoss = PacketLoss;
 		MessageHandler = new ServerMessageHandler(this);
 		Thread thread = new Thread(new ThreadStart(ThreadMethod));
