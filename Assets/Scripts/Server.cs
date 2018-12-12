@@ -20,7 +20,7 @@ public class Server : MonoBehaviour
 	private float time = 0f;
 	private float acumTime = 0f;
 	private float inputTime = 0f;
-	public float lag = 0f;
+	public long lag_ms = 0L;
 	
 	private static int listenPort = GlobalSettings.ServerPort;
 	public int idCount = 1;
@@ -65,6 +65,7 @@ public class Server : MonoBehaviour
 	// Use  this for initialization
 	void Start()
 	{
+		PacketQueue.GetInstance().lag_ms = lag_ms;
 		PacketQueue.GetInstance().packetLoss = PacketLoss;
 		MessageHandler = new ServerMessageHandler(this);
 		Thread thread = new Thread(new ThreadStart(ThreadMethod));
@@ -208,7 +209,6 @@ public class Server : MonoBehaviour
 		players.Add(id, ps);
 		usernames.Add(id, playerName);
 		playersnapshots.Add(ps);
-		//Debug.Log("Broadcast de " + playerName);
 		NotifiyPreviousConnections(connection, id);
 		BroadCastConnectionMessage(id, playerName);
 	}
@@ -256,7 +256,6 @@ public class Server : MonoBehaviour
 			playerActions.RemoveAt(0);
 			Mover.GetInstance().ApplyAction(ps, mssg.Action, time);
 			ps.lastId = mssg._MessageId;
-			//Debug.Log(mssg._MessageId + " : " + mssg.Action);
 		}
 
 	}
@@ -285,7 +284,6 @@ public class Server : MonoBehaviour
 				if (gm.type() == MessageType.PlayerInput)
 				{
 					PlayerInputMessage rm = (PlayerInputMessage) gm;
-					//Debug.Log("MSSG : " + rm._MessageId + " - "  +  rm.Action);
 				}
 				reliableFlag = true;
 				int id = ((ReliableMessage) gm)._MessageId;
@@ -331,14 +329,6 @@ public class Server : MonoBehaviour
 			List<GameMessage> messagesToSend = entry.Value.MessageToResend(time);
 			if (messagesToSend.Count > 0)
 			{
-				foreach (GameMessage mssg in messagesToSend)
-				{
-					//Debug.Log(mssg.type());
-					if (mssg.type() == MessageType.ConnectConfirmation)
-					{
-						//Debug.Log("WAITING FOR " + ((ClientConnectedMessage)mssg)._MessageId);
-					}
-				}
 				Packet packet = new Packet(messagesToSend);
 				SendUdp(SourcePort, entry.Value.connection.srcIp.ToString(), GlobalSettings.GamePort, packet.serialize());
 			}

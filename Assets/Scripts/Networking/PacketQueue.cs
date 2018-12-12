@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using Object = UnityEngine.Object;
 using Random = System.Random;
 
 /**
@@ -8,15 +10,16 @@ using Random = System.Random;
 public class PacketQueue
 {
 	public float packetLoss = 0.0f;
+	public long lag_ms = 0L;
 	private static readonly Object LockObject = new Object();
 	private static PacketQueue _instance;
 	
 	// Only one packet queue per game instance
-	private Queue<Packet> queue;
+	private SortedList<long, Packet> queue;
 
 	private PacketQueue()
 	{
-		queue = new Queue<Packet>();
+		queue = new SortedList<long, Packet>();
 	}
 
 	public static PacketQueue GetInstance()
@@ -29,9 +32,10 @@ public class PacketQueue
 		Random r = new Random();
 		if (r.NextDouble() >= packetLoss)
 		{
+			long Timestamp = new DateTimeOffset(DateTime.UtcNow).ToFileTime();
 			lock (LockObject)
 			{
-				queue.Enqueue(p);
+				queue.Add(Timestamp, p);
 			}
 		}
 	}
@@ -41,10 +45,11 @@ public class PacketQueue
 		Packet p = null;
 		lock (LockObject)
 		{
-
-			if (queue.Count != 0)
+			long CurrentTimestamp = new DateTimeOffset(DateTime.UtcNow).ToFileTime();	
+			if (queue.Count != 0 && CurrentTimestamp > queue.First().Key + lag_ms)
 			{
-				p = queue.Dequeue();
+				p = queue.First().Value;
+				queue.RemoveAt(0);
 			}
 		}
 		return p;
