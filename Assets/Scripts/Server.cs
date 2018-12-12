@@ -129,8 +129,6 @@ public class Server : MonoBehaviour
 		}
 	}
 
-
-
 	private void processConnect(ClientConnectMessage ccm, Connection connection)
 	{
 		if (!connections.ContainsKey(connection))

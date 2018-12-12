@@ -16,6 +16,9 @@ public class Player : MonoBehaviour
 	private Queue<PlayerInputMessage> actions = new Queue<PlayerInputMessage>();
 	private HashSet<PlayerAction> frameActions = new HashSet<PlayerAction>();
 	
+	public GameObject dazzle;
+	public ParticleSystem muzzleFlash;
+	
 	// Se llama luego de haber sido constuido el GameObject y todos sus componentes
 	void Awake () {
 
@@ -56,7 +59,7 @@ public class Player : MonoBehaviour
 			toSend.Add(new PlayerInputMessage(PlayerAction.Shoot, time, true));
 		}
 
-		if (acumTime >= (1.0f / GlobalSettings.Fps))
+/*		if (acumTime >= (1.0f / GlobalSettings.Fps))
 		{
 			acumTime -= (1.0f / GlobalSettings.Fps);
 			foreach (var action in frameActions)
@@ -72,9 +75,25 @@ public class Player : MonoBehaviour
 			toSend.Add(new RotationMessage(this.gameObject.transform.eulerAngles));
 			frameActions.Clear();
 		}
-
+*/
 		camera.transform.position = this.gameObject.transform.position;
 		camera.transform.rotation = this.gameObject.transform.rotation;
+	}
+
+	void FixedUpdate()
+	{
+		foreach (var action in frameActions)
+		{
+			PlayerInputMessage msg = new PlayerInputMessage(action, time, true);
+			toSend.Add(msg);
+			if (SnapshotHandler.GetInstance().prediction)
+			{
+				actions.Enqueue(msg);
+				applyAction(action);
+			}
+		}
+		toSend.Add(new RotationMessage(this.gameObject.transform.eulerAngles));
+		frameActions.Clear();
 	}
 
 	public void prediction(int lastId)
@@ -127,12 +146,17 @@ public class Player : MonoBehaviour
 		Ray ray = new Ray(transform.position, transform.forward);
 		RaycastHit hit;
 		if (Physics.Raycast(ray, out hit,500)) {
+			
+			muzzleFlash.Play();
 			if (hit.collider.tag == "serverplayer")
 			{
 				ServerPlayer player = hit.collider.gameObject.GetComponent<ServerPlayer>();
 				ShotMessage shot = new ShotMessage(player.id, time, true);
 				toSend.Add(shot);
 			}
+
+			GameObject go = Instantiate(dazzle, hit.point, Quaternion.LookRotation(hit.normal));
+			Destroy(go, 3.0f);
 		}
 	}
 }
