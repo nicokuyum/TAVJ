@@ -11,6 +11,7 @@ public class ServerPlayer : MonoBehaviour {
 	public bool Invulnerable;
 	
 	public float time;
+	public GameObject hitFeed;
 	
 	// Use this for initialization
 	void Start ()
@@ -24,5 +25,11 @@ public class ServerPlayer : MonoBehaviour {
 		{
 			this.gameObject.SetActive(false);
 		}
+	}
+
+	public void ProvideHitFeedback()
+	{
+		GameObject go = Instantiate(hitFeed, gameObject.transform.position, Quaternion.LookRotation(Vector3.up));
+		Destroy(go, 5.0f);
 	}
 }
