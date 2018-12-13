@@ -5,4 +5,5 @@ public enum PlayerAction {
 	MoveRight=2,
 	MoveBack=3,
 	Shoot=4,
+	Grenade=5,
 }

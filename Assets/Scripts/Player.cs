@@ -4,6 +4,7 @@ using UnityEngine;
 public class Player : MonoBehaviour
 {
 	private GameObject camera;
+	public GameObject grenadePrefab;
 	
 	public int id;
 	public int Health;
@@ -59,7 +60,15 @@ public class Player : MonoBehaviour
 			toSend.Add(new PlayerInputMessage(PlayerAction.Shoot, time, true));
 		}
 
-/*		if (acumTime >= (1.0f / GlobalSettings.Fps))
+		if (Input.GetKeyDown(KeyCode.G))
+		{
+			GameObject go = Instantiate(grenadePrefab);
+			go.transform.position = this.transform.position;
+			go.GetComponent<Grenade>().Launch(this.transform.forward);
+			//toSend.Add(new PlayerInputMessage(PlayerAction.Grenade, time, true));
+		}
+
+		if (acumTime >= (1.0f / GlobalSettings.Fps))
 		{
 			acumTime -= (1.0f / GlobalSettings.Fps);
 			foreach (var action in frameActions)
@@ -75,12 +84,12 @@ public class Player : MonoBehaviour
 			toSend.Add(new RotationMessage(this.gameObject.transform.eulerAngles));
 			frameActions.Clear();
 		}
-*/
+
 		camera.transform.position = this.gameObject.transform.position;
 		camera.transform.rotation = this.gameObject.transform.rotation;
 	}
 
-	void FixedUpdate()
+	/*void FixedUpdate()
 	{
 		foreach (var action in frameActions)
 		{
@@ -94,7 +103,7 @@ public class Player : MonoBehaviour
 		}
 		toSend.Add(new RotationMessage(this.gameObject.transform.eulerAngles));
 		frameActions.Clear();
-	}
+	}*/
 
 	public void prediction(int lastId)
 	{

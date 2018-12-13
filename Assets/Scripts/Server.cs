@@ -15,7 +15,7 @@ public class Server : MonoBehaviour
 	static readonly object lockObject = new object();
 
 	public static float snapRate = GlobalSettings.ServerSendRate;
-	public static int SourcePort = 8081;
+	public static int SourcePort = 8089;
 	
 	private float time = 0f;
 	private float acumTime = 0f;
@@ -65,7 +65,7 @@ public class Server : MonoBehaviour
 	// Use  this for initialization
 	void Start()
 	{
-		PacketQueue.GetInstance().lag_ms = lag_ms;
+		//PacketQueue.GetInstance().lag_ms = lag_ms;
 		PacketQueue.GetInstance().packetLoss = PacketLoss;
 		MessageHandler = new ServerMessageHandler(this);
 		Thread thread = new Thread(new ThreadStart(ThreadMethod));

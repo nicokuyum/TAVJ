@@ -105,9 +105,13 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e9bb4640ba6ba483dbd09be00b7d8a95, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
+  m_Name: 
+  m_EditorClassIdentifier: 
+  grenadePrefab: {fileID: 1640917937937566, guid: 33ed88e9dce924ee89117eb7d217f08b,
+    type: 2}
   id: 0
-  MaxHealth: 100
   Health: 80
-Invulnerable: 1
+  Invulnerable: 0
+  time: 0
+  dazzle: {fileID: 0}
+  muzzleFlash: {fileID: 0}

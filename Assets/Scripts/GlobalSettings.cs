@@ -41,5 +41,5 @@ public class GlobalSettings{
 	public const float speed = 10.0f;
 
 	public const int AIDuration = 10;
-	public const int AIPlayers = 1;
+	public const int AIPlayers = 1; 
 }
