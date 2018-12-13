@@ -113,6 +113,10 @@ public class SnapshotHandler
             if (otherPlayers.ContainsKey(pair.Key))
             {
                 ServerPlayer p = otherPlayers[pair.Key];
+                if (p.Health > pair.Value.Health)
+                {
+                    p.ProvideHitFeedback();
+                }
                 p.Health = pair.Value.Health;
                 p.Invulnerable = pair.Value.Invulnerable;
                 p.gameObject.transform.position = pair.Value.position;

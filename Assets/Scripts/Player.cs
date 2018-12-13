@@ -16,12 +16,14 @@ public class Player : MonoBehaviour
 	private float acumTime;
 	private float cooldown;
 
+
 	public List<GameMessage> toSend = new List<GameMessage>();
 	private Queue<PlayerInputMessage> actions = new Queue<PlayerInputMessage>();
 	private HashSet<PlayerAction> frameActions = new HashSet<PlayerAction>();
 	
 	public GameObject dazzle;
 	public ParticleSystem muzzleFlash;
+	public GameObject hitFeedback;
 	
 	// Se llama luego de haber sido constuido el GameObject y todos sus componentes
 	void Awake () {
@@ -173,9 +175,12 @@ public class Player : MonoBehaviour
 				ShotMessage shot = new ShotMessage(player.id, time, true);
 				toSend.Add(shot);
 			}
+			else
+			{
+				GameObject go = Instantiate(dazzle, hit.point, Quaternion.LookRotation(hit.normal));
+				Destroy(go, 3.0f);
+			}
 
-			GameObject go = Instantiate(dazzle, hit.point, Quaternion.LookRotation(hit.normal));
-			Destroy(go, 3.0f);
 		}
 	}
 }
