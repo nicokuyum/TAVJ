@@ -33,6 +33,7 @@ public class Server : MonoBehaviour
 
 
 	public GameObject prefab;
+	public GameObject grenade;
 	
 	
 	//All Snapshots
@@ -65,7 +66,7 @@ public class Server : MonoBehaviour
 	// Use  this for initialization
 	void Start()
 	{
-		//PacketQueue.GetInstance().lag_ms = lag_ms;
+		PacketQueue.GetInstance().lag_ms = lag_ms;
 		PacketQueue.GetInstance().packetLoss = PacketLoss;
 		MessageHandler = new ServerMessageHandler(this);
 		Thread thread = new Thread(new ThreadStart(ThreadMethod));
@@ -353,6 +354,21 @@ public class Server : MonoBehaviour
 			lastAcks[userId] = rm._MessageId;
 			bufferedMessages[userId].Remove(rm._MessageId);
 			MessageHandler.ProcessMessage((GameMessage)rm, connection);
+		}
+	}
+
+	public void launchGrenade(GrenadeLaunchMessage glm, Connection connection)
+	{
+		GameObject go = Instantiate(grenade);
+		go.GetComponent<Grenade>().Launch(glm.position, glm.direction);
+		
+		foreach (KeyValuePair<Connection,int> keyValuePair in connections)
+		{
+			if (keyValuePair.Value != connections[connection])
+			{
+				rq[keyValuePair.Value].AddQueueWithTimeout(new GrenadeLaunchMessage(glm.position, glm.direction, time, true), time);
+			}
+
 		}
 	}
 	

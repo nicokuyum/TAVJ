@@ -24,6 +24,9 @@ public class ClientMessageHandler
 			case MessageType.WorldSnapshot:
 				handleWorldSnapshot((WorldSnapshotMessage) gm);
 				break;
+			case MessageType.Grenade:
+				handleGrenade((GrenadeLaunchMessage) gm);
+				break;
 			default:
 				throw new NotImplementedException();
 		}
@@ -69,5 +72,11 @@ public class ClientMessageHandler
 		}
 		
 		SnapshotHandler.GetInstance().ReceiveSnapshot(worldSnap, time);
+	}
+
+	private void handleGrenade(GrenadeLaunchMessage glm)
+	{
+		client.getOutgoingMessages().Add(new AckMessage(glm._MessageId));
+		client.launchGrenade(glm);
 	}
 }

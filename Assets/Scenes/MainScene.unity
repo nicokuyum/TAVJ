@@ -29259,7 +29259,9 @@ MonoBehaviour:
   prefab: {fileID: 1343396969763456, guid: 013db062fcc664b669930ddca2e48e93, type: 2}
   otherPlayersPrefab: {fileID: 1259171764223310, guid: 83d9d4c1f8c9f48238acfa4c2cc7a7da,
     type: 2}
-  DestIp: 10.17.65.8
+  grenadePrefab: {fileID: 1640917937937566, guid: 33ed88e9dce924ee89117eb7d217f08b,
+    type: 2}
+  DestIp: 127.0.0.1
   playerName: kuyum2
   prediction: 1
 --- !u!4 &1907637407
@@ -33038,7 +33040,7 @@ RectTransform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 2076914679}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 371, y: 248, z: 0}
+  m_LocalPosition: {x: 285, y: 248, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1298807036}

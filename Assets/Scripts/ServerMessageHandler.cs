@@ -34,6 +34,9 @@ public class ServerMessageHandler
             case MessageType.Rotation:
                 processRotation((RotationMessage) gm, connection);
                 break;
+            case MessageType.Grenade:
+                processGrenade((GrenadeLaunchMessage) gm, connection);
+                break;
             default:
                 throw new NotImplementedException();
                 break;
@@ -75,5 +78,10 @@ public class ServerMessageHandler
             server.players[server.connections[connection]].rotation = Quaternion.Euler(rm.rot);
             server.players[server.connections[connection]].player.transform.eulerAngles = rm.rot;
         }
+    }
+
+    private void processGrenade(GrenadeLaunchMessage glm, Connection connection)
+    {
+        server.launchGrenade(glm, connection);
     }
 }

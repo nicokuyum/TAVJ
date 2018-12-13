@@ -3,11 +3,18 @@ using UnityEngine;
 
 public class GrenadeLaunchMessage : ReliableMessage
 {
-    private Vector3 position;
-    private Vector3 direction;
+    public Vector3 position;
+    public Vector3 direction;
     
     public GrenadeLaunchMessage(Vector3 position, Vector3 direction, float timeStamp, bool increase) : base(timeStamp, increase)
     {
+        this.position = position;
+        this.direction = direction;
+    }
+    
+    public GrenadeLaunchMessage(int id, Vector3 position, Vector3 direction, float timeStamp, bool increase) : base(timeStamp, increase)
+    {
+        this._MessageId = id;
         this.position = position;
         this.direction = direction;
     }
@@ -23,12 +30,17 @@ public class GrenadeLaunchMessage : ReliableMessage
         compressor.WriteNumber((int)MessageType.ConnectConfirmation, Enum.GetNames(typeof(MessageType)).Length);
         compressor.WriteNumber(_MessageId, GlobalSettings.MaxACK);
         CompressingUtils.WriteTime(compressor, _TimeStamp);
-        //compressor.WriteString(name);
+        CompressingUtils.WritePosition(compressor, position);
+        CompressingUtils.WritePosition(compressor, direction);
         return compressor.GetBuffer();
     }
 
-    public override void SerializeWithCompressor(Compressor c)
+    public override void SerializeWithCompressor(Compressor compressor)
     {
-        throw new System.NotImplementedException();
+        compressor.WriteNumber((int)MessageType.ConnectConfirmation, Enum.GetNames(typeof(MessageType)).Length);
+        compressor.WriteNumber(_MessageId, GlobalSettings.MaxACK);
+        CompressingUtils.WriteTime(compressor, _TimeStamp);
+        CompressingUtils.WritePosition(compressor, position);
+        CompressingUtils.WritePosition(compressor, direction);
     }
 }

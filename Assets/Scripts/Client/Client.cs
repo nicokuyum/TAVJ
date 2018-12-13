@@ -16,6 +16,7 @@ public class Client : MonoBehaviour
 
 	public GameObject prefab;
 	public GameObject otherPlayersPrefab;
+	public GameObject grenadePrefab;
 	
 	public String DestIp;
 	public String playerName;
@@ -108,6 +109,12 @@ public class Client : MonoBehaviour
 				outgoingMessages.Clear();
 			}
 		}
+	}
+
+	public void launchGrenade(GrenadeLaunchMessage glm)
+	{
+		GameObject go = Instantiate(grenadePrefab);
+		go.GetComponent<Grenade>().Launch(glm.position, glm.direction);
 	}
 	
 	private void ThreadMethod()

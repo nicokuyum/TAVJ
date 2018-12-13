@@ -28,6 +28,8 @@ public class MessageSerializer {
 					return ShotDeserialize(decompressor);
 				case MessageType.Rotation:
 					return RotationDeserialize(decompressor);
+				case MessageType.Grenade:
+					return GrenadeDeserialize(decompressor);
 				default: return null;
 		}
 	}
@@ -114,5 +116,14 @@ public class MessageSerializer {
 	{
 		Vector3 rot = CompressingUtils.GetRotation(decompressor);
 		return new RotationMessage(rot);
+	}
+
+	public static GameMessage GrenadeDeserialize(Decompressor decompressor)
+	{
+		int id = decompressor.GetNumber(GlobalSettings.MaxACK);
+		float time = CompressingUtils.GetTime(decompressor);
+		Vector3 pos = CompressingUtils.GetPosition(decompressor);
+		Vector3 dir = CompressingUtils.GetPosition(decompressor);
+		return new GrenadeLaunchMessage(id, pos, dir, time, false);
 	}
 }

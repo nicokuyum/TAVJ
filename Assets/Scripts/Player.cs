@@ -71,7 +71,7 @@ public class Player : MonoBehaviour
 			{
 				GameObject go = Instantiate(grenadePrefab);
 				go.GetComponent<Grenade>().Launch(transform.position, transform.forward);
-				toSend.Add(new PlayerInputMessage(PlayerAction.Grenade, time, true));
+				toSend.Add(new GrenadeLaunchMessage(transform.position, transform.forward, time, true));
 				cooldown = grenadeCooldown;
 			}
 		}
@@ -102,7 +102,7 @@ public class Player : MonoBehaviour
 		foreach (var action in frameActions)
 		{
 			PlayerInputMessage msg = new PlayerInputMessage(action, time, true);
-			//toSend.Add(msg);
+			toSend.Add(msg);
 			if (SnapshotHandler.GetInstance().prediction)
 			{
 				actions.Enqueue(msg);
@@ -167,7 +167,7 @@ public class Player : MonoBehaviour
 		if (Physics.Raycast(ray, out hit,500)) {
 			
 			muzzleFlash.Play();
-			if (hit.collider.tag == "serverplayer")
+			if (hit.collider.CompareTag("serverplayer"))
 			{
 				ServerPlayer player = hit.collider.gameObject.GetComponent<ServerPlayer>();
 				ShotMessage shot = new ShotMessage(player.id, time, true);
