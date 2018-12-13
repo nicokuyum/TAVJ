@@ -30,8 +30,9 @@ public class Grenade : MonoBehaviour
 		GetComponent<Rigidbody>().AddForce(Physics.gravity * 0.1f);
 	}
 
-	public void Launch (Vector3 direction)
+	public void Launch (Vector3 position, Vector3 direction)
 	{
+		gameObject.transform.position = position + direction; 
 		GetComponent<Rigidbody>().AddForce((direction + new Vector3(0, 0.3f, 0)) * strength);
 	}
 

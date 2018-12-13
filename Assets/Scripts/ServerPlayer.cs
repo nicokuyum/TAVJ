@@ -13,8 +13,9 @@ public class ServerPlayer : MonoBehaviour {
 	public float time;
 	
 	// Use this for initialization
-	void Start () {
-		
+	void Start ()
+	{
+		Health = GlobalSettings.MaxHealth;
 	}
 	
 	// Update is called once per frame

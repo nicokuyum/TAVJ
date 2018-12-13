@@ -6,5 +6,6 @@
     ConnectConfirmation=4,
     WorldSnapshot=5,
     Shot=6,
-    Rotation=7
+    Rotation=7,
+    Grenade=8,
 }

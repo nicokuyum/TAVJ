@@ -5,6 +5,8 @@ TagManager:
   serializedVersion: 2
   tags:
   - serverplayer
+  - FxTemporaire
+  - grenade
   layers:
   - Default
   - TransparentFX

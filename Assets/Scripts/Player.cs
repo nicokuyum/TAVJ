@@ -5,13 +5,16 @@ public class Player : MonoBehaviour
 {
 	private GameObject camera;
 	public GameObject grenadePrefab;
+	public ParticleSystem flash;
 	
 	public int id;
 	public int Health;
 	public bool Invulnerable;
+	public float grenadeCooldown;
 	
 	public float time;
 	private float acumTime;
+	private float cooldown;
 
 	public List<GameMessage> toSend = new List<GameMessage>();
 	private Queue<PlayerInputMessage> actions = new Queue<PlayerInputMessage>();
@@ -29,6 +32,7 @@ public class Player : MonoBehaviour
 	// Use this for initialization
 	void Start () {
 		camera = GameObject.Find("Camera");
+		cooldown = 0;
 	}
 	
 	// Update is called once per frame
@@ -36,6 +40,7 @@ public class Player : MonoBehaviour
 	{
 		time += Time.deltaTime;
 		acumTime += Time.deltaTime;
+		cooldown -= Time.deltaTime;
 		
 		if (Input.GetKey(KeyCode.W))
 		{
@@ -62,13 +67,16 @@ public class Player : MonoBehaviour
 
 		if (Input.GetKeyDown(KeyCode.G))
 		{
-			GameObject go = Instantiate(grenadePrefab);
-			go.transform.position = this.transform.position;
-			go.GetComponent<Grenade>().Launch(this.transform.forward);
-			//toSend.Add(new PlayerInputMessage(PlayerAction.Grenade, time, true));
+			if (cooldown <= 0)
+			{
+				GameObject go = Instantiate(grenadePrefab);
+				go.GetComponent<Grenade>().Launch(transform.position, transform.forward);
+				toSend.Add(new PlayerInputMessage(PlayerAction.Grenade, time, true));
+				cooldown = grenadeCooldown;
+			}
 		}
 
-		if (acumTime >= (1.0f / GlobalSettings.Fps))
+		/*if (acumTime >= (1.0f / GlobalSettings.Fps))
 		{
 			acumTime -= (1.0f / GlobalSettings.Fps);
 			foreach (var action in frameActions)
@@ -83,18 +91,18 @@ public class Player : MonoBehaviour
 			}
 			toSend.Add(new RotationMessage(this.gameObject.transform.eulerAngles));
 			frameActions.Clear();
-		}
+		}*/
 
 		camera.transform.position = this.gameObject.transform.position;
 		camera.transform.rotation = this.gameObject.transform.rotation;
 	}
 
-	/*void FixedUpdate()
+	void FixedUpdate()
 	{
 		foreach (var action in frameActions)
 		{
 			PlayerInputMessage msg = new PlayerInputMessage(action, time, true);
-			toSend.Add(msg);
+			//toSend.Add(msg);
 			if (SnapshotHandler.GetInstance().prediction)
 			{
 				actions.Enqueue(msg);
@@ -103,7 +111,7 @@ public class Player : MonoBehaviour
 		}
 		toSend.Add(new RotationMessage(this.gameObject.transform.eulerAngles));
 		frameActions.Clear();
-	}*/
+	}
 
 	public void prediction(int lastId)
 	{
@@ -120,7 +128,7 @@ public class Player : MonoBehaviour
 	}
 
 	public void applyAction(PlayerAction action)
-	{
+	{ 
 		switch (action)
 		{
 			case PlayerAction.MoveForward:
@@ -151,6 +159,8 @@ public class Player : MonoBehaviour
 
 	public void Shoot()
 	{
+		// Create muzzle flash
+		Instantiate(flash, gameObject.transform);
 		
 		Ray ray = new Ray(transform.position, transform.forward);
 		RaycastHit hit;
