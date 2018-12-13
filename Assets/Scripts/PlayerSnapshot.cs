@@ -29,9 +29,9 @@ public class PlayerSnapshot
         Health = GlobalSettings.MaxHealth;
         Random random = new Random();
         Invulnerable = false;
-        int range = (int)(GlobalSettings.MaxPosition - GlobalSettings.MinPosition);
-        position = new Vector3(random.Next(range) + GlobalSettings.MinPosition
-            ,2, random.Next(range) + GlobalSettings.MinPosition);
+        int range = 6;
+        position = new Vector3(random.Next(range)
+            ,2, random.Next(range));
         this.player = player;
         player.transform.position = position;
     }

@@ -15,6 +15,10 @@ Prefab:
       propertyPath: m_Constraints
       value: 116
       objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: hitFeed
+      value: 
+      objectReference: {fileID: 100002, guid: 6ecf76dc4f268d340b2666896a954bcc, type: 2}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}
   m_RootGameObject: {fileID: 1259171764223310}
@@ -136,3 +140,4 @@ MonoBehaviour:
   Health: 0
   Invulnerable: 0
   time: 0
+  hitFeed: {fileID: 100002, guid: 6ecf76dc4f268d340b2666896a954bcc, type: 2}

@@ -11,7 +11,8 @@ public class PacketQueue
 {
 	public float packetLoss = 0.0f;
 	public long lag_ms = 0L;
-	/*private static readonly Object LockObject = new Object();
+	
+	private static readonly Object LockObject = new Object();
 	private static PacketQueue _instance;
 	
 	// Only one packet queue per game instance
@@ -53,8 +54,9 @@ public class PacketQueue
 			}
 		}
 		return p;
-	}*/
-	private static readonly Object LockObject = new Object();
+	}
+	
+	/*private static readonly Object LockObject = new Object();
 	private static PacketQueue _instance;
 	
 	// Only one packet queue per game instance
@@ -94,5 +96,5 @@ public class PacketQueue
 			}
 		}
 		return p;
-	}
+	}*/
 }
